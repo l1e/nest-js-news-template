@@ -11,5 +11,5 @@
 11) Unit testings;
 12) End-to-end (e2e) tests;
 13) Integration tests;
-14) Database seeds;
++14) Database seeds;
 15) Authomaticly generate articles based on telegram channels;

@@ -43,7 +43,7 @@ export class AdminMediaService {
 
 		const filePath = path.resolve(
 			__dirname,
-			"../../../temporary/",
+			"../../../../temporary/",
 			folder,
 			image.photo_name_new,
 		);

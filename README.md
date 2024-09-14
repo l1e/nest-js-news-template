@@ -71,3 +71,17 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](LICENSE).
+
+This is a nest.js you can see News template where you can create your articles, attach to the category, donwload picture of the article. That project include 3 parts. Admin part where you are abale to manage articles, users, categories. On the publisher side, you are able to create article, attach image and publish article. On the CMS site you are able to get list of articles, filter them, get list of categories, get the most popular articles. We also prepared database data for seeeding.
+
+
+## To start project you have to: 
+
+1) Instal packages
+npm i
+
+2) rename .env.example to .env and update db and S3 acceses. 
+
+3) seed data to the current database with commandb to seed: npm run sequelize-seed
+
+4) Lounch the project npm run start:dev
