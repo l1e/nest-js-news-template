@@ -7,8 +7,8 @@ import {
 } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags, ApiQuery } from "@nestjs/swagger";
 import { CmsPublisherService } from "./cms-publisher.service";
-import { User } from "src/admin/admin-user/model/user.model";
-import { Requestor } from "src/admin/admin-article/model/article.model";
+import { User } from "./../../admin/admin-user/model/user.model";
+import { Requestor } from "./../../admin/admin-article/model/article.model";
 
 @ApiTags("cms-publisher")
 @Controller("cms-publisher")

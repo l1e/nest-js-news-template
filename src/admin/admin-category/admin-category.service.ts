@@ -6,7 +6,7 @@ import {
 	InternalServerErrorException,
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
-import { Article } from "../admin-article/model/article.model";
+import { Article } from "./../admin-article/model/article.model";
 import { Category, PublishStatus } from "./model/category.model";
 import { CreateCategoryDto } from "./dto/category.create.dto";
 
@@ -31,6 +31,7 @@ export class AdminCategoryService {
 			const category = await this.categoryModel.findByPk(id, {
 				include: [Article],
 			});
+			// console.log("getCategoryById category:", category);
 			if (!category) {
 				throw new HttpException(
 					`Category with ID ${id} not found`,
@@ -48,6 +49,15 @@ export class AdminCategoryService {
 			}
 			return category;
 		} catch (error) {
+			if (
+				error.status === HttpStatus.FORBIDDEN ||
+				error.status === HttpStatus.NOT_FOUND
+			) {
+				// Rethrowing known exceptions to preserve their messages
+				throw error;
+			}
+
+			// console.log(" getCategoryById error:", error);
 			throw new InternalServerErrorException("Failed to fetch category");
 		}
 	}

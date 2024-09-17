@@ -17,9 +17,9 @@ import { AdminCategoryService } from "../admin-category/admin-category.service";
 import { AdminUserService } from "../admin-user/admin-user.service";
 import { Category } from "../admin-category/model/category.model";
 import { User } from "../admin-user/model/user.model";
-import { UpdateArticleDto } from "./dto/update.article.dto";
 import { isExsistFormat, Media } from "../admin-media/model/media.model";
 import { AdminMediaService } from "../admin-media/admin-media.service";
+import { UpdateArticleDto } from "./dto/update.article.dto";
 
 @Injectable()
 export class AdminArticleService {
@@ -34,6 +34,7 @@ export class AdminArticleService {
 	async createArticle(createArticleDto: CreateArticleDto): Promise<Article> {
 		let category = await this.adminCategoryService.getCategoryById(
 			createArticleDto.categoryId,
+			Requestor.ADMIN,
 		);
 
 		let userId = await this.adminUserService.findByEmail({
@@ -103,6 +104,9 @@ export class AdminArticleService {
 		creatorEmail?: string,
 	): Promise<Article> {
 		try {
+			// console.log("getArticleById id:", id);
+			// console.log("getArticleById requestor:", requestor);
+
 			const whereConditionsForArticle =
 				requestor === Requestor.CMS
 					? { publishStatus: PublishStatus.PUBLISHED, id: id }
@@ -160,7 +164,17 @@ export class AdminArticleService {
 				await article.save();
 			}
 
-			let additionalFilter = article.toJSON();
+			// console.log("getArticleById article _1:", article);
+			// console.log(
+			// 	"getArticleById article?.dataValues _2:",
+			// 	article?.dataValues,
+			// );
+
+			// console.log("getArticleById typeof article:", typeof article);
+
+			let additionalFilter = article?.dataValues
+				? article.toJSON()
+				: article;
 			delete additionalFilter?.creatorId;
 			if (requestor === Requestor.CMS) {
 				delete additionalFilter?.creator;
@@ -170,9 +184,11 @@ export class AdminArticleService {
 			return additionalFilter;
 		} catch (error) {
 			if (error instanceof NotFoundException) {
-				console.error("0: Error fetching article", error);
+				// console.log("0: Error fetching article", error);
 				throw error;
 			}
+
+			// console.log("1: Error fetching article", error);
 
 			throw new InternalServerErrorException("Failed to fetch articles");
 		}
@@ -184,10 +200,10 @@ export class AdminArticleService {
 				? ["isPhysicallyExist", "publishStatus", "articleId"]
 				: [];
 
-		const whereConditionsForMedia =
-			requestor === Requestor.CMS
-				? { isPhysicallyExist: isExsistFormat.YES }
-				: {};
+		// const whereConditionsForMedia =
+		// 	requestor === Requestor.CMS
+		// 		? { isPhysicallyExist: isExsistFormat.YES }
+		// 		: {};
 
 		const article = await this.articleModel.findOne({
 			where: { articleOfTheDay: ArticleOfTheDay.YES },
@@ -226,7 +242,7 @@ export class AdminArticleService {
 					attributes: {
 						exclude: attributesToExcludeFromMedia,
 					},
-					where: whereConditionsForMedia,
+					// where: whereConditionsForMedia,
 				},
 			],
 		});
@@ -488,7 +504,7 @@ export class AdminArticleService {
 		});
 
 		if (!article) {
-			throw new NotFoundException(`Article with ID ${id} not found`);
+			throw new NotFoundException(`Article with ID ${id} not found.`);
 		}
 
 		if (updateArticleDto.media && updateArticleDto.media.length > 0) {
@@ -529,11 +545,13 @@ export class AdminArticleService {
 		requestor: Requestor,
 		creatorEmail: string,
 	): Promise<void> {
-		const articleOwnershipValidation = await this.getArticleById(
-			id,
-			requestor,
-			creatorEmail,
-		);
+		if (!Requestor.ADMIN) {
+			const articleOwnershipValidation = await this.getArticleById(
+				id,
+				requestor,
+				creatorEmail,
+			);
+		}
 
 		const article = await this.articleModel.findByPk(id);
 

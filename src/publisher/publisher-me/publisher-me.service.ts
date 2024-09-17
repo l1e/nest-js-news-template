@@ -4,7 +4,7 @@ import {
 	InternalServerErrorException,
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
-import { User } from "src/admin/admin-user/model/user.model";
+import { User } from "./../../admin/admin-user/model/user.model";
 
 @Injectable()
 export class PublisherMeService {

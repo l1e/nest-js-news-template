@@ -19,7 +19,7 @@ import {
 	ApiResponse,
 	ApiTags,
 } from "@nestjs/swagger";
-import { AuthAdminhGuard } from "src/utils/auth.admin.guard";
+import { AuthAdminhGuard } from "./../../utils/auth.admin.guard";
 import { AuthGuard } from "@nestjs/passport";
 import { Requestor } from "../admin-article/model/article.model";
 

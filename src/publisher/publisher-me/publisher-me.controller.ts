@@ -7,9 +7,9 @@ import {
 	ApiTags,
 } from "@nestjs/swagger";
 import { AuthGuard } from "@nestjs/passport";
-import { AuthPublisherGuard } from "src/utils/auth.publisher.guard";
-import { EmailToken } from "src/utils/email.from.token.decorator";
-import { User } from "src/admin/admin-user/model/user.model";
+import { AuthPublisherGuard } from "./../../utils/auth.publisher.guard";
+import { EmailToken } from "./../../utils/email.from.token.decorator";
+import { User } from "./../../admin/admin-user/model/user.model";
 
 @ApiBearerAuth()
 @Controller("publisher-me")

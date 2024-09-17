@@ -55,7 +55,7 @@ export class UpdateArticleDto {
 	})
 	@IsEnum(ArticleOfTheDay)
 	@IsOptional()
-	articleOfTheDay: ArticleOfTheDay;
+	articleOfTheDay?: ArticleOfTheDay;
 
 	@ApiProperty({
 		example: ArticleSpecial.NO,
@@ -101,7 +101,7 @@ export class UpdateArticleDto {
 	})
 	@IsOptional()
 	// @IsInt()
-	media: number[] | null;
+	media?: number[] | null;
 
 	//   @ApiProperty({
 	//     example: 1,

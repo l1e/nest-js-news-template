@@ -17,7 +17,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
+	"teste2e": "jest --config ./test/jest-e2e.json ",
+    "teste2e:watch": "jest --config ./test/jest-e2e.json --watch",
     "sequelize-seed": "cross-env ts-node -r tsconfig-paths/register ./node_modules/sequelize-cli/lib/sequelize db:seed:all --config ./config/config.js"
   },
   "dependencies": {

@@ -4,7 +4,7 @@ import * as bcrypt from "bcrypt";
 
 import { CreateUserDto } from "./dto/create-user.dto";
 import { User, UserRole, UserStatus } from "./model/user.model";
-import { Payload } from "src/utils/types/payload.dto";
+import { Payload } from "./../../utils/types/payload.dto";
 import { Op } from "sequelize";
 import { AdminUserLoginDTO } from "./dto/create-user.login.dto";
 import { Article, Requestor } from "../admin-article/model/article.model";

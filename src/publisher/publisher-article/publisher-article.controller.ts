@@ -16,7 +16,7 @@ import {
 	Article,
 	Requestor,
 	ValidationStatus,
-} from "src/admin/admin-article/model/article.model";
+} from "./../../admin/admin-article/model/article.model";
 import {
 	ApiBearerAuth,
 	ApiExcludeEndpoint,
@@ -25,10 +25,10 @@ import {
 	ApiTags,
 } from "@nestjs/swagger";
 import { AuthGuard } from "@nestjs/passport";
-import { AuthPublisherGuard } from "src/utils/auth.publisher.guard";
-import { EmailToken } from "src/utils/email.from.token.decorator";
-import { UserRole } from "src/admin/admin-user/model/user.model";
-import { UpdateArticleDto } from "src/admin/admin-article/dto/update.article.dto";
+import { AuthPublisherGuard } from "./../../utils/auth.publisher.guard";
+import { EmailToken } from "./../../utils/email.from.token.decorator";
+import { UserRole } from "./../../admin/admin-user/model/user.model";
+import { UpdateArticleDto } from "./../../admin/admin-article/dto/update.article.dto";
 
 @ApiBearerAuth()
 @Controller("publisher-article")

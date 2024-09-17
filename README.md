@@ -85,3 +85,15 @@ npm i
 3) seed data to the current database with commandb to seed: npm run sequelize-seed
 
 4) Lounch the project npm run start:dev
+
+## To launch Unit tests you should  npm run test. I made partly Unit tests for: 
+	- admin/admin-article.controller.spec.ts, 
+	  admin/admin-article.service.spec.ts 
+	- admin/admin-category.controller.spec.ts
+	  admin/admin-category.service.spec.ts
+	 
+
+## To launch e2e tests you should  npm run teste2e. I made full unit tests of admin part, CMS part, publisher part you can find there: 
+	- test/admin.e2e-spec.ts
+	- test/cms.e2e-spec.ts
+	- test/publisher.e2e-spec.ts

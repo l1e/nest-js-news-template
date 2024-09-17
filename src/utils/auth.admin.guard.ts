@@ -1,6 +1,6 @@
 import { Injectable, CanActivate, ExecutionContext } from "@nestjs/common";
 import { Observable } from "rxjs";
-import { UserStatus } from "src/admin/admin-user/model/user.model";
+import { UserStatus } from "./../admin/admin-user/model/user.model";
 
 @Injectable()
 export class AuthAdminhGuard implements CanActivate {

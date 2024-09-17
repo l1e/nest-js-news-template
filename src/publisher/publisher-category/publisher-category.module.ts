@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { PublisherCategoryService } from "./publisher-category.service";
-import { AdminCategoryModule } from "src/admin/admin-category/admin-category.module";
+import { AdminCategoryModule } from "./../../admin/admin-category/admin-category.module";
 import { PublisherCategoryController } from "./publisher-category.controller";
 
 @Module({

@@ -7,7 +7,7 @@ import {
 	HasMany,
 } from "sequelize-typescript";
 import * as bcrypt from "bcrypt";
-import { Article } from "src/admin/admin-article/model/article.model";
+import { Article } from "./../../admin-article/model/article.model";
 
 export enum UserRole {
 	ADMIN = "admin",

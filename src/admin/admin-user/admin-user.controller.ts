@@ -21,7 +21,7 @@ import {
 import { User, UserRole, UserStatus } from "./model/user.model";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { AdminUserService } from "./admin-user.service";
-import { AuthAdminhGuard } from "src/utils/auth.admin.guard";
+import { AuthAdminhGuard } from "./../../utils/auth.admin.guard";
 import { AuthGuard } from "@nestjs/passport";
 import { Requestor } from "../admin-article/model/article.model";
 import { UpdateUserDto } from "./dto/update-user.dto";

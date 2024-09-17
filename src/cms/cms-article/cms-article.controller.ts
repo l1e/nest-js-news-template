@@ -18,7 +18,7 @@ import { CmsArticleService } from "./cms-article.service"; // Update this path t
 import {
 	Article,
 	Requestor,
-} from "src/admin/admin-article/model/article.model";
+} from "./../../admin/admin-article/model/article.model";
 
 @ApiTags("cms-article")
 @Controller("cms-article")

@@ -7,8 +7,8 @@ import {
 } from "@nestjs/common";
 import { PublisherAuthService } from "./publisher-auth.service";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { CreateUserDto } from "src/admin/admin-user/dto/create-user.dto";
-import { UserStatus } from "src/admin/admin-user/model/user.model";
+import { CreateUserDto } from "./../../admin/admin-user/dto/create-user.dto";
+import { UserStatus } from "./../../admin/admin-user/model/user.model";
 import { PortalAuthTalantLoginStandartDTO } from "./dto/portal-auth.login.dto";
 
 @ApiTags("publisher-auth")

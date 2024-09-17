@@ -7,9 +7,9 @@ import {
 	Model,
 	Table,
 } from "sequelize-typescript";
-import { Category } from "src/admin/admin-category/model/category.model";
-import { Media } from "src/admin/admin-media/model/media.model";
-import { User } from "src/admin/admin-user/model/user.model";
+import { Category } from "./../../admin-category/model/category.model";
+import { Media } from "./../../admin-media/model/media.model";
+import { User } from "./../../admin-user/model/user.model";
 
 export enum PublishStatus {
 	PUBLISHED = "published",

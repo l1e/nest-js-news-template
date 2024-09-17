@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { sign } from "jsonwebtoken";
 
 import { AdminUserService } from "../admin-user/admin-user.service";
-import { Payload } from "src/utils/types/payload.dto";
+import { Payload } from "./../../utils/types/payload.dto";
 
 @Injectable()
 export class AdminAuthService {

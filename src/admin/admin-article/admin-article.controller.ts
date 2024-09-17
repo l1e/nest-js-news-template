@@ -24,9 +24,10 @@ import {
 	ApiResponse,
 	ApiTags,
 } from "@nestjs/swagger";
-import { AuthAdminhGuard } from "src/utils/auth.admin.guard";
+import { AuthAdminhGuard } from "./../../utils/auth.admin.guard";
 import { AuthGuard } from "@nestjs/passport";
-import { EmailToken } from "src/utils/email.from.token.decorator";
+import { EmailToken } from "./../../utils/email.from.token.decorator";
+import { UpdateArticleDto } from "./dto/update.article.dto";
 
 @ApiBearerAuth()
 @ApiTags("articles")
@@ -137,7 +138,7 @@ export class AdminArticleController {
 	@UseGuards(AuthGuard("jwt"), AuthAdminhGuard)
 	async updateArticle(
 		@Param("id", ParseIntPipe) id: number,
-		@Body() updateArticleDto: CreateArticleDto,
+		@Body() updateArticleDto: UpdateArticleDto,
 		@EmailToken("decodedEmail") decodedEmail: string,
 	): Promise<Article> {
 		updateArticleDto.creatorEmail = decodedEmail;

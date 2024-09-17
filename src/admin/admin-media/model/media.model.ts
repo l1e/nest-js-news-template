@@ -8,7 +8,7 @@ import {
 	Default,
 	AllowNull,
 } from "sequelize-typescript";
-import { Article } from "src/admin/admin-article/model/article.model";
+import { Article } from "./../../admin-article/model/article.model";
 
 export enum SrcType {
 	IMAGE = "image",

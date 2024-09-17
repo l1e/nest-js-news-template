@@ -1,6 +1,6 @@
 import { Controller, Get, HttpStatus } from "@nestjs/common";
 import { CmsCategoryService } from "./cms-category.service";
-import { Category } from "src/admin/admin-category/model/category.model";
+import { Category } from "./../../admin/admin-category/model/category.model";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 
 @ApiTags("cms-category")

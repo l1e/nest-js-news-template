@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
-import { AdminAuthService } from "src/admin/admin-auth/admin-auth.service";
-import { AdminUserService } from "src/admin/admin-user/admin-user.service";
-import { CreateUserDto } from "src/admin/admin-user/dto/create-user.dto";
-import { Payload } from "src/utils/types/payload.dto";
+import { AdminAuthService } from "./../../admin/admin-auth/admin-auth.service";
+import { AdminUserService } from "./../../admin/admin-user/admin-user.service";
+import { CreateUserDto } from "./../../admin/admin-user/dto/create-user.dto";
+import { Payload } from "./../../utils/types/payload.dto";
 import { PortalAuthTalantLoginStandartDTO } from "./dto/portal-auth.login.dto";
 
 @Injectable()

@@ -1,7 +1,7 @@
-import { Requestor } from "src/admin/admin-article/model/article.model";
+import { Requestor } from "./../../admin/admin-article/model/article.model";
 import { Controller, Get, HttpStatus } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { Category } from "src/admin/admin-category/model/category.model";
+import { Category } from "./../../admin/admin-category/model/category.model";
 import { PublisherCategoryService } from "./publisher-category.service";
 
 @ApiTags("publisher-category")

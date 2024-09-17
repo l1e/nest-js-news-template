@@ -9,6 +9,7 @@ import {
 } from "../model/article.model";
 
 export class CreateArticleDto {
+	id?: number;
 	@ApiProperty({
 		example: "An amazing article title",
 		description: "The title of the article.",

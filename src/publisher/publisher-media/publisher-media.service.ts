@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { AdminMediaService } from "src/admin/admin-media/admin-media.service";
-import { CreateMediaDto } from "src/admin/admin-media/dto/admin-media.create.dto";
+import { AdminMediaService } from "./../../admin/admin-media/admin-media.service";
+import { CreateMediaDto } from "./../../admin/admin-media/dto/admin-media.create.dto";
 
 @Injectable()
 export class PublisherMediaService {

@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { Requestor } from "src/admin/admin-article/model/article.model";
-import { AdminUserService } from "src/admin/admin-user/admin-user.service";
+import { Requestor } from "./../../admin/admin-article/model/article.model";
+import { AdminUserService } from "./../../admin/admin-user/admin-user.service";
 
 @Injectable()
 export class CmsPublisherService {

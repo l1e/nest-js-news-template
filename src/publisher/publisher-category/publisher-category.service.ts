@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { Requestor } from "src/admin/admin-article/model/article.model";
-import { AdminCategoryService } from "src/admin/admin-category/admin-category.service";
+import { Requestor } from "./../../admin/admin-article/model/article.model";
+import { AdminCategoryService } from "./../../admin/admin-category/admin-category.service";
 
 @Injectable()
 export class PublisherCategoryService {

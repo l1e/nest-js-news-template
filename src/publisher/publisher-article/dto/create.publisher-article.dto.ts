@@ -4,7 +4,7 @@ import {
 	ArticleOfTheDay,
 	Requestor,
 	ValidationStatus,
-} from "src/admin/admin-article/model/article.model";
+} from "./../../../admin/admin-article/model/article.model";
 
 export enum ArticleStatus {
 	DRAFT = "draft",

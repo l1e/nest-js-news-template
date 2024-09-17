@@ -8,8 +8,8 @@ import {
 import {
 	Article,
 	Requestor,
-} from "src/admin/admin-article/model/article.model";
-import { UpdateArticleDto } from "src/admin/admin-article/dto/update.article.dto";
+} from "./../../admin/admin-article/model/article.model";
+import { UpdateArticleDto } from "./../../admin/admin-article/dto/update.article.dto";
 
 @Injectable()
 export class PublisherArticleService {

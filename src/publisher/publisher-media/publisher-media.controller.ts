@@ -22,8 +22,8 @@ import {
 	ApiConsumes,
 } from "@nestjs/swagger";
 import { diskStorage } from "multer";
-import { CreateMediaDto } from "src/admin/admin-media/dto/admin-media.create.dto";
-import { editFileName, ImgFileFilter } from "src/utils/file-upload.utils";
+import { CreateMediaDto } from "./../../admin/admin-media/dto/admin-media.create.dto";
+import { editFileName, ImgFileFilter } from "./../../utils/file-upload.utils";
 import { PublisherMediaService } from "./publisher-media.service";
 
 @ApiBearerAuth()

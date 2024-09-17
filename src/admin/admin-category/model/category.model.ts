@@ -1,5 +1,5 @@
 import { Column, DataType, Model, Table, HasMany } from "sequelize-typescript";
-import { Article } from "src/admin/admin-article/model/article.model";
+import { Article } from "./../../admin-article/model/article.model";
 
 export enum PublishStatus {
 	DRAFT = "draft",

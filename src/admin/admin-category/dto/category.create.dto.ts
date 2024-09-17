@@ -1,8 +1,9 @@
 import { IsString, IsOptional, IsEnum } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
-import { PublishStatus } from "src/admin/admin-article/model/article.model";
+import { PublishStatus } from "./../model/category.model";
 
 export class CreateCategoryDto {
+	id?: number;
 	@ApiProperty({
 		example: "Technology",
 		description: "The name of the category",
@@ -15,7 +16,6 @@ export class CreateCategoryDto {
 		description: "The description of the category",
 	})
 	@IsString()
-	@IsOptional()
 	description?: string;
 
 	@ApiProperty({

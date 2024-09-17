@@ -167,6 +167,28 @@ module.exports = {
 				createdAt: new Date(),
 				updatedAt: new Date(),
 			},
+			{
+				fileName: "15",
+				articleId: 15,
+				type: "image",
+				src: "https://admissions.rochester.edu/blog/wp-content/uploads/2015/08/test.png",
+				order: 1,
+				isPhysicallyExist: "yes",
+				publishStatus: "published",
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			},
+			{
+				fileName: "16",
+				articleId: 16,
+				type: "image",
+				src: "https://daily.jstor.org/wp-content/uploads/2015/05/standardizedtests.jpg",
+				order: 1,
+				isPhysicallyExist: "yes",
+				publishStatus: "published",
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			},
 		]);
 	},
 

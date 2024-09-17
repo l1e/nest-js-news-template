@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { SequelizeModule } from "@nestjs/sequelize";
-import { User } from "src/admin/admin-user/model/user.model";
+import { User } from "./../../admin/admin-user/model/user.model";
 import { PublisherMeService } from "./publisher-me.service";
 import { PublisherMeController } from "./publisher-me.controller";
 

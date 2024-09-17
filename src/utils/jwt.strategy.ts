@@ -2,9 +2,9 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { ExtractJwt, VerifiedCallback } from "passport-jwt";
 import { Strategy } from "passport-jwt";
-import { AdminAuthService } from "src/admin/admin-auth/admin-auth.service";
-import { UserStatus } from "src/admin/admin-user/model/user.model";
-import { PublisherAuthService } from "src/publisher/publisher-auth/publisher-auth.service";
+import { AdminAuthService } from "./../admin/admin-auth/admin-auth.service";
+import { UserStatus } from "./../admin/admin-user/model/user.model";
+import { PublisherAuthService } from "./../publisher/publisher-auth/publisher-auth.service";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {

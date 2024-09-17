@@ -7,13 +7,14 @@ import { AdminCategoryModule } from "../admin-category/admin-category.module";
 import { UserModule } from "../admin-user/admin-user.module";
 import { Media } from "../admin-media/model/media.model";
 import { AdminMediaModule } from "../admin-media/admin-media.module";
+import { Category } from "../admin-category/model/category.model";
 
 @Module({
 	imports: [
 		AdminCategoryModule,
 		AdminMediaModule,
 		UserModule,
-		SequelizeModule.forFeature([Article, Media]),
+		SequelizeModule.forFeature([Article, Media, Category]),
 	],
 	providers: [AdminArticleService],
 	controllers: [AdminArticleController],
