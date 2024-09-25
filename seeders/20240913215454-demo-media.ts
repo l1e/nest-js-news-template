@@ -169,7 +169,7 @@ module.exports = {
 			},
 			{
 				fileName: "15",
-				articleId: 15,
+				articleId: null,
 				type: "image",
 				src: "https://admissions.rochester.edu/blog/wp-content/uploads/2015/08/test.png",
 				order: 1,
@@ -180,7 +180,7 @@ module.exports = {
 			},
 			{
 				fileName: "16",
-				articleId: 16,
+				articleId: null,
 				type: "image",
 				src: "https://daily.jstor.org/wp-content/uploads/2015/05/standardizedtests.jpg",
 				order: 1,
