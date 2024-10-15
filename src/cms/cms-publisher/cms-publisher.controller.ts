@@ -4,16 +4,25 @@ import {
 	Query,
 	InternalServerErrorException,
 	NotFoundException,
+	Inject,
 } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags, ApiQuery } from "@nestjs/swagger";
 import { CmsPublisherService } from "./cms-publisher.service";
 import { User } from "./../../admin/admin-user/model/user.model";
 import { Requestor } from "./../../admin/admin-article/model/article.model";
 
+import { RedisClientType } from 'redis';
+
+import { Cache } from "cache-manager";
+import { CACHE_MANAGER, CacheInterceptor, CacheKey, CacheTTL } from "@nestjs/cache-manager";
 @ApiTags("cms-publisher")
 @Controller("cms-publisher")
 export class CmsPublisherController {
-	constructor(private readonly cmsPublisherService: CmsPublisherService) {}
+	constructor(
+		private readonly cmsPublisherService: CmsPublisherService,
+		@Inject(CACHE_MANAGER)
+        private cacheManager: Cache,
+	) {}
 
 	@Get()
 	@ApiOperation({ summary: "Get all users" })
@@ -49,6 +58,12 @@ export class CmsPublisherController {
 		@Query("sortDirection") sortDirection: "asc" | "desc" = "desc",
 	): Promise<User[]> {
 		try {
+
+			let hashRequest = 'sortBy='+sortBy+'&sortDirection='+sortDirection;
+			let cachedUsers = await this.cacheManager.get<User[]>(`cms_users?${hashRequest}`);
+
+			if(cachedUsers) return cachedUsers;
+
 			const users = await this.cmsPublisherService.findAllUsers(
 				Requestor.CMS,
 				sortDirection,
@@ -57,9 +72,10 @@ export class CmsPublisherController {
 			if (users.length === 0) {
 				throw new NotFoundException("No users found");
 			}
+			this.cacheManager.set(`cms_users?${hashRequest}`, users, 100);
 			return users;
 		} catch (error) {
-			throw new InternalServerErrorException("Error retrieving users");
+			throw new InternalServerErrorException("Error retrieving publishers");
 		}
 	}
 }

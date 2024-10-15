@@ -1,6 +1,7 @@
 module.exports = {
 	up: async (queryInterface, Sequelize) => {
-		return queryInterface.bulkInsert("Media", [
+		console.log('Seeds for Media START...')
+		await queryInterface.bulkInsert("Media", [
 			{
 				fileName: "3790532890_bf58d30b56_b.jpg",
 				articleId: 1,
@@ -190,6 +191,7 @@ module.exports = {
 				updatedAt: new Date(),
 			},
 		]);
+		console.log('Seeds for Media END...')
 	},
 
 	down: async (queryInterface, Sequelize) => {

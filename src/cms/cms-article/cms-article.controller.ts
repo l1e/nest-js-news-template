@@ -9,6 +9,7 @@ import {
 	BadRequestException,
 	Controller,
 	Get,
+	Inject,
 	InternalServerErrorException,
 	NotFoundException,
 	Param,
@@ -19,11 +20,21 @@ import {
 	Article,
 	Requestor,
 } from "./../../admin/admin-article/model/article.model";
+import { RedisClientType } from 'redis';
+
+import { Cache } from "cache-manager";
+import { CACHE_MANAGER, CacheInterceptor, CacheKey, CacheTTL } from "@nestjs/cache-manager";
+
 
 @ApiTags("cms-article")
 @Controller("cms-article")
 export class CmsArticleController {
-	constructor(private readonly cmsArticleService: CmsArticleService) {}
+	constructor(
+		private readonly cmsArticleService: CmsArticleService,
+		@Inject(CACHE_MANAGER)
+        private cacheManager: Cache,
+
+	) {}
 
 	@Get("public")
 	@ApiOperation({ summary: "Get all public articles with sorting" })
@@ -61,8 +72,11 @@ export class CmsArticleController {
 	async getPublicArticles(
 		@Query("sortBy") sortBy: "views" | "createdAt" = "createdAt",
 		@Query("sortDirection") sortDirection: "asc" | "desc" = "desc",
-	): Promise<Article[]> {
-		// Validate query parameters
+	){
+		console.log('getPublicArticles sortBy :',sortBy)
+		console.log('getPublicArticles sortDirection :',sortDirection)
+
+		// Validate query parameters 
 		if (!["views", "createdAt"].includes(sortBy)) {
 			throw new BadRequestException("Invalid sortBy value");
 		}
@@ -71,6 +85,12 @@ export class CmsArticleController {
 		}
 
 		try {
+			
+			let hashRequest = 'sortBy='+sortBy+'&sortDirection='+sortDirection;
+			let cachedArticles = await this.cacheManager.get(`cms_articles?${hashRequest}`);
+
+			if(cachedArticles) return cachedArticles;
+
 			const articles = await this.cmsArticleService.getPublicArticles(
 				sortBy,
 				sortDirection,
@@ -80,6 +100,8 @@ export class CmsArticleController {
 					"No articles found matching the given criteria",
 				);
 			}
+
+			this.cacheManager.set(`cms_articles?${hashRequest}`, articles, 100);
 			return articles;
 		} catch (error) {
 			// Log the error or handle it as needed
@@ -98,23 +120,28 @@ export class CmsArticleController {
 	})
 	@ApiResponse({ status: 404, description: "Article not found" })
 	@ApiResponse({ status: 400, description: "Invalid article ID" })
-	async getPublicArticleById(@Param("id") id: number): Promise<Article> {
+	async getPublicArticleById(@Param("id") id: number) {
 		try {
 			// Ensure the ID is a valid number
 			if (isNaN(id) || id <= 0) {
 				throw new BadRequestException("Invalid article ID");
 			}
 
+			let hashRequest = `${id}`;
+			let cachedArticle = await this.cacheManager.get(`cms_article/${hashRequest}`);
+
+			if(cachedArticle) return cachedArticle;
+
 			const article = await this.cmsArticleService.getArticleById(
 				id,
 				Requestor.CMS,
 			);
 
-			// Check if the article exists
 			if (!article) {
 				throw new NotFoundException(`Article with ID ${id} not found`);
 			}
 
+			this.cacheManager.set(`cms_article/${hashRequest}`, article, 100);
 			return article;
 		} catch (error) {
 			throw new BadRequestException("Error fetching the article");
@@ -157,6 +184,11 @@ export class CmsArticleController {
 				throw new BadRequestException("Invalid category ID");
 			}
 
+			let hashRequest = `cms_articles_by_category/${categoryId}?sortBy=${sortBy}&${sortDirection}=sortDirection`;
+			let cachedArticles = await this.cacheManager.get<Article[]>(`cms_category/${hashRequest}`);
+
+			if(cachedArticles) return cachedArticles;
+
 			const articles =
 				await this.cmsArticleService.getArticlesByCategoryId(
 					categoryId,
@@ -165,13 +197,13 @@ export class CmsArticleController {
 					Requestor.CMS,
 				);
 
-			// Check if any articles were found
 			if (!articles || articles.length === 0) {
 				throw new NotFoundException(
 					`No articles found for category ID: ${categoryId}`,
 				);
 			}
 
+			await this.cacheManager.set(`cms_articles_by_category/${hashRequest}`, articles, 100)
 			return articles;
 		} catch (error) {
 			throw new BadRequestException("Error fetching articles");
@@ -187,15 +219,19 @@ export class CmsArticleController {
 	@ApiResponse({ status: 404, description: "No article of the day found" })
 	async getArticleOfTheDay(): Promise<Article> {
 		try {
+
+			let hashRequest = `articleoftheday`;
+			let cachedArticle = await this.cacheManager.get<Article>(`cms_articleoftheday/${hashRequest}`);
+
+			if(cachedArticle) return cachedArticle;
+
 			const article = await this.cmsArticleService.getArticleOfTheDay(
 				Requestor.CMS,
 			);
-
-			// Check if the article exists
 			if (!article) {
 				throw new NotFoundException("No article of the day found");
 			}
-
+			await this.cacheManager.set(`cms_articleoftheday/${hashRequest}`, article, 100)
 			return article;
 		} catch (error) {
 			throw new BadRequestException("Error during article fetching");
@@ -211,15 +247,20 @@ export class CmsArticleController {
 	@ApiResponse({ status: 404, description: "No special articles found" })
 	async getArticleSpecial(): Promise<Article[]> {
 		try {
+			
+			let hashRequest = `articlespecial`;
+			let cachedArticle = await this.cacheManager.get<Article[]>(`cms_articlespecial/${hashRequest}`);
+
+			if(cachedArticle) return cachedArticle;
+
 			const articles = await this.cmsArticleService.getArticleSpecial(
 				Requestor.CMS,
 			);
 
-			// Check if articles exist
 			if (!articles || articles.length === 0) {
 				throw new NotFoundException("No special articles found");
 			}
-
+			await this.cacheManager.set(`cms_articlespecial/${hashRequest}`, articles, 100)
 			return articles;
 		} catch (error) {
 			// Handle the error more specifically if needed

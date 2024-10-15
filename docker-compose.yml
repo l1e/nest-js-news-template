@@ -1,0 +1,84 @@
+version: "3.8"
+
+services:
+    app:
+        container_name: news_auth_sequilize
+        build:
+            dockerfile: Dockerfile
+            context: .
+            target: development
+        volumes:
+            - .:/usr/src/app
+            - /usr/src/app/node_modules
+        env_file:
+            - ./.env
+        ports:
+            - ${NEST_APP_PORT}:${NEST_APP_PORT}
+        command: /bin/sh -c "npm run start:dev"
+        restart: always
+        environment:
+            NODE_ENV: development
+        depends_on:
+            - mariadb
+    # we need that stage for data migration and seeding
+    seed:
+        container_name: news_auth_sequilize_seed
+        build:
+            dockerfile: Dockerfile
+            context: .
+            target: development
+        volumes:
+            - .:/usr/src/app
+            - /usr/src/app/node_modules
+        env_file:
+            - ./.env
+        command: /bin/sh -c "sleep 10 && npm run sequelize-migration && npm run sequelize-seed"
+        # restart: always
+        environment:
+            NODE_ENV: development
+        depends_on:
+            - mariadb
+
+    mariadb:
+        container_name: news_auth_sequilize_mariadb
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: development
+        image: mariadb:latest
+        restart: always
+        environment:
+            MYSQL_DATABASE: ${MYSQL_DATABASE} 
+            MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+        ports:
+            - ${MYSQL_PORT}:${MYSQL_PORT} 
+        volumes:
+            - mariadb_data:/var/lib/mysql 
+        env_file:
+            - ./.env 
+    phpmyadmin:
+        container_name: news_auth_sequilize_phpmyadmin
+        image: phpmyadmin:latest
+        restart: always
+        ports:
+            - "8080:80" 
+        environment:
+            PMA_HOST: mariadb
+            MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD} 
+        depends_on:
+            - mariadb 
+    redis:
+      image: redis:6.0
+      ports:
+        - ${REDIS_PORT}:${REDIS_PORT}
+    redis-commander:
+      container_name: redis-commander
+      hostname: redis-commander
+      image: ghcr.io/joeferner/redis-commander:latest
+      environment:
+        - REDIS_HOSTS=local:redis:${REDIS_PORT}
+      ports:
+        - '8081:8081'
+
+volumes:
+    mariadb_data:

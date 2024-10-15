@@ -1,6 +1,7 @@
 module.exports = {
 	up: async (queryInterface, Sequelize) => {
-		return queryInterface.bulkInsert("Articles", [
+		console.log('Seeds for Articles START...');
+		const articles = [
 			{
 				title: "Robotics in Modern Warfare: The Future of Combat",
 				description: `
@@ -308,7 +309,13 @@ module.exports = {
 				updatedAt: new Date(),
 			},
 			// Additional articles here
-		]);
+		]
+		try {
+			await queryInterface.bulkInsert("Articles", articles);
+			console.log('Seeds for Articles END...');
+		  } catch (error) {
+			console.error('Error during article seeding:', error);
+		  }
 	},
 
 	down: async (queryInterface, Sequelize) => {

@@ -50,7 +50,7 @@ export class AdminUserService {
 				include: [
 					[
 						Sequelize.literal(
-							"(SELECT COUNT(*) FROM articles WHERE articles.creatorId = user.id AND articles.publishStatus = 'published')",
+							"(SELECT COUNT(*) FROM Articles WHERE Articles.creatorId = User.id AND Articles.publishStatus = 'published')",
 						),
 						"publishedArticlesCount",
 					],
@@ -67,14 +67,14 @@ export class AdminUserService {
 					required: false, // Use LEFT JOIN
 				},
 			],
-			group: ["user.id"],
+			group: ["User.id"],
 			having: Sequelize.literal("publishedArticlesCount > 0"),
 			order: [
 				[
 					Sequelize.literal(
 						sortBy === "publishedArticlesCount"
 							? "publishedArticlesCount"
-							: "user.id",
+							: "User.id",
 					),
 					sortDirection,
 				],

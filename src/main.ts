@@ -18,7 +18,7 @@ import { AdminMediaModule } from "./admin/admin-media/admin-media.module";
 import { PublisherMediaModule } from "./publisher/publisher-media/publisher-media.module";
 
 async function bootstrap() {
-	const PORT = process.env.PORT || 3006;
+	const PORT = process.env.NEST_APP_PORT || 3006;
 	const app = await NestFactory.create(AppModule);
 
 	app.enableCors({

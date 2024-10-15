@@ -13,3 +13,5 @@
 13) Integration tests;
 +14) Database seeds;
 15) Authomaticly generate articles based on telegram channels;
+16) docker;
+17) redis;
