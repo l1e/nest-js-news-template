@@ -26,10 +26,37 @@ export class AdminUserService {
 				HttpStatus.NOT_FOUND,
 			);
 		}
+		let usedNikcname = await this.userModel.findOne({
+			where: {
+				nickname: createUserDto.nickname
+			}
+		})
 
-		const user = await this.userModel.create({
-			...createUserDto,
-		});
+		if (usedNikcname) {
+			throw new HttpException(
+				"You already use that nickname.",
+				HttpStatus.NOT_FOUND,
+			);
+		}
+
+		const validRoles = ['admin', 'publisher'];
+		if (!validRoles.includes(createUserDto.role)) {
+			throw new HttpException('Invalid role provided.', HttpStatus.BAD_REQUEST);
+		}
+
+		let user
+
+		try {
+			user = await this.userModel.create({
+				...createUserDto,
+			});
+		} catch (error) {
+			console.error('Sequelize validation error:', error);
+			throw new HttpException(
+			  "Validation error: " + error.parent.sqlMessage,
+			  HttpStatus.BAD_REQUEST,
+			);
+		}
 
 		const userSanitized = await this.userModel.findByPk(user.id, {
 			attributes: { exclude: ["password"] },

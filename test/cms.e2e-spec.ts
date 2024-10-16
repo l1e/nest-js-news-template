@@ -11,6 +11,7 @@ describe("CMS Endpoints (e2e)", () => {
 	let articles: Article[];
 
 	beforeAll(async () => {
+		console.log('Test environment:', process.env.NODE_ENV); 
 		const moduleFixture: TestingModule = await Test.createTestingModule({
 			imports: [AppModule],
 		}).compile();

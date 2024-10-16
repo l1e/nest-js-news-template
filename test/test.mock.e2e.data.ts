@@ -15,6 +15,8 @@ import { CreateCategoryDto } from "./../src/admin/admin-category/dto/category.cr
 let randomEmailPrefix = (Math.random() + 1).toString(36).substring(7);
 let randomEmailPrefixPassword = (Math.random() + 1).toString(36).substring(7);
 
+let randomNickNamePrefix = (Math.random() + 1).toString(36).substring(7);
+
 export const userLogIn = {
 	email: "admin@example.com",
 	password: "password123",
@@ -34,7 +36,7 @@ export const userRegister = {
 	biography: "This is a short biography...",
 	firstName: "John",
 	lastName: "Doe",
-	nickname: "Johnny",
+	nickname: `Johnny_${randomNickNamePrefix}`,
 	status: UserStatus.ACTIVE,
 	role: UserRole.PUBLISHER,
 };
@@ -46,7 +48,7 @@ export const adminRegister = {
 	biography: "This is a short test...",
 	firstName: "John",
 	lastName: "Doe",
-	nickname: "Johnny",
+	nickname: `Johnny_${randomNickNamePrefix}`,
 	status: UserStatus.ACTIVE,
 	role: UserRole.ADMIN,
 };

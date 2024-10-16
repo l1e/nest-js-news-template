@@ -8,6 +8,8 @@ temporary/*
 logs
 *.log
 .env
+.env.development
+.env.test
 npm-debug.log*
 pnpm-debug.log*
 yarn-debug.log*

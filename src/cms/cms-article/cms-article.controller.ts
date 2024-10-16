@@ -23,7 +23,7 @@ import {
 import { RedisClientType } from 'redis';
 
 import { Cache } from "cache-manager";
-import { CACHE_MANAGER, CacheInterceptor, CacheKey, CacheTTL } from "@nestjs/cache-manager";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
 
 
 @ApiTags("cms-article")

@@ -37,14 +37,14 @@ export class User extends Model<User> {
 	@Column({
 		type: DataTypes.STRING,
 		allowNull: true,
-		defaultValue: "0000000000", // Default value for phone
+		// defaultValue: "0000000000"
 	})
 	phone: string;
 
 	@Column({
 		type: DataTypes.TEXT,
 		allowNull: true,
-		defaultValue: "No biography provided.", // Default value for biography
+		defaultValue: "No biography provided.", 
 	})
 	biography: string;
 
@@ -69,14 +69,14 @@ export class User extends Model<User> {
 	@Column({
 		type: DataTypes.ENUM(...Object.values(UserRole)),
 		allowNull: false,
-		defaultValue: UserRole.PUBLISHER, // Default role
+		defaultValue: UserRole.PUBLISHER, 
 	})
 	role: UserRole;
 
 	@Column({
 		type: DataTypes.ENUM(...Object.values(UserStatus)),
 		allowNull: false,
-		defaultValue: UserStatus.ACTIVE, // Default status
+		defaultValue: UserStatus.ACTIVE, 
 	})
 	status: UserStatus;
 

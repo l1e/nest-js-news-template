@@ -20,7 +20,7 @@ import { APP_INTERCEPTOR } from "@nestjs/core";
 import { CmsPublisherModule } from "./cms/cms-publisher/cms-publisher.module";
 import { AdminAuthModule } from "./admin/admin-auth/admin-auth.module";
 import { PublisherAuthModule } from "./publisher/publisher-auth/publisher-auth.module";
-import { ConfigModule } from "@nestjs/config";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 import { JwtStrategy } from "./utils/jwt.strategy";
 import { PublisherMeModule } from "./publisher/publisher-me/publisher-me.module";
 import { AdminMediaModule } from "./admin/admin-media/admin-media.module";
@@ -28,21 +28,27 @@ import { Media } from "./admin/admin-media/model/media.model";
 import { S3Module } from "nestjs-s3";
 import { PublisherMediaModule } from "./publisher/publisher-media/publisher-media.module";
 
+import { RedisClientOptions } from "redis";
+import * as redisStore from "cache-manager-redis-store";
+import { CacheModule } from "@nestjs/cache-manager";
+
 @Module({
 	imports: [
 		UserModule,
-		SequelizeModule.forRoot({
-			dialect: "mysql",
-			host: process.env.MYSQL_HOST,
-			port: Number(process.env.MYSQL_PORT),
-			username: process.env.MYSQL_USERNAME,
-			password: process.env.MYSQL_PASSWORD,
-			database: process.env.MYSQL_DATABASE,
-			models: [User, Article, Category, Media],
-			autoLoadModels: true,
-			synchronize: true,
-			sync: { alter: true },
-		}),
+        SequelizeModule.forRootAsync({
+            useFactory: async (configService: ConfigService) => ({
+                dialect: "mysql",
+                host: configService.get<string>("MYSQL_HOST"),
+                port: configService.get<number>("MYSQL_PORT"),
+                username: configService.get<string>("MYSQL_USERNAME"),
+                password: configService.get<string>("MYSQL_PASSWORD"),
+                database: configService.get<string>("MYSQL_DATABASE"),
+                models: [User, Article, Category, Media],
+                autoLoadModels: false,
+                synchronize: false,
+            }),
+            inject: [ConfigService],
+        }),
 		S3Module.forRoot({
 			config: {
 				credentials: {
@@ -54,7 +60,10 @@ import { PublisherMediaModule } from "./publisher/publisher-media/publisher-medi
 				region: process.env.AWS_S3_REGION,
 			},
 		}),
-		ConfigModule.forRoot(),
+		ConfigModule.forRoot({
+			isGlobal: true,
+			envFilePath: process.env.NODE_ENV === 'development' ? '.env' : `.env.${process.env.NODE_ENV}`,
+		}),
 		SequelizeModule.forFeature([User, Article, Category, Media]),
 		AdminCategoryModule,
 		CmsCategoryModule,
@@ -77,6 +86,7 @@ import { PublisherMediaModule } from "./publisher/publisher-media/publisher-medi
 			useClass: TransformInterceptor,
 		},
 		JwtStrategy,
+		ConfigService,
 	],
 })
 export class AppModule {}

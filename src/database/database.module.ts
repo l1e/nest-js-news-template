@@ -7,20 +7,34 @@ import { Category } from "./../admin/admin-category/model/category.model";
 import { Media } from "./../admin/admin-media/model/media.model";
 import { User } from "./../admin/admin-user/model/user.model";
 import * as dotenv from "dotenv";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 
 dotenv.config();
 
+console.log(
+	{'database.module.ts':'database.module.ts',
+	'process.env.MYSQL_HOST':process.env.MYSQL_HOST,
+	'process.env.MYSQL_PORT':process.env.MYSQL_PORT,
+	'process.env.MYSQL_USERNAME':process.env.MYSQL_USERNAME,
+	'process.env.MYSQL_PASSWORD': process.env.MYSQL_PASSWORD,
+	'process.env.MYSQL_DATABASE': process.env.MYSQL_DATABASE
+})
+
 @Module({
 	imports: [
-		SequelizeModule.forRoot({
-			dialect: "mysql",
-			host: process.env.MYSQL_HOST || "127.0.0.1",
-			port: parseInt(process.env.MYSQL_PORT, 10) || 3306,
-			username: process.env.MYSQL_USERNAME || "root",
-			password: process.env.MYSQL_PASSWORD || "root",
-			database: process.env.MYSQL_DATABASE || "nest-auth-sequlize-seeds",
-			models: [Category, Article, User, Media], // Register all necessary models here
-		}),
+		SequelizeModule.forRootAsync({
+			imports: [ConfigModule],
+			inject: [ConfigService],
+			useFactory: async (configService: ConfigService) => ({
+			  dialect: "mysql",
+			  host: configService.get<string>('MYSQL_HOST', '127.0.0.1'),
+			  port: configService.get<number>('MYSQL_PORT', 3306),
+			  username: configService.get<string>('MYSQL_USERNAME', 'root'),
+			  password: configService.get<string>('MYSQL_PASSWORD', 'root'),
+			  database: configService.get<string>('MYSQL_DATABASE', 'nest-auth-sequlize-seeds'),
+			  models: [Category, Article, User, Media],
+			}),
+		  }),
 		SequelizeModule.forFeature([Category, Article, User, Media]), // For feature models
 	],
 	exports: [SequelizeModule], // Export SequelizeModule so it can be imported in other modules

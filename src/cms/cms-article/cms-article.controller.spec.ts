@@ -9,7 +9,11 @@ import { CmsArticleService } from "./cms-article.service";
 import { AdminArticleService } from "./../../../src/admin/admin-article/admin-article.service";
 import { AdminUserService } from "./../../../src/admin/admin-user/admin-user.service";
 import { AdminMediaService } from "./../../../src/admin/admin-media/admin-media.service";
-require("dotenv").config();
+import { RedisClientOptions } from "redis";
+import { ConfigService, ConfigModule } from "@nestjs/config";
+import * as redisStore from "cache-manager-redis-store";
+import { CacheModule } from "@nestjs/cache-manager";
+
 describe("CmsArticleController", () => {
 	let controller: CmsArticleController;
 
@@ -17,6 +21,10 @@ describe("CmsArticleController", () => {
 		const module: TestingModule = await Test.createTestingModule({
 			controllers: [CmsArticleController],
 			imports: [
+				ConfigModule.forRoot({
+					isGlobal: true,
+					envFilePath: process.env.NODE_ENV === 'development' ? '.env' : `.env.${process.env.NODE_ENV}`,
+				}),
 				DatabaseModule,
 				CmsArticleModule,
 				AdminCategoryModule,
@@ -24,14 +32,22 @@ describe("CmsArticleController", () => {
 					config: {
 						credentials: {
 							accessKeyId: process.env.AWS_S3_ACCESS_KEY,
-							secretAccessKey:
-								process.env.AWS_S3_SECRET_ACCESS_KEY,
+							secretAccessKey: process.env.AWS_S3_SECRET_ACCESS_KEY,
 						},
 						endpoint: process.env.AWS_S3_ENDPOINT,
 						forcePathStyle: true,
 						region: process.env.AWS_S3_REGION,
-						// signatureVersion: 'v4',
 					},
+				}),
+				CacheModule.registerAsync<RedisClientOptions>({
+					imports: [ConfigModule], 
+					useFactory: async (configService: ConfigService) => ({
+						isGlobal: true,
+						store: redisStore,
+						url: `${configService.get<string>('REDIS_SERVER_NODE_URL')}:${configService.get<number>('REDIS_PORT')}`,
+						ttl: 600,
+					}),
+					inject: [ConfigService],
 				}),
 			],
 			providers: [
@@ -39,6 +55,7 @@ describe("CmsArticleController", () => {
 				AdminArticleService,
 				AdminUserService,
 				AdminMediaService,
+				ConfigService,
 			],
 		}).compile();
 

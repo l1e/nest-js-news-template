@@ -6,16 +6,22 @@ import { AdminCategoryModule } from "./../../admin/admin-category/admin-category
 import { RedisClientOptions } from "redis";
 import * as redisStore from "cache-manager-redis-store";
 import { CacheModule } from "@nestjs/cache-manager";
+import { ConfigService } from "@nestjs/config";
+//need that for tests
+require("dotenv").config();
 
 @Module({
 	imports: [
 		AdminCategoryModule,
-		CacheModule.register<RedisClientOptions>({
-			isGlobal: true,
-			store: redisStore,
-			url: process.env.REDIS_SERVER_NODE_URL+':'+process.env.REDIS_PORT,
-			ttl: 600,
-		}),
+        CacheModule.registerAsync<RedisClientOptions>({
+            useFactory: async (configService: ConfigService) => ({
+                isGlobal: true,
+                store: redisStore,
+                url: `${configService.get<string>('REDIS_SERVER_NODE_URL')}:${configService.get<number>('REDIS_PORT')}`,
+                ttl: 600,
+            }),
+            inject: [ConfigService],
+        }),
 	],
 	providers: [CmsCategoryService],
 	controllers: [CmsCategoryController],

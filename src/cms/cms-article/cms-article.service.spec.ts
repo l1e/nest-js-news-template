@@ -6,6 +6,7 @@ import { AdminMediaService } from "./../../../src/admin/admin-media/admin-media.
 import { AdminUserService } from "./../../../src/admin/admin-user/admin-user.service";
 import { AdminCategoryService } from "./../../../src/admin/admin-category/admin-category.service";
 import { S3Module } from "nestjs-s3";
+import { ConfigService } from "@nestjs/config";
 
 describe("CmsArticleService", () => {
 	let service: CmsArticleService;
@@ -18,6 +19,7 @@ describe("CmsArticleService", () => {
 				AdminArticleService,
 				AdminUserService,
 				AdminMediaService,
+				ConfigService
 			],
 			imports: [
 				DatabaseModule,

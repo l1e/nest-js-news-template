@@ -16,6 +16,7 @@ import {
 import { CreateCategoryDto } from "./../src/admin/admin-category/dto/category.create.dto";
 import { CreateArticleDto } from "src/admin/admin-article/dto/article.create.dto";
 import { UpdateArticleDto } from "src/admin/admin-article/dto/update.article.dto";
+import { ConfigModule } from "@nestjs/config";
 
 describe("Admin (e2e)", () => {
 	let app: INestApplication;
@@ -30,12 +31,19 @@ describe("Admin (e2e)", () => {
 
 	beforeEach(async () => {
 		const moduleFixture: TestingModule = await Test.createTestingModule({
-			imports: [AppModule],
+			imports: [
+				AppModule,
+				ConfigModule.forRoot({
+                    isGlobal: true,
+                    envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : `.env.${process.env.NODE_ENV}`,
+                }),
+			],
 		}).compile();
 
 		app = moduleFixture.createNestApplication();
 		await app.init();
 	});
+	
 
 	it("/ (GET)", () => {
 		return request(app.getHttpServer())
@@ -67,6 +75,7 @@ describe("Admin (e2e)", () => {
 		});
 
 		it("Should return registration message.", async () => {
+			console.log('Should return registration message adminRegister:',adminRegister)
 			const response = await request(app.getHttpServer())
 				.post("/admin-auth/register")
 				.send(adminRegister)

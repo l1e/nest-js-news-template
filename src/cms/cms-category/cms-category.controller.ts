@@ -3,10 +3,9 @@ import { CmsCategoryService } from "./cms-category.service";
 import { Category } from "./../../admin/admin-category/model/category.model";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 
-import { RedisClientType } from 'redis';
 
 import { Cache } from "cache-manager";
-import { CACHE_MANAGER, CacheInterceptor, CacheKey, CacheTTL } from "@nestjs/cache-manager";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
 
 @ApiTags("cms-category")
 @Controller("cms-category")

@@ -45,7 +45,7 @@ module.exports = {
         allowNull: false,
       },
       status: {
-        type: DataTypes.ENUM('active', 'inactive'),
+        type: DataTypes.ENUM('active', 'disabled'),
         allowNull: false,
       },
       createdAt: {
