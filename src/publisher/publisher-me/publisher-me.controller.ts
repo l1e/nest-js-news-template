@@ -1,5 +1,4 @@
 import { Controller, Get, UseGuards } from "@nestjs/common";
-import { PublisherMeService } from "./publisher-me.service";
 import {
 	ApiBearerAuth,
 	ApiOperation,
@@ -7,6 +6,7 @@ import {
 	ApiTags,
 } from "@nestjs/swagger";
 import { AuthGuard } from "@nestjs/passport";
+import { PublisherMeService } from "./publisher-me.service";
 import { AuthPublisherGuard } from "./../../utils/auth.publisher.guard";
 import { EmailToken } from "./../../utils/email.from.token.decorator";
 import { User } from "./../../admin/admin-user/model/user.model";

@@ -1,5 +1,5 @@
 import { createParamDecorator, ExecutionContext } from "@nestjs/common";
-import { sign, verify } from "jsonwebtoken";
+import { verify } from "jsonwebtoken";
 
 function getDirtyTokenRowFromHeders(headers) {
 	let token: string;

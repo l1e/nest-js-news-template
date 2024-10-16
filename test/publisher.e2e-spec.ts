@@ -60,7 +60,7 @@ describe("Publisher Endpoints (e2e)", () => {
 		expect(response.body).toEqual({
 			success: true,
 			status_code: 200,
-			data: expect.any(Array), // Ensure data is an array
+			data: expect.any(Array),
 		});
 	});
 
@@ -71,19 +71,9 @@ describe("Publisher Endpoints (e2e)", () => {
 			.post("/publisher-auth/register")
 			.send(createUserDto)
 			.expect(HttpStatus.CREATED)
-			// .expect({ token: "mock-jwt-token" })
 			.expect((response: request.Response) => {
-				// console.log('Register user response:', response)
 				publisherToken = response.body.data.token;
-				// console.log('Register user  response.body.data.token:', response.body.data.token)
 			});
-
-		// console.log("Register user  response.body", response.body);
-
-		// console.log(
-		// 	"Register user  response.body.data.token:",
-		// 	response.body.data.token,
-		// );
 
 		expect(response.body.status_code).toEqual(201);
 		expect(response.body.success).toEqual(true);
@@ -91,8 +81,8 @@ describe("Publisher Endpoints (e2e)", () => {
 	});
 
 	it("should return the authenticated publisher's information with usage off the new register data", async () => {
-		// Create a valid JWT token for the test
 
+		// Create a valid JWT token for the test
 		const token = sign(
 			{ email: userRegister.email },
 			process.env.SECRET_KEY,
@@ -103,11 +93,6 @@ describe("Publisher Endpoints (e2e)", () => {
 			.get("/publisher-me/me")
 			.set("Authorization", `Bearer ${token}`)
 			.expect(HttpStatus.OK);
-
-		// console.log(
-		// 	"should return the authenticated publisher's information with usage off the new register data response :",
-		// 	response,
-		// );
 
 		expect(response.body).toEqual({
 			data: expect.objectContaining({
@@ -121,16 +106,12 @@ describe("Publisher Endpoints (e2e)", () => {
 	});
 
 	describe("/publisher-me/me (GET)", () => {
+
 		it("should return the authenticated publisher's information", async () => {
 			const response = await request(app.getHttpServer())
 				.get("/publisher-me/me")
 				.set("Authorization", `Bearer ${publisherToken}`)
 				.expect(HttpStatus.OK);
-
-			// console.log(
-			// 	"should return the authenticated publisher's information:",
-			// 	response,
-			// );
 			expect(response.body).toEqual({
 				data: expect.objectContaining({
 					email: userRegister.email,
@@ -140,12 +121,15 @@ describe("Publisher Endpoints (e2e)", () => {
 				status_code: 200,
 				success: true,
 			});
+
 		});
 
 		it("should return 401 Unauthorized if no token is provided", () => {
+
 			return request(app.getHttpServer())
 				.get("/publisher-me/me")
 				.expect(HttpStatus.UNAUTHORIZED);
+
 		});
 
 		it("should return 404 if publisher information is not found", async () => {
@@ -160,10 +144,6 @@ describe("Publisher Endpoints (e2e)", () => {
 				.set("Authorization", `Bearer ${token}`)
 				.expect(HttpStatus.CONFLICT);
 
-			// console.log(
-			// 	"should return 409 if publisher information is not found response:",
-			// 	response,
-			// );
 		});
 	});
 	describe("/publisher-article/ (GET,PUT,POST,DELETE)", () => {
@@ -172,11 +152,6 @@ describe("Publisher Endpoints (e2e)", () => {
 				...mockCreateArticleAsPublisher,
 				categoryId: categories[0].id,
 			};
-
-			// console.log(
-			// 	"publisher-article (POST) createArticleDto:",
-			// 	createArticleDto,
-			// );
 
 			const response = await request(app.getHttpServer())
 				.post("/publisher-article")
@@ -187,20 +162,16 @@ describe("Publisher Endpoints (e2e)", () => {
 			publishedArticle = response.body.data; // Store the article ID for further tests
 			expect(response.body.data).toHaveProperty("id");
 			expect(response.body.data.title).toEqual(createArticleDto.title);
-			// console.log("Created Article ID:", publishedArticle.id);
-			// console.log("Created Article categories:", categories);
+
 		});
 
 		it("/publisher-article/:id (GET) - should get an article by ID", async () => {
+
 			const response = await request(app.getHttpServer())
 				.get(`/publisher-article/${publishedArticle.id}`)
 				.set("Authorization", `Bearer ${publisherToken}`)
 				.expect(HttpStatus.OK);
 
-			// console.log(
-			// 	"should get an article by ID response.body:",
-			// 	response.body,
-			// );
 			expect(response.body.data.id).toEqual(publishedArticle.id);
 			expect(response.body.data.title).toBeDefined();
 			expect(response.body).toEqual({
@@ -212,8 +183,10 @@ describe("Publisher Endpoints (e2e)", () => {
 				status_code: 200,
 				success: true,
 			});
+
 		});
 		it("/publisher-article/:id (PUT) - should update an article", async () => {
+
 			const updateArticleDto: UpdateArticleDto = {
 				title: "Updated Article Title",
 				description: "Updated content of the article",
@@ -232,8 +205,10 @@ describe("Publisher Endpoints (e2e)", () => {
 			expect(response.body.data.description).toEqual(
 				updateArticleDto.description,
 			);
+
 		});
 		it("/publisher-article (GET) - should get all articles of the publisher", async () => {
+
 			const response = await request(app.getHttpServer())
 				.get("/publisher-article")
 				.set("Authorization", `Bearer ${publisherToken}`)
@@ -244,13 +219,6 @@ describe("Publisher Endpoints (e2e)", () => {
 			expect(response.body.success).toEqual(true);
 
 			const firstArticle = response.body.data[0];
-
-			// console.log("response.body.data firstArticle:", firstArticle);
-			// console.log(
-			// 	"response.body.data publishedArticle:",
-			// 	publishedArticle,
-			// );
-
 			expect(firstArticle).toHaveProperty("id");
 			expect(firstArticle).toHaveProperty("title");
 			expect(firstArticle).toHaveProperty("description");
@@ -260,6 +228,7 @@ describe("Publisher Endpoints (e2e)", () => {
 			expect(firstArticle.description).toEqual(
 				publishedArticleUpdated.description,
 			);
+
 		});
 		it("/publisher-article/:id (DELETE) - should delete an article", async () => {
 			const response = await request(app.getHttpServer())
@@ -267,10 +236,6 @@ describe("Publisher Endpoints (e2e)", () => {
 				.set("Authorization", `Bearer ${publisherToken}`)
 				.expect(HttpStatus.OK);
 
-			// console.log(
-			// 	"should delete an article response.body:",
-			// 	response.body,
-			// );
 			expect(response.body.status_code).toEqual(200);
 			expect(response.body.success).toEqual(true);
 		});

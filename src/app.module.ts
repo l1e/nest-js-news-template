@@ -1,12 +1,11 @@
 import { Module } from "@nestjs/common";
 import { SequelizeModule } from "@nestjs/sequelize";
+import { S3Module } from "nestjs-s3";
 
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
-
 import { AdminCategoryModule } from "./admin/admin-category/admin-category.module";
 import { CmsCategoryModule } from "./cms/cms-category/cms-category.module";
-import { PublisherArticleService } from "./publisher/publisher-article/publisher-article.service";
 import { PublisherArticleModule } from "./publisher/publisher-article/publisher-article.module";
 import { AdminArticleModule } from "./admin/admin-article/admin-article.module";
 import { CmsArticleModule } from "./cms/cms-article/cms-article.module";
@@ -25,12 +24,8 @@ import { JwtStrategy } from "./utils/jwt.strategy";
 import { PublisherMeModule } from "./publisher/publisher-me/publisher-me.module";
 import { AdminMediaModule } from "./admin/admin-media/admin-media.module";
 import { Media } from "./admin/admin-media/model/media.model";
-import { S3Module } from "nestjs-s3";
 import { PublisherMediaModule } from "./publisher/publisher-media/publisher-media.module";
 
-import { RedisClientOptions } from "redis";
-import * as redisStore from "cache-manager-redis-store";
-import { CacheModule } from "@nestjs/cache-manager";
 
 @Module({
 	imports: [

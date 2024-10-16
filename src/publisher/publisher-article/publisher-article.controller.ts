@@ -10,13 +10,6 @@ import {
 	Delete,
 	HttpStatus,
 } from "@nestjs/common";
-import { PublisherArticleService } from "./publisher-article.service";
-import { CreateArticleDto } from "./dto/create.publisher-article.dto";
-import {
-	Article,
-	Requestor,
-	ValidationStatus,
-} from "./../../admin/admin-article/model/article.model";
 import {
 	ApiBearerAuth,
 	ApiExcludeEndpoint,
@@ -25,9 +18,15 @@ import {
 	ApiTags,
 } from "@nestjs/swagger";
 import { AuthGuard } from "@nestjs/passport";
+import { PublisherArticleService } from "./publisher-article.service";
+import { CreateArticleDto } from "./dto/create.publisher-article.dto";
+import {
+	Article,
+	Requestor,
+	ValidationStatus,
+} from "./../../admin/admin-article/model/article.model";
 import { AuthPublisherGuard } from "./../../utils/auth.publisher.guard";
 import { EmailToken } from "./../../utils/email.from.token.decorator";
-import { UserRole } from "./../../admin/admin-user/model/user.model";
 import { UpdateArticleDto } from "./../../admin/admin-article/dto/update.article.dto";
 
 @ApiBearerAuth()

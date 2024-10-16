@@ -1,18 +1,18 @@
 import { Test, TestingModule } from "@nestjs/testing";
+import { ConfigService, ConfigModule } from "@nestjs/config";
+import { S3Module } from "nestjs-s3";
+import { RedisClientOptions } from "redis";
+import * as redisStore from "cache-manager-redis-store";
+import { CacheModule } from "@nestjs/cache-manager";
 import { CmsArticleController } from "./cms-article.controller";
-import { CmsCategoryModule } from "../cms-category/cms-category.module";
 import { DatabaseModule } from "./../../../src/database/database.module";
 import { CmsArticleModule } from "./cms-article.module";
-import { S3Module } from "nestjs-s3";
 import { AdminCategoryModule } from "./../../../src/admin/admin-category/admin-category.module";
 import { CmsArticleService } from "./cms-article.service";
 import { AdminArticleService } from "./../../../src/admin/admin-article/admin-article.service";
 import { AdminUserService } from "./../../../src/admin/admin-user/admin-user.service";
 import { AdminMediaService } from "./../../../src/admin/admin-media/admin-media.service";
-import { RedisClientOptions } from "redis";
-import { ConfigService, ConfigModule } from "@nestjs/config";
-import * as redisStore from "cache-manager-redis-store";
-import { CacheModule } from "@nestjs/cache-manager";
+
 
 describe("CmsArticleController", () => {
 	let controller: CmsArticleController;

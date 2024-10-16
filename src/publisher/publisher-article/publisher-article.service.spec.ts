@@ -1,11 +1,11 @@
 import { Test, TestingModule } from "@nestjs/testing";
+import { S3Module } from "nestjs-s3";
 import { PublisherArticleService } from "./publisher-article.service";
 import { AdminArticleService } from "./../../../src/admin/admin-article/admin-article.service";
 import { AdminCategoryService } from "./../../../src/admin/admin-category/admin-category.service";
 import { AdminMediaService } from "./../../../src/admin/admin-media/admin-media.service";
 import { AdminUserService } from "./../../../src/admin/admin-user/admin-user.service";
 import { DatabaseModule } from "./../../../src/database/database.module";
-import { S3Module } from "nestjs-s3";
 
 describe("PublisherArticleService", () => {
 	let service: PublisherArticleService;

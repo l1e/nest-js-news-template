@@ -1,7 +1,7 @@
 import { Controller, Get, HttpStatus, Inject, InternalServerErrorException } from "@nestjs/common";
+import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { CmsCategoryService } from "./cms-category.service";
 import { Category } from "./../../admin/admin-category/model/category.model";
-import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 
 
 import { Cache } from "cache-manager";
@@ -21,7 +21,6 @@ export class CmsCategoryController {
 	@ApiResponse({
 		status: HttpStatus.OK,
 		description: "Successfully retrieved all categories.",
-		// type: [Category], // This specifies that an array of Category objects will be returned
 	})
 	@ApiResponse({
 		status: HttpStatus.INTERNAL_SERVER_ERROR,

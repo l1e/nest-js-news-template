@@ -19,11 +19,13 @@ import { UpdateArticleDto } from "src/admin/admin-article/dto/update.article.dto
 import { ConfigModule } from "@nestjs/config";
 
 describe("Admin (e2e)", () => {
+
+	console.log('Test environment:', process.env.NODE_ENV); 
+
 	let app: INestApplication;
 	let categories: Category[];
 	let categoryCreated: Category;
 	let categoryUpdated: Category;
-	let articles: Article[];
 	let adminToken: string;
 
 	let publishedArticle: Article;
@@ -53,21 +55,14 @@ describe("Admin (e2e)", () => {
 	});
 	describe("/admin-auth ", () => {
 		it("Should return token that we get from authentication.", async () => {
-			// Create a valid JWT token for the test
 
 			const response = await request(app.getHttpServer())
 				.post("/admin-auth/login")
 				.send(adminLogIn)
-				// .set("Authorization", `Bearer ${token}`)
 				.expect(HttpStatus.CREATED)
 				.expect((response: request.Response) => {
 					adminToken = response.body.data.token;
 				});
-
-			// console.log(
-			// 	"Should return toket that we get from authentication. :",
-			// 	response,
-			// );
 
 			expect(response.body.status_code).toEqual(201);
 			expect(response.body.success).toEqual(true);
@@ -79,16 +74,7 @@ describe("Admin (e2e)", () => {
 			const response = await request(app.getHttpServer())
 				.post("/admin-auth/register")
 				.send(adminRegister)
-				// .set("Authorization", `Bearer ${token}`)
 				.expect(HttpStatus.CREATED);
-			// .expect((response: request.Response) => {
-			// 	// adminToken = response.body.data.token;
-			// });
-
-			// console.log(
-			// 	"Should return toket that we get from response.body:",
-			// 	response.body,
-			// );
 
 			expect(response.body.status_code).toEqual(201);
 			expect(response.body.success).toEqual(true);
@@ -98,25 +84,13 @@ describe("Admin (e2e)", () => {
 		});
 	});
 	describe("/admin-category (GET,PUT,POST,DELETE)", () => {
-		// console.log("my token START:");
-		// console.log("my token adminToken:", adminToken);
-		// console.log("my token END:");
 
 		it("/admin-category (GET) - should return all categories and validate quantity", async () => {
-			// console.log("Admin Token: ", adminToken);
 			const response = await request(app.getHttpServer())
 				.get("/admin-category")
 				.set("Authorization", `Bearer ${adminToken}`)
 				.expect(200);
 
-			// console.log(
-			// 	"/admin-category (GET) - should return all categories and validate quantity response.body.data:",
-			// 	response.body.data,
-			// );
-			// console.log(
-			// 	"/admin-category (GET) - should return all categories and validate quantity response.body.data ${adminToken }: ",
-			// 	adminToken,
-			// );
 			expect(response.body.data.length).toBeGreaterThan(0);
 			categories = response.body.data;
 			expect(response.body).toEqual({
@@ -139,16 +113,12 @@ describe("Admin (e2e)", () => {
 					categoryCreated = response.body.data;
 				});
 
-			// console.log(
-			// 	"/admin-category (POST) - should create a category response.body.data:",
-			// 	response.body.data,
-			// );
 			expect(response.body.data).toHaveProperty("id");
 			expect(response.body.data.name).toEqual(createCategoryDto.name);
 		});
 
 		it("/admin-category/:id (GET) - should get a created category by ID", async () => {
-			// Now, retrieve the category by its ID
+
 			const response = await request(app.getHttpServer())
 				.get(`/admin-category/${categoryCreated.id}`)
 				.set("Authorization", `Bearer ${adminToken}`)
@@ -173,10 +143,6 @@ describe("Admin (e2e)", () => {
 					categoryUpdated = response.body.data;
 				});
 
-			// console.log(
-			// 	"/admin-category (PUT) - should update a category:",
-			// 	response.body.data,
-			// );
 			expect(response.body.data).toHaveProperty("id");
 			expect(response.body.data.name).toEqual(updateCategoryDto.name);
 			expect(response.body.data.description).toEqual(
@@ -190,7 +156,6 @@ describe("Admin (e2e)", () => {
 				.delete(`/admin-category/${categoryCreated.id}`)
 				.set("Authorization", `Bearer ${adminToken}`)
 				.expect(HttpStatus.OK);
-			// console.log("should delete a category response:", response);
 		});
 
 		it("/admin-category/:id (GET) - category does not exsist", async () => {
@@ -198,7 +163,6 @@ describe("Admin (e2e)", () => {
 				.get(`/admin-category/${categoryCreated.id}`)
 				.set("Authorization", `Bearer ${adminToken}`)
 				.expect(HttpStatus.NOT_FOUND);
-			// console.log("should category does not exsist response:", response);
 		});
 	});
 
@@ -214,22 +178,9 @@ describe("Admin (e2e)", () => {
 			expect(response.body.success).toEqual(true);
 
 			const firstArticle = response.body.data[0];
-
-			// console.log("response.body.data firstArticle:", firstArticle);
-			// console.log(
-			// 	"response.body.data publishedArticle:",
-			// 	publishedArticle,
-			// );
-
 			expect(firstArticle).toHaveProperty("id");
 			expect(firstArticle).toHaveProperty("title");
 			expect(firstArticle).toHaveProperty("description");
-
-			// expect(firstArticle.id).toEqual(publishedArticle.id);
-			// expect(firstArticle.title).toEqual(publishedArticleUpdated.title);
-			// expect(firstArticle.description).toEqual(
-			// 	publishedArticleUpdated.description,
-			// );
 		});
 		it("/admin-article (POST) - should create a new article", async () => {
 			const createArticleDto: CreateArticleDto = {
@@ -237,11 +188,6 @@ describe("Admin (e2e)", () => {
 				categoryId: categories[0].id,
 			};
 
-			// console.log(
-			// 	"admin-article (POST) createArticleDto:",
-			// 	createArticleDto,
-			// );
-			// console.log("admin-article (POST) adminToken:", adminToken);
 			const response = await request(app.getHttpServer())
 				.post("/admin-article")
 				.set("Authorization", `Bearer ${adminToken}`)
@@ -251,8 +197,6 @@ describe("Admin (e2e)", () => {
 			publishedArticle = response.body.data; // Store the article ID for further tests
 			expect(response.body.data).toHaveProperty("id");
 			expect(response.body.data.title).toEqual(createArticleDto.title);
-			// console.log("Created Article ID:", publishedArticle.id);
-			// console.log("Created Article categories:", categories);
 		});
 
 		it("/admin-article/:id (GET) - should get an article by ID", async () => {
@@ -261,10 +205,6 @@ describe("Admin (e2e)", () => {
 				.set("Authorization", `Bearer ${adminToken}`)
 				.expect(HttpStatus.OK);
 
-			// console.log(
-			// 	"should get an article by ID response.body:",
-			// 	response.body,
-			// );
 			expect(response.body.data.id).toEqual(publishedArticle.id);
 			expect(response.body.data.title).toBeDefined();
 			expect(response.body).toEqual({
@@ -282,7 +222,6 @@ describe("Admin (e2e)", () => {
 			const updateArticleDto: UpdateArticleDto = {
 				title: "Updated Magic Article Title",
 				description: "Updated Magic content of the article",
-				// Add other necessary fields
 			};
 
 			const response = await request(app.getHttpServer())
@@ -311,12 +250,6 @@ describe("Admin (e2e)", () => {
 
 			const firstArticle = response.body.data[0];
 
-			// console.log("response.body.data firstArticle:", firstArticle);
-			// console.log(
-			// 	"response.body.data publishedArticle:",
-			// 	publishedArticle,
-			// );
-
 			expect(firstArticle).toHaveProperty("id");
 			expect(firstArticle).toHaveProperty("title");
 			expect(firstArticle).toHaveProperty("description");
@@ -334,10 +267,6 @@ describe("Admin (e2e)", () => {
 				.set("Authorization", `Bearer ${adminToken}`)
 				.expect(HttpStatus.OK);
 
-			// console.log(
-			// 	"should delete an article response.body:",
-			// 	response.body,
-			// );
 			expect(response.body.status_code).toEqual(200);
 			expect(response.body.success).toEqual(true);
 		});

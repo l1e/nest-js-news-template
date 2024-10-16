@@ -1,14 +1,11 @@
 import { Module } from "@nestjs/common";
-import { CmsCategoryService } from "./cms-category.service";
-import { CmsCategoryController } from "./cms-category.controller";
-import { AdminCategoryModule } from "./../../admin/admin-category/admin-category.module";
-
+import { ConfigService } from "@nestjs/config";
 import { RedisClientOptions } from "redis";
 import * as redisStore from "cache-manager-redis-store";
 import { CacheModule } from "@nestjs/cache-manager";
-import { ConfigService } from "@nestjs/config";
-//need that for tests
-require("dotenv").config();
+import { CmsCategoryService } from "./cms-category.service";
+import { CmsCategoryController } from "./cms-category.controller";
+import { AdminCategoryModule } from "./../../admin/admin-category/admin-category.module";
 
 @Module({
 	imports: [

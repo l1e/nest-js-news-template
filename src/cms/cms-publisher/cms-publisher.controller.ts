@@ -7,14 +7,13 @@ import {
 	Inject,
 } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags, ApiQuery } from "@nestjs/swagger";
+import { Cache } from "cache-manager";
+import { CACHE_MANAGER} from "@nestjs/cache-manager";
 import { CmsPublisherService } from "./cms-publisher.service";
 import { User } from "./../../admin/admin-user/model/user.model";
 import { Requestor } from "./../../admin/admin-article/model/article.model";
 
-import { RedisClientType } from 'redis';
 
-import { Cache } from "cache-manager";
-import { CACHE_MANAGER, CacheInterceptor, CacheKey, CacheTTL } from "@nestjs/cache-manager";
 @ApiTags("cms-publisher")
 @Controller("cms-publisher")
 export class CmsPublisherController {

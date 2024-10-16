@@ -1,11 +1,11 @@
 import { Module } from "@nestjs/common";
-import { CmsArticleService } from "./cms-article.service";
-import { CmsArticleController } from "./cms-article.controller";
-import { AdminArticleModule } from "./../../admin/admin-article/admin-article.module";
+import { ConfigService } from "@nestjs/config";
 import { RedisClientOptions } from "redis";
 import * as redisStore from "cache-manager-redis-store";
 import { CacheModule } from "@nestjs/cache-manager";
-import { ConfigService } from "@nestjs/config";
+import { CmsArticleService } from "./cms-article.service";
+import { CmsArticleController } from "./cms-article.controller";
+import { AdminArticleModule } from "./../../admin/admin-article/admin-article.module";
 
 @Module({
 	imports: [

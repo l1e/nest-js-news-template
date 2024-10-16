@@ -15,12 +15,11 @@ import {
 	Param,
 	Query,
 } from "@nestjs/common";
-import { CmsArticleService } from "./cms-article.service"; // Update this path to your actual service location
+import { CmsArticleService } from "./cms-article.service";
 import {
 	Article,
 	Requestor,
 } from "./../../admin/admin-article/model/article.model";
-import { RedisClientType } from 'redis';
 
 import { Cache } from "cache-manager";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";

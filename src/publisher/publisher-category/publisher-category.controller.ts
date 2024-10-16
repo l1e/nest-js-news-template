@@ -1,8 +1,8 @@
-import { Requestor } from "./../../admin/admin-article/model/article.model";
 import { Controller, Get, HttpStatus } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { Category } from "./../../admin/admin-category/model/category.model";
 import { PublisherCategoryService } from "./publisher-category.service";
+import { Requestor } from "./../../admin/admin-article/model/article.model";
+import { Category } from "./../../admin/admin-category/model/category.model";
 
 @ApiTags("publisher-category")
 @Controller("publisher-category")

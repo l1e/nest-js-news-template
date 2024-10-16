@@ -6,7 +6,7 @@ import { AppModule } from "./../src/app.module";
 
 describe("AppController (e2e)", () => {
 
-	console.log('Current Environment:', process.env.NODE_ENV);
+	console.log('Test environment:', process.env.NODE_ENV); 
 
 	let app: INestApplication;
 

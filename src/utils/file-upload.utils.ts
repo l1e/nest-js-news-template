@@ -1,14 +1,10 @@
 import { extname } from "path";
-
 import { Request } from "express";
-
-import fs from "fs-extra";
 
 export const ImgFileFilter = (req, file, callback) => {
 	console.log("ImgFileFilter", file);
 
 	const allowedExtensions = /\.(png|jpg|gif|webp|svg|jpeg|pdf)$/i; // Case-insensitive regex for allowed extensions
-
 	let preparedFileName = file.originalname.toLowerCase();
 
 	if (!preparedFileName.match(allowedExtensions)) {

@@ -1,11 +1,10 @@
 import { Injectable } from "@nestjs/common";
-import { InjectModel } from "@nestjs/sequelize";
 import { AdminArticleService } from "./../../admin/admin-article/admin-article.service";
 import {
 	Article,
 	Requestor,
 } from "./../../admin/admin-article/model/article.model";
-import { Category } from "./../../admin/admin-category/model/category.model";
+
 
 @Injectable()
 export class CmsArticleService {

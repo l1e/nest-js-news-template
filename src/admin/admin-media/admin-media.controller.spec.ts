@@ -1,7 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
+import { S3Module } from "nestjs-s3";
 import { AdminMediaController } from "./admin-media.controller";
 import { DatabaseModule } from "./../../../src/database/database.module";
-import { S3Module } from "nestjs-s3";
 import { AdminMediaService } from "./admin-media.service";
 
 describe("AdminMediaController", () => {

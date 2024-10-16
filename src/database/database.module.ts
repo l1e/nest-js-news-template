@@ -2,12 +2,13 @@
 
 import { Module } from "@nestjs/common";
 import { SequelizeModule } from "@nestjs/sequelize";
+import * as dotenv from "dotenv";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 import { Article } from "./../admin/admin-article/model/article.model";
 import { Category } from "./../admin/admin-category/model/category.model";
 import { Media } from "./../admin/admin-media/model/media.model";
 import { User } from "./../admin/admin-user/model/user.model";
-import * as dotenv from "dotenv";
-import { ConfigModule, ConfigService } from "@nestjs/config";
+
 
 dotenv.config();
 
@@ -35,8 +36,8 @@ console.log(
 			  models: [Category, Article, User, Media],
 			}),
 		  }),
-		SequelizeModule.forFeature([Category, Article, User, Media]), // For feature models
+		SequelizeModule.forFeature([Category, Article, User, Media]), 
 	],
-	exports: [SequelizeModule], // Export SequelizeModule so it can be imported in other modules
+	exports: [SequelizeModule],
 })
 export class DatabaseModule {}

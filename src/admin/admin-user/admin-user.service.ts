@@ -1,14 +1,15 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import * as bcrypt from "bcrypt";
+import { Sequelize } from "sequelize-typescript";
+import { Op } from "sequelize";
 
 import { CreateUserDto } from "./dto/create-user.dto";
 import { User, UserRole, UserStatus } from "./model/user.model";
 import { Payload } from "./../../utils/types/payload.dto";
-import { Op } from "sequelize";
 import { AdminUserLoginDTO } from "./dto/create-user.login.dto";
 import { Article, Requestor } from "../admin-article/model/article.model";
-import { Sequelize } from "sequelize-typescript";
+
 
 @Injectable()
 export class AdminUserService {

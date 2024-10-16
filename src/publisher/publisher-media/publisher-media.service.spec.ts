@@ -1,7 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
+import { S3Module } from "nestjs-s3";
 import { PublisherMediaService } from "./publisher-media.service";
 import { AdminMediaService } from "./../../../src/admin/admin-media/admin-media.service";
-import { S3Module } from "nestjs-s3";
 import { DatabaseModule } from "./../../../src/database/database.module";
 
 describe("PublisherMediaService", () => {
