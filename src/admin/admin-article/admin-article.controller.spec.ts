@@ -20,6 +20,7 @@ import {
 	Requestor,
 	ValidationStatus,
 } from "./model/article.model";
+import { SortBy, SortDirection } from "src/cms/cms-article/dto/articles.filter.dto";
 
 describe("AdminArticleController", () => {
 	let controller: AdminArticleController;
@@ -160,7 +161,7 @@ describe("AdminArticleController", () => {
 
 			mockArticleService.getAllArticles.mockResolvedValue(articles);
 
-			const result = await controller.getAllArticles();
+			const result = await controller.getAllArticles(SortBy.VIEWS, SortDirection.ASC,undefined,undefined,undefined,undefined,undefined,undefined);
 
 			console.log("controller getAllArticles result:", result);
 

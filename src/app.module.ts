@@ -25,6 +25,7 @@ import { PublisherMeModule } from "./publisher/publisher-me/publisher-me.module"
 import { AdminMediaModule } from "./admin/admin-media/admin-media.module";
 import { Media } from "./admin/admin-media/model/media.model";
 import { PublisherMediaModule } from "./publisher/publisher-media/publisher-media.module";
+import { AdminOpensearchModule } from './admin/admin-opensearch/admin-opensearch.module';
 
 
 @Module({
@@ -72,6 +73,7 @@ import { PublisherMediaModule } from "./publisher/publisher-media/publisher-medi
 		PublisherMeModule,
 		AdminMediaModule,
 		PublisherMediaModule,
+		AdminOpensearchModule,
 	],
 	controllers: [AppController],
 	providers: [

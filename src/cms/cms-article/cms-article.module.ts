@@ -6,6 +6,7 @@ import { CacheModule } from "@nestjs/cache-manager";
 import { CmsArticleService } from "./cms-article.service";
 import { CmsArticleController } from "./cms-article.controller";
 import { AdminArticleModule } from "./../../admin/admin-article/admin-article.module";
+import { AdminOpensearchModule } from "src/admin/admin-opensearch/admin-opensearch.module";
 
 @Module({
 	imports: [
@@ -19,6 +20,7 @@ import { AdminArticleModule } from "./../../admin/admin-article/admin-article.mo
             }),
             inject: [ConfigService],
         }),
+		AdminOpensearchModule,
 
 	],
 	providers: [CmsArticleService],

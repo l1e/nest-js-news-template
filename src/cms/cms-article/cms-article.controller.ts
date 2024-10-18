@@ -23,6 +23,7 @@ import {
 
 import { Cache } from "cache-manager";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { FilterArticleDto, SortBy, SortDirection } from "./dto/articles.filter.dto";
 
 
 @ApiTags("cms-article")
@@ -49,6 +50,40 @@ export class CmsArticleController {
 		enum: ["asc", "desc"],
 		description: "Sort direction (ascending or descending)",
 	})
+
+	@ApiQuery({
+		name: "categoryId",
+		required: false,
+		description: "By what categoryId you want to get articles",
+	})
+	@ApiQuery({
+		name: "publisherId",
+		required: false,
+		description: "By what publisherId you want to get articles",
+	})
+	@ApiQuery({
+		name: "textToSearch",
+		required: false,
+		description: "By what text you want to get articles",
+	})
+	// @ApiQuery({
+	// 	name: "minPublishedArticles",
+	// 	required: false,
+	// 	description: "By what minPublishedArticles you want to get articles (NOT IMPLEMENTED YET)",
+	// })
+
+	@ApiQuery({
+		name: "minArticleVeiws",
+		required: false,
+		description: "By what minArticleVeiws you want to get articles",
+	})
+	// @ApiQuery({
+	// 	name: "minArticleSizeSymbols",
+	// 	required: false,
+	// 	description: "By what minPublisherTottalVeiws you want to get articles (NOT IMPLEMENTED YET)",
+	// })
+	
+	
 	@ApiResponse({
 		status: 200,
 		description: "Successfully fetched public articles",
@@ -69,11 +104,16 @@ export class CmsArticleController {
 			"Internal server error. An unexpected error occurred while fetching the articles.",
 	})
 	async getPublicArticles(
-		@Query("sortBy") sortBy: "views" | "createdAt" = "createdAt",
-		@Query("sortDirection") sortDirection: "asc" | "desc" = "desc",
+		@Query("sortBy") sortBy: SortBy = SortBy.CREATED_AT,
+		@Query("sortDirection") sortDirection: SortDirection = SortDirection.ASC,
+		@Query("categoryId") categoryId: number,
+		@Query("publisherId") publisherId: number,
+		@Query("textToSearch") textToSearch: string,
+		@Query("minPublishedArticles") minPublishedArticles: number,
+		@Query("minArticleVeiws") minArticleVeiws: number,
+		@Query("minArticleSizeSymbols") minArticleSizeSymbols: number,
+		
 	){
-		console.log('getPublicArticles sortBy :',sortBy)
-		console.log('getPublicArticles sortDirection :',sortDirection)
 
 		// Validate query parameters 
 		if (!["views", "createdAt"].includes(sortBy)) {
@@ -83,26 +123,35 @@ export class CmsArticleController {
 			throw new BadRequestException("Invalid sortDirection value");
 		}
 
+		let filterArticleDto: FilterArticleDto = {
+			sortBy: sortBy,
+			sortDirection: sortDirection,
+			categoryId: categoryId,
+			publisherId: publisherId,
+			minPublishedArticles: minPublishedArticles,
+			minArticleVeiws: minArticleVeiws,
+			minArticleSizeSymbols: minArticleSizeSymbols,
+			textToSearch: textToSearch
+		}
+
+		console.log('getPublicArticles filterArticleDto:',filterArticleDto)
+
 		try {
 			
-			let hashRequest = 'sortBy='+sortBy+'&sortDirection='+sortDirection;
-			let cachedArticles = await this.cacheManager.get(`cms_articles?${hashRequest}`);
-
-			if(cachedArticles) return cachedArticles;
-
-			const articles = await this.cmsArticleService.getPublicArticles(
-				sortBy,
-				sortDirection,
-			);
+			// const articles = await this.cmsArticleService.getPublicArticles(
+			// 	sortBy,
+			// 	sortDirection,
+			// );
+			let articles = await this.cmsArticleService.findArticlesByFilterWithTheHealthCheck(filterArticleDto)
 			if (articles.length === 0) {
 				throw new NotFoundException(
 					"No articles found matching the given criteria",
 				);
 			}
 
-			this.cacheManager.set(`cms_articles?${hashRequest}`, articles, 100);
 			return articles;
 		} catch (error) {
+			// console.log('error getPublicArticles:',error)
 			// Log the error or handle it as needed
 			throw new InternalServerErrorException(
 				"Error fetching public articles",
@@ -126,21 +175,19 @@ export class CmsArticleController {
 				throw new BadRequestException("Invalid article ID");
 			}
 
-			let hashRequest = `${id}`;
-			let cachedArticle = await this.cacheManager.get(`cms_article/${hashRequest}`);
 
-			if(cachedArticle) return cachedArticle;
 
-			const article = await this.cmsArticleService.getArticleById(
+			const article = await this.cmsArticleService.getArticleByIdByFilterWithTheHealthCheck(
 				id,
 				Requestor.CMS,
 			);
 
+			
 			if (!article) {
 				throw new NotFoundException(`Article with ID ${id} not found`);
 			}
 
-			this.cacheManager.set(`cms_article/${hashRequest}`, article, 100);
+
 			return article;
 		} catch (error) {
 			throw new BadRequestException("Error fetching the article");

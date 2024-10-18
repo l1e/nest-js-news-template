@@ -29,12 +29,20 @@ import { Article, Requestor } from "./model/article.model";
 import { AuthAdminhGuard } from "./../../utils/auth.admin.guard";
 import { EmailToken } from "./../../utils/email.from.token.decorator";
 import { UpdateArticleDto } from "./dto/update.article.dto";
+import { SortBy, SortDirection } from "src/cms/cms-article/dto/articles.filter.dto";
 
 @ApiBearerAuth()
 @ApiTags("articles")
 @Controller("admin-article")
 export class AdminArticleController {
 	constructor(private readonly adminArticleService: AdminArticleService) {}
+
+	@Get("push-to-opensearch")
+    @ApiOperation({ summary: "Push blogs to opensearch" })
+    @UseGuards(AuthGuard("jwt"), AuthAdminhGuard)
+    async pushModelsToOpenSearch() {
+        return await this.adminArticleService.pushArticleToOpenSearch();
+    }
 
 	@Post()
 	@ApiOperation({ summary: "Create an article" })
@@ -84,6 +92,37 @@ export class AdminArticleController {
 		enum: ["asc", "desc"],
 		description: "Sort direction (ascending or descending)",
 	})
+	@ApiQuery({
+		name: "categoryId",
+		required: false,
+		description: "By what categoryId you want to get articles",
+	})
+	@ApiQuery({
+		name: "publisherId",
+		required: false,
+		description: "By what publisherId you want to get articles",
+	})
+	@ApiQuery({
+		name: "textToSearch",
+		required: false,
+		description: "By what text you want to get articles",
+	})
+	// @ApiQuery({
+	// 	name: "minPublishedArticles",
+	// 	required: false,
+	// 	description: "By what minPublishedArticles you want to get articles",
+	// })
+
+	@ApiQuery({
+		name: "minArticleVeiws",
+		required: false,
+		description: "By what minArticleVeiws you want to get articles",
+	})
+	// @ApiQuery({
+	// 	name: "minSizeSymbols",
+	// 	required: false,
+	// 	description: "By what minSizeSymbols you want to get articles",
+	// })
 	@ApiResponse({
 		status: 200,
 		description: "Successfully fetched public articles",
@@ -105,8 +144,14 @@ export class AdminArticleController {
 	})
 	@UseGuards(AuthGuard("jwt"), AuthAdminhGuard)
 	async getAllArticles(
-		@Query("sortBy") sortBy: "views" | "createdAt" = "createdAt",
-		@Query("sortDirection") sortDirection: "asc" | "desc" = "desc",
+		@Query("sortBy") sortBy: SortBy,
+		@Query("sortDirection") sortDirection: SortDirection,
+		@Query("categoryId") categoryId: number,
+		@Query("publisherId") publisherId: number,
+		@Query("textToSearch") textToSearch: string,
+		@Query("minPublishedArticles") minPublishedArticles: number,
+		@Query("minArticleVeiws") minArticleVeiws: number,
+		@Query("minSizeSymbols") minSizeSymbols: number,
 	): Promise<Article[]> {
 		if (!["views", "createdAt"].includes(sortBy)) {
 			throw new BadRequestException("Invalid sortBy value");
@@ -120,6 +165,10 @@ export class AdminArticleController {
 				Requestor.ADMIN,
 				sortBy,
 				sortDirection,
+				categoryId,
+				publisherId,
+				textToSearch,
+				minArticleVeiws
 			);
 			if (articles.length === 0) {
 				throw new NotFoundException(

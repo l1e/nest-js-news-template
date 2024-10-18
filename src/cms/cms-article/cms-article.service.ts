@@ -1,29 +1,126 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { AdminArticleService } from "./../../admin/admin-article/admin-article.service";
 import {
 	Article,
 	Requestor,
 } from "./../../admin/admin-article/model/article.model";
+import { Cache } from "cache-manager";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { FilterArticleDto, SortBy, SortDirection } from "./dto/articles.filter.dto";
+import { AdminOpensearchService } from "src/admin/admin-opensearch/admin-opensearch.service";
 
 
 @Injectable()
 export class CmsArticleService {
-	constructor(private readonly adminArticleService: AdminArticleService) {}
+	constructor(
+		private readonly adminArticleService: AdminArticleService,
+		private adminOpenSearchService: AdminOpensearchService,
+		@Inject(CACHE_MANAGER)
+        private cacheManager: Cache,
+	) {}
 
 	// Method to get articles for the public.
 	async getPublicArticles(
-		sortBy: "views" | "createdAt" = "createdAt", // Default to createdAt
-		sortDirection: "asc" | "desc" = "desc", // Default to descending order
+		sortBy: SortBy | "createdAt" = "createdAt", // Default to createdAt
+		sortDirection: SortDirection | "desc" = "desc", // Default to descending order
+		categoryId: number,
+		publisherId: number,
+		textToSearch: string,
+		minArticleVeiws: number,
 	): Promise<Article[]> {
-		return this.adminArticleService.getAllArticles(
+
+		console.log('getPublicArticles {sortBy, sortDirection, categoryId, publisherId, textToSearch}:' ,{sortBy, sortDirection, categoryId, publisherId, textToSearch})
+		
+
+		// let hashRequest = 'sortBy='+sortBy+'&sortDirection='+sortDirection;
+		// let cachedArticles:Article[] = await this.cacheManager.get(`cms_articles?${hashRequest}`);
+
+		// if(cachedArticles) return cachedArticles;
+
+
+		let articles =  this.adminArticleService.getAllArticles(
 			Requestor.CMS,
 			sortBy,
 			sortDirection,
+			categoryId,
+			publisherId,
+			textToSearch,
+			minArticleVeiws
 		);
+
+		// this.cacheManager.set(`cms_articles?${hashRequest}`, articles, 100);
+
+		return articles;
 	}
 
-	async getArticleById(id: number, requestor: Requestor) {
-		return this.adminArticleService.getArticleById(id, requestor);
+	async findArticlesByFilterWithTheHealthCheck(filterArticleDto : FilterArticleDto):Promise<Article[]>{
+
+		let openSearcHealthCheck = await this.adminOpenSearchService.checkOpenSearchClusterHealth(process.env.OPENSEARCH_ARTICLE_INDEX_NAME);
+
+		
+		console.log('findArticlesByFilterWithTheHealthCheck openSearcHealthCheck:', openSearcHealthCheck)
+
+		let articles:Article[] ;
+ 
+ 
+		if(openSearcHealthCheck.opensearch === true) {
+		// if(false) {
+
+			articles = await this.adminOpenSearchService.findArticlesByFilter(filterArticleDto)
+
+			console.log('findArticlesByFilterWithTheHealthCheck articless:', articles)
+		}else if(openSearcHealthCheck.opensearch === false){
+			articles =  await this.getPublicArticles(
+				SortBy.VIEWS, 
+				SortDirection.ASC, 
+				filterArticleDto.categoryId,
+				filterArticleDto.publisherId,
+				filterArticleDto.textToSearch,
+				filterArticleDto.minArticleVeiws,
+			);
+		}else{
+			articles =  await this.getPublicArticles(
+				SortBy.VIEWS, 
+				SortDirection.ASC, 
+				filterArticleDto.categoryId,
+				filterArticleDto.publisherId,
+				filterArticleDto.textToSearch,
+				filterArticleDto.minArticleVeiws,
+			);
+		}
+		
+		return articles;
+
+	}
+
+	async getArticleById(id: number, requestor: Requestor):Promise<Article> {
+
+		let hashRequest = `${id}`;
+		let cachedArticle: Article = await this.cacheManager.get(`cms_article/${hashRequest}`);
+
+		if(cachedArticle) return cachedArticle;
+
+		let article = this.adminArticleService.getArticleById(id, requestor);
+		this.cacheManager.set(`cms_article/${hashRequest}`, article, 100);
+		return article
+	}
+
+	async getArticleByIdByFilterWithTheHealthCheck(id: number, requestor: Requestor):Promise<Article>{
+
+		let openSearcHealthCheck = await this.adminOpenSearchService.checkOpenSearchClusterHealth(process.env.OPENSEARCH_ARTICLE_INDEX_NAME);
+		let article: Article;
+		console.log('findArticlesByFilterWithTheHealthCheck openSearcHealthCheck:', openSearcHealthCheck)
+		if(openSearcHealthCheck.opensearch === true) {
+			article = (await this.adminOpenSearchService.findOneArticle(id)).body._source;
+			console.log('getArticleByIdByFilterWithTheHealthCheck if article:', article)
+		}else{
+			console.log('getArticleByIdByFilterWithTheHealthCheck else article:', article)
+			article = await this.getArticleById(
+				id,
+				Requestor.CMS,
+			);
+		}
+		return article
 	}
 
 	async getArticlesByCategoryId(

@@ -13,5 +13,12 @@
 13) Integration tests;
 +14) Database seeds;
 15) Authomaticly generate articles based on telegram channels;
-16) docker;
-17) redis;
++16) docker;
++17) redis;
+18) Add the ability to search articles using OpenSearch while keeping the option to search with Sequelize.
+	Filters available:
+	 - Publishers
+	 - Minimum number of published articles
+	 - Total views
+	 - Article size
+	 - Text in the title/description

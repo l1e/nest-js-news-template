@@ -1,3 +1,5 @@
+import { updatedArticle } from './../../../test/test.mock.data';
+import { AdminOpensearchService } from './../admin-opensearch/admin-opensearch.service';
 import {
 	Injectable,
 	InternalServerErrorException,
@@ -20,6 +22,8 @@ import { User } from "../admin-user/model/user.model";
 import { isExsistFormat, Media } from "../admin-media/model/media.model";
 import { AdminMediaService } from "../admin-media/admin-media.service";
 import { UpdateArticleDto } from "./dto/update.article.dto";
+import { SortBy, SortDirection } from 'src/cms/cms-article/dto/articles.filter.dto';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class AdminArticleService {
@@ -29,6 +33,7 @@ export class AdminArticleService {
 		private adminCategoryService: AdminCategoryService,
 		private adminUserService: AdminUserService,
 		private adminMediaService: AdminMediaService,
+		private adminOpensearchService: AdminOpensearchService,
 	) {}
 
 	async createArticle(createArticleDto: CreateArticleDto): Promise<Article> {
@@ -94,6 +99,8 @@ export class AdminArticleService {
 			},
 			include: [Category, { model: Media, as: "media" }],
 		});
+
+		await this.trigetToUpdateTalentByIdOpenSearch(article.id);
 
 		return articleSanitized;
 	}
@@ -312,14 +319,34 @@ export class AdminArticleService {
 
 	async getAllArticles(
 		requestor: Requestor,
-		sortBy: "views" | "createdAt" = "createdAt",
-		sortDirection: "asc" | "desc" = "desc",
+		sortBy: SortBy | "createdAt" = "createdAt",
+		sortDirection: SortDirection | "desc" = "desc",
+		categoryId: number,
+		publisherId: number,
+		textToSearch: string,
+		minArticleVeiws: number,
 	): Promise<Article[]> {
+
+		let whereConditionsGeneral = [];
+		if (categoryId) whereConditionsGeneral.push({ categoryId });
+		if (publisherId) whereConditionsGeneral.push({ creatorId : publisherId });
+		if (minArticleVeiws) whereConditionsGeneral.push({ views: { [Op.gte]: minArticleVeiws } });
+		
+		if (textToSearch) {
+			whereConditionsGeneral.push({
+				[Op.or]: [
+					{ title: { [Op.like]: `%${textToSearch}%` } },
+					{ description: { [Op.like]: `%${textToSearch}%` } }
+				]
+			});
+		}
+		
+
 		const attributesToExcludeFromArticle =
 			requestor === Requestor.CMS
 				? [
-						"creatorId",
-						"requestor",
+						// "creatorId",
+						// "requestor",
 						"publishStatus",
 						"categoryId",
 						"validationStatus",
@@ -331,16 +358,23 @@ export class AdminArticleService {
 				? ["isPhysicallyExist", "publishStatus", "articleId"]
 				: [];
 
-		const whereConditionsForArticle =
-			requestor === Requestor.CMS
-				? { validationStatus: "approved", publishStatus: "published" }
-				: {};
+				const whereConditionsForArticle =
+				requestor === Requestor.CMS
+					? {
+						  validationStatus: "approved",
+						  publishStatus: "published",
+						  [Op.and]: whereConditionsGeneral
+					  }
+					: {
+						  [Op.and]: whereConditionsGeneral
+					  };
 
 		const whereConditionsForMedia =
 			requestor === Requestor.CMS
 				? { isPhysicallyExist: isExsistFormat.YES }
 				: {};
 
+				console.log('whereConditionsForArticle:', whereConditionsForArticle)
 		try {
 			const articles = await this.articleModel.findAll({
 				attributes: {
@@ -437,6 +471,14 @@ export class AdminArticleService {
 			],
 		});
 	}
+
+    async trigetToUpdateTalentByIdOpenSearch(id: number) {
+        let article_data_full = await this.getArticleById(id,Requestor.ADMIN);
+
+        let article_to_save = await this.adminOpensearchService.updateArticle(article_data_full);
+
+        return article_to_save;
+    }
 
 	async getPublisherArticles(publisherEmail: string): Promise<Article[]> {
 		try {
@@ -536,7 +578,7 @@ export class AdminArticleService {
 				exclude: ["requestor", "validationStatus", "creatorId"],
 			},
 		});
-
+		await this.trigetToUpdateTalentByIdOpenSearch(id);
 		return articleSanitized;
 	}
 
@@ -556,6 +598,7 @@ export class AdminArticleService {
 		const article = await this.articleModel.findByPk(id);
 
 		await article.destroy();
+		await this.adminOpensearchService.removeArticle(id);
 	}
 	async articleOwnerValidation(
 		article: Article,
@@ -572,4 +615,17 @@ export class AdminArticleService {
 			);
 		}
 	}
+
+	async pushArticleToOpenSearch() {
+        let articles = await this.getAllArticles(Requestor.ADMIN, SortBy.VIEWS, SortDirection.ASC, undefined,undefined,undefined,undefined)
+
+		for (const article of await articles) {
+			const is_alredy_saved_article = await this.adminOpensearchService.findOneArticle(article.id);
+			if (!is_alredy_saved_article) {
+				// If the product does not exist, create it in the OpenSearch index
+				this.adminOpensearchService.createArticle(article);
+			}
+		}
+        return "Data successfully pushed into the opensearch";
+    }
 }

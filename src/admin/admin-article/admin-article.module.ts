@@ -1,3 +1,4 @@
+import { AdminOpensearchModule } from './../admin-opensearch/admin-opensearch.module';
 import { Module } from "@nestjs/common";
 import { SequelizeModule } from "@nestjs/sequelize";
 import { AdminArticleService } from "./admin-article.service";
@@ -15,6 +16,7 @@ import { Category } from "../admin-category/model/category.model";
 		AdminMediaModule,
 		UserModule,
 		SequelizeModule.forFeature([Article, Media, Category]),
+		AdminOpensearchModule,
 	],
 	providers: [AdminArticleService],
 	controllers: [AdminArticleController],
