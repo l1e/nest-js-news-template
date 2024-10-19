@@ -14,7 +14,7 @@ services:
             - ./.env
         ports:
             - ${NEST_APP_PORT}:${NEST_APP_PORT}
-        command: /bin/sh -c "npm run start:dev"
+        command: /bin/sh -c "npm i && npm run start:dev"
         restart: always
         environment:
             NODE_ENV: development
