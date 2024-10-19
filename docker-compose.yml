@@ -20,6 +20,10 @@ services:
             NODE_ENV: development
         depends_on:
             - mariadb
+            - opensearch-node1 # Ensure the app starts after OpenSearch is ready
+            - redis
+        networks:
+            - news-net
     # we need that stage for data migration and seeding
     seed:
         container_name: news_auth_sequilize_seed
@@ -38,6 +42,8 @@ services:
             NODE_ENV: development
         depends_on:
             - mariadb
+        networks:
+            - news-net
 
     mariadb:
         container_name: news_auth_sequilize_mariadb
@@ -56,6 +62,8 @@ services:
             - mariadb_data:/var/lib/mysql 
         env_file:
             - ./.env 
+        networks:
+            - news-net
     phpmyadmin:
         container_name: news_auth_sequilize_phpmyadmin
         image: phpmyadmin:latest
@@ -67,10 +75,15 @@ services:
             MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD} 
         depends_on:
             - mariadb 
+        networks:
+            - news-net
     redis:
       image: redis:6.0
       ports:
         - ${REDIS_PORT}:${REDIS_PORT}
+      networks:
+          - news-net
+
     redis-commander:
       container_name: redis-commander
       hostname: redis-commander
@@ -79,6 +92,8 @@ services:
         - REDIS_HOSTS=local:redis:${REDIS_PORT}
       ports:
         - '8081:8081'
+      networks:
+          - news-net
 
     opensearch-node1: # This is also the hostname of the container within the Docker network (i.e. https://opensearch-node1/)
         image: opensearchproject/opensearch:latest # Specifying the latest available image - modify if you want a specific version
@@ -104,7 +119,7 @@ services:
             - 9200:9200 # REST API
             - 9600:9600 # Performance Analyzer
         networks:
-            - opensearch-net # All of the containers will join the same Docker bridge network
+            - news-net # All of the containers will join the same Docker bridge network
     opensearch-node2:
         image: opensearchproject/opensearch:latest # This should be the same image used for opensearch-node1 to avoid issues
         container_name: opensearch-node2
@@ -126,7 +141,7 @@ services:
         volumes:
             - opensearch-data2:/usr/share/opensearch/data
         networks:
-            - opensearch-net
+            - news-net
     opensearch-dashboards:
         image: opensearchproject/opensearch-dashboards:latest # Make sure the version of opensearch-dashboards matches the version of opensearch installed on other nodes
         container_name: opensearch-dashboards
@@ -137,10 +152,10 @@ services:
         environment:
             OPENSEARCH_HOSTS: '["https://opensearch-node1:9200","https://opensearch-node2:9200"]' # Define the OpenSearch nodes that OpenSearch Dashboards will query
         networks:
-            - opensearch-net
+            - news-net
 
 networks:
-    opensearch-net:
+    news-net:
 
 
 
