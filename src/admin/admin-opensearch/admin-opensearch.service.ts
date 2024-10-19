@@ -29,8 +29,8 @@ export class AdminOpensearchService {
             clusterHealthResponse = await this.client.cluster.health({});
 			indexExists = await this.client.indices.exists({ index: searchIndex });
 
-			console.log('checkOpenSearchClusterHealth indexExists:', indexExists)
-			console.log('checkOpenSearchClusterHealth clusterHealthResponse:', clusterHealthResponse)
+			// console.log('checkOpenSearchClusterHealth indexExists:', indexExists)
+			// console.log('checkOpenSearchClusterHealth clusterHealthResponse:', clusterHealthResponse)
 
 			if(clusterHealthResponse.body.status==="green" && indexExists.statusCode ===200){
 				return { opensearch: true };
@@ -39,10 +39,10 @@ export class AdminOpensearchService {
 			}
 
         } catch (error) {
-            console.log("no healthy claster");
+            // console.log("no healthy claster");
         }
 
-        console.log("Get Cluster Health", clusterHealthResponse);
+        // console.log("Get Cluster Health", clusterHealthResponse);
 
         return { opensearch: false };
     }
@@ -56,10 +56,10 @@ export class AdminOpensearchService {
                 id: String(article.id),
             });
 
-            console.log("createArticle article.id:", article.id);
+            // console.log("createArticle article.id:", article.id);
         } catch (e) {
-            console.log("createArticle create e:", e);
-            console.log("createArticle article :", article);
+            // console.log("createArticle create e:", e);
+            // console.log("createArticle article :", article);
 
             // Throw an HttpException if there's an error during indexing
             throw new HttpException(e, HttpStatus.BAD_REQUEST);
@@ -103,7 +103,7 @@ export class AdminOpensearchService {
                 index: process.env.OPENSEARCH_ARTICLE_INDEX_NAME,
                 id: String(id),
             });
-			console.log('findOneArticle response:', response)
+			// console.log('findOneArticle response:', response)
             return response; // Return the document source data
         } catch (error) {
             // console.log("create error:", error);
@@ -116,7 +116,7 @@ export class AdminOpensearchService {
         }
     }
 	async findArticlesByFilter(filterArticleDto: FilterArticleDto) {
-		console.log('findArticlesByFilter openSearch filterArticleDto:', filterArticleDto);
+		// console.log('findArticlesByFilter openSearch filterArticleDto:', filterArticleDto);
 	
 		// Build the query based on filterArticleDto
 		const query = {
@@ -171,7 +171,7 @@ export class AdminOpensearchService {
 			},
 		};
 	
-		console.log('findArticlesByFilter query:', query);
+		// console.log('findArticlesByFilter query:', query);
 	
 		try {
 			// Send the search request to OpenSearch

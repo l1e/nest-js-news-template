@@ -6,8 +6,9 @@ import {
 } from "./../../admin/admin-article/model/article.model";
 import { Cache } from "cache-manager";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
-import { FilterArticleDto, SortBy, SortDirection } from "./dto/articles.filter.dto";
-import { AdminOpensearchService } from "src/admin/admin-opensearch/admin-opensearch.service";
+import { FilterArticleDto } from "./dto/articles.filter.dto";
+import { AdminOpensearchService } from "./../../admin/admin-opensearch/admin-opensearch.service";
+import { SortBy, SortDirection } from "./../../utils/types/types";
 
 
 @Injectable()
@@ -21,15 +22,15 @@ export class CmsArticleService {
 
 	// Method to get articles for the public.
 	async getPublicArticles(
-		sortBy: SortBy | "createdAt" = "createdAt", // Default to createdAt
-		sortDirection: SortDirection | "desc" = "desc", // Default to descending order
+		sortBy: SortBy, // Default to createdAt
+		sortDirection: SortDirection, // Default to descending order
 		categoryId: number,
 		publisherId: number,
 		textToSearch: string,
 		minArticleVeiws: number,
 	): Promise<Article[]> {
 
-		console.log('getPublicArticles {sortBy, sortDirection, categoryId, publisherId, textToSearch}:' ,{sortBy, sortDirection, categoryId, publisherId, textToSearch})
+		// console.log('getPublicArticles {sortBy, sortDirection, categoryId, publisherId, textToSearch}:' ,{sortBy, sortDirection, categoryId, publisherId, textToSearch})
 		
 
 		// let hashRequest = 'sortBy='+sortBy+'&sortDirection='+sortDirection;
@@ -58,7 +59,7 @@ export class CmsArticleService {
 		let openSearcHealthCheck = await this.adminOpenSearchService.checkOpenSearchClusterHealth(process.env.OPENSEARCH_ARTICLE_INDEX_NAME);
 
 		
-		console.log('findArticlesByFilterWithTheHealthCheck openSearcHealthCheck:', openSearcHealthCheck)
+		// console.log('findArticlesByFilterWithTheHealthCheck openSearcHealthCheck :', openSearcHealthCheck)
 
 		let articles:Article[] ;
  
@@ -68,7 +69,7 @@ export class CmsArticleService {
 
 			articles = await this.adminOpenSearchService.findArticlesByFilter(filterArticleDto)
 
-			console.log('findArticlesByFilterWithTheHealthCheck articless:', articles)
+			// console.log('findArticlesByFilterWithTheHealthCheck articless:', articles)
 		}else if(openSearcHealthCheck.opensearch === false){
 			articles =  await this.getPublicArticles(
 				SortBy.VIEWS, 
@@ -109,12 +110,12 @@ export class CmsArticleService {
 
 		let openSearcHealthCheck = await this.adminOpenSearchService.checkOpenSearchClusterHealth(process.env.OPENSEARCH_ARTICLE_INDEX_NAME);
 		let article: Article;
-		console.log('findArticlesByFilterWithTheHealthCheck openSearcHealthCheck:', openSearcHealthCheck)
+		// console.log('findArticlesByFilterWithTheHealthCheck openSearcHealthCheck:', openSearcHealthCheck)
 		if(openSearcHealthCheck.opensearch === true) {
 			article = (await this.adminOpenSearchService.findOneArticle(id)).body._source;
-			console.log('getArticleByIdByFilterWithTheHealthCheck if article:', article)
+			// console.log('getArticleByIdByFilterWithTheHealthCheck if article:', article)
 		}else{
-			console.log('getArticleByIdByFilterWithTheHealthCheck else article:', article)
+			// console.log('getArticleByIdByFilterWithTheHealthCheck else article:', article)
 			article = await this.getArticleById(
 				id,
 				Requestor.CMS,

@@ -1,6 +1,8 @@
 import { updatedArticle } from './../../../test/test.mock.data';
 import { AdminOpensearchService } from './../admin-opensearch/admin-opensearch.service';
 import {
+	HttpException,
+	HttpStatus,
 	Injectable,
 	InternalServerErrorException,
 	NotFoundException,
@@ -22,8 +24,9 @@ import { User } from "../admin-user/model/user.model";
 import { isExsistFormat, Media } from "../admin-media/model/media.model";
 import { AdminMediaService } from "../admin-media/admin-media.service";
 import { UpdateArticleDto } from "./dto/update.article.dto";
-import { SortBy, SortDirection } from 'src/cms/cms-article/dto/articles.filter.dto';
+
 import { Op } from 'sequelize';
+import { SortBy, SortDirection } from './../../utils/types/types';
 
 @Injectable()
 export class AdminArticleService {
@@ -73,7 +76,9 @@ export class AdminArticleService {
 			);
 		}
 
-		const article = await this.articleModel.create({
+		console.log('createArticle createArticleDto:', createArticleDto)
+
+		let articleToSave = {
 			title: createArticleDto.title,
 			description: createArticleDto.description,
 			publishStatus:
@@ -87,7 +92,20 @@ export class AdminArticleService {
 			views: createArticleDto.views ?? 0,
 			categoryId: createArticleDto.categoryId,
 			creatorId: createArticleDto.creatorId,
-		});
+		}
+		console.log('createArticle articleToSave:', articleToSave)
+
+		let article;
+
+		try {
+			article = await this.articleModel.create(articleToSave);
+		} catch (error) {
+			console.error('Sequelize validation error:', error);
+			throw new HttpException(
+			  "Validation error: " + error.parent.sqlMessage,
+			  HttpStatus.BAD_REQUEST,
+			);
+		}
 
 		if (media.length > 0) {
 			await article.$set("media", media); // Assuming a Many-to-Many relationship with media
@@ -100,7 +118,14 @@ export class AdminArticleService {
 			include: [Category, { model: Media, as: "media" }],
 		});
 
-		await this.trigetToUpdateTalentByIdOpenSearch(article.id);
+		console.log('createArticle article:',article)
+		console.log('createArticle process.env.NODE_ENV :',process.env.NODE_ENV )
+
+
+		if(process.env.NODE_ENV !=='test'){
+			await this.trigetToUpdateTalentByIdOpenSearch(article.id);
+		}
+
 
 		return articleSanitized;
 	}
@@ -154,6 +179,8 @@ export class AdminArticleService {
 				],
 			});
 
+			console.log('getArticleById article:',article)
+
 			if (!article) {
 				throw new NotFoundException(`Article with ID ${id} not found`);
 			}
@@ -179,19 +206,25 @@ export class AdminArticleService {
 
 			// console.log("getArticleById typeof article:", typeof article);
 
+
 			let additionalFilter = article?.dataValues
 				? article.toJSON()
 				: article;
+
+				console.log('getArticleById additionalFilter', additionalFilter)
+
 			delete additionalFilter?.creatorId;
 			if (requestor === Requestor.CMS) {
 				delete additionalFilter?.creator;
 				delete additionalFilter?.category?.publishStatus;
 			}
 
+			console.log('getArticleById additionalFilter delete', additionalFilter)
+
 			return additionalFilter;
 		} catch (error) {
 			if (error instanceof NotFoundException) {
-				// console.log("0: Error fetching article", error);
+				console.log("0: Error fetching article", error);
 				throw error;
 			}
 
@@ -319,8 +352,8 @@ export class AdminArticleService {
 
 	async getAllArticles(
 		requestor: Requestor,
-		sortBy: SortBy | "createdAt" = "createdAt",
-		sortDirection: SortDirection | "desc" = "desc",
+		sortBy: SortBy,
+		sortDirection: SortDirection,
 		categoryId: number,
 		publisherId: number,
 		textToSearch: string,
@@ -374,7 +407,7 @@ export class AdminArticleService {
 				? { isPhysicallyExist: isExsistFormat.YES }
 				: {};
 
-				console.log('whereConditionsForArticle:', whereConditionsForArticle)
+				// console.log('whereConditionsForArticle:', whereConditionsForArticle)
 		try {
 			const articles = await this.articleModel.findAll({
 				attributes: {
@@ -578,7 +611,9 @@ export class AdminArticleService {
 				exclude: ["requestor", "validationStatus", "creatorId"],
 			},
 		});
-		await this.trigetToUpdateTalentByIdOpenSearch(id);
+		if(process.env.NODE_ENV !=='test'){
+			await this.trigetToUpdateTalentByIdOpenSearch(article.id);
+		}
 		return articleSanitized;
 	}
 
@@ -598,7 +633,9 @@ export class AdminArticleService {
 		const article = await this.articleModel.findByPk(id);
 
 		await article.destroy();
-		await this.adminOpensearchService.removeArticle(id);
+		if(process.env.NODE_ENV !=='test'){
+			await this.adminOpensearchService.removeArticle(id);
+		}
 	}
 	async articleOwnerValidation(
 		article: Article,

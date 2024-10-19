@@ -1,13 +1,4 @@
-export enum SortBy{
-	CREATED_AT = 'created_at',
-	VIEWS = 'views',
-}
-
-export enum SortDirection{
-	ASC = 'asc',
-	DESC = 'desc',
-}
-
+import { SortBy, SortDirection } from "./../../../utils/types/types";
 
 export class FilterArticleDto {
 

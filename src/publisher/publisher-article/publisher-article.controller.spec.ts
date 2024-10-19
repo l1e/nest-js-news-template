@@ -8,6 +8,7 @@ import { PublisherArticleService } from "./publisher-article.service";
 import { AdminArticleService } from "./../../../src/admin/admin-article/admin-article.service";
 import { AdminUserService } from "./../../../src/admin/admin-user/admin-user.service";
 import { AdminMediaService } from "./../../../src/admin/admin-media/admin-media.service";
+import { AdminOpensearchService } from "./../../../src/admin/admin-opensearch/admin-opensearch.service";
 
 describe("PublisherArticleController", () => {
 	let controller: PublisherArticleController;
@@ -36,6 +37,7 @@ describe("PublisherArticleController", () => {
 			providers: [
 				PublisherArticleService,
 				AdminArticleService,
+				AdminOpensearchService,
 				AdminUserService,
 				AdminMediaService,
 			],

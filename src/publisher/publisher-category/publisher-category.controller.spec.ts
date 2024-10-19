@@ -8,6 +8,7 @@ import { AdminCategoryModule } from "./../../../src/admin/admin-category/admin-c
 import { AdminArticleService } from "./../../../src/admin/admin-article/admin-article.service";
 import { AdminUserService } from "./../../../src/admin/admin-user/admin-user.service";
 import { AdminMediaService } from "./../../../src/admin/admin-media/admin-media.service";
+import { AdminOpensearchService } from "./../../admin/admin-opensearch/admin-opensearch.service";
 
 describe("PublisherCategoryController", () => {
 	let controller: PublisherCategoryController;
@@ -36,6 +37,7 @@ describe("PublisherCategoryController", () => {
 			providers: [
 				PublisherCategoryService,
 				AdminArticleService,
+				AdminOpensearchService,
 				AdminUserService,
 				AdminMediaService,
 			],

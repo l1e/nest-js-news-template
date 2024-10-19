@@ -17,6 +17,9 @@ let randomEmailPrefixPassword = (Math.random() + 1).toString(36).substring(7);
 
 let randomNickNamePrefix = (Math.random() + 1).toString(36).substring(7);
 
+
+let randomArticleTitlePrefix = (Math.random() + 1).toString(36).substring(7);
+
 export const userLogIn = {
 	email: "admin@example.com",
 	password: "password123",
@@ -54,7 +57,7 @@ export const adminRegister = {
 };
 
 export const mockCreateArticleAsPublisher: CreateArticleDto = {
-	title: "Kamara shines as Saints stun Cowboys",
+	title: "Kamara shines as Saints stun Cowboys"+randomArticleTitlePrefix,
 	description: `
 		Putting 40-plus points against the lowly Carolina Panthers last week was one thing, but beating the Cowboys 44-19 in their home opener is a different story as the Saints sent out a warning to the rest of the league.
 		The unstoppable Alvin Kamara scored four touchdowns for this prolific Saints attack, which has now scored 91 points in their opening two games - the second most in the Super Bowl era.

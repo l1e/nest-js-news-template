@@ -29,7 +29,7 @@ import { Article, Requestor } from "./model/article.model";
 import { AuthAdminhGuard } from "./../../utils/auth.admin.guard";
 import { EmailToken } from "./../../utils/email.from.token.decorator";
 import { UpdateArticleDto } from "./dto/update.article.dto";
-import { SortBy, SortDirection } from "src/cms/cms-article/dto/articles.filter.dto";
+import { SortBy, SortDirection } from "./../../utils/types/types";
 
 @ApiBearerAuth()
 @ApiTags("articles")
@@ -107,22 +107,22 @@ export class AdminArticleController {
 		required: false,
 		description: "By what text you want to get articles",
 	})
-	// @ApiQuery({
-	// 	name: "minPublishedArticles",
-	// 	required: false,
-	// 	description: "By what minPublishedArticles you want to get articles",
-	// })
+	@ApiQuery({
+		name: "minPublishedArticles",
+		required: false,
+		description: "By what minPublishedArticles you want to get articles",
+	})
 
 	@ApiQuery({
 		name: "minArticleVeiws",
 		required: false,
 		description: "By what minArticleVeiws you want to get articles",
 	})
-	// @ApiQuery({
-	// 	name: "minSizeSymbols",
-	// 	required: false,
-	// 	description: "By what minSizeSymbols you want to get articles",
-	// })
+	@ApiQuery({
+		name: "minSizeSymbols",
+		required: false,
+		description: "By what minSizeSymbols you want to get articles",
+	})
 	@ApiResponse({
 		status: 200,
 		description: "Successfully fetched public articles",
@@ -144,8 +144,8 @@ export class AdminArticleController {
 	})
 	@UseGuards(AuthGuard("jwt"), AuthAdminhGuard)
 	async getAllArticles(
-		@Query("sortBy") sortBy: SortBy,
-		@Query("sortDirection") sortDirection: SortDirection,
+		@Query("sortBy") sortBy: SortBy = SortBy.CREATED_AT,
+		@Query("sortDirection") sortDirection: SortDirection = SortDirection.ASC,
 		@Query("categoryId") categoryId: number,
 		@Query("publisherId") publisherId: number,
 		@Query("textToSearch") textToSearch: string,
@@ -153,6 +153,7 @@ export class AdminArticleController {
 		@Query("minArticleVeiws") minArticleVeiws: number,
 		@Query("minSizeSymbols") minSizeSymbols: number,
 	): Promise<Article[]> {
+		console.log('getAllArticles {sortBy, sortDirection, categoryId, publisherId, textToSearch, minPublishedArticles, minArticleVeiws, minSizeSymbols}:', {sortBy, sortDirection, categoryId, publisherId, textToSearch, minPublishedArticles, minArticleVeiws, minSizeSymbols})
 		if (!["views", "createdAt"].includes(sortBy)) {
 			throw new BadRequestException("Invalid sortBy value");
 		}

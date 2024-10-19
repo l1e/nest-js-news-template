@@ -23,7 +23,8 @@ import {
 
 import { Cache } from "cache-manager";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
-import { FilterArticleDto, SortBy, SortDirection } from "./dto/articles.filter.dto";
+import { FilterArticleDto } from "./dto/articles.filter.dto";
+import { SortBy, SortDirection } from "./../../utils/types/types";
 
 
 @ApiTags("cms-article")
@@ -66,22 +67,22 @@ export class CmsArticleController {
 		required: false,
 		description: "By what text you want to get articles",
 	})
-	// @ApiQuery({
-	// 	name: "minPublishedArticles",
-	// 	required: false,
-	// 	description: "By what minPublishedArticles you want to get articles (NOT IMPLEMENTED YET)",
-	// })
+	@ApiQuery({
+		name: "minPublishedArticles",
+		required: false,
+		description: "By what minPublishedArticles you want to get articles (NOT IMPLEMENTED YET)",
+	})
 
 	@ApiQuery({
 		name: "minArticleVeiws",
 		required: false,
 		description: "By what minArticleVeiws you want to get articles",
 	})
-	// @ApiQuery({
-	// 	name: "minArticleSizeSymbols",
-	// 	required: false,
-	// 	description: "By what minPublisherTottalVeiws you want to get articles (NOT IMPLEMENTED YET)",
-	// })
+	@ApiQuery({
+		name: "minArticleSizeSymbols",
+		required: false,
+		description: "By what minPublisherTottalVeiws you want to get articles (NOT IMPLEMENTED YET)",
+	})
 	
 	
 	@ApiResponse({
@@ -181,6 +182,8 @@ export class CmsArticleController {
 				id,
 				Requestor.CMS,
 			);
+
+			console.log('getPublicArticleById article :',article)
 
 			
 			if (!article) {

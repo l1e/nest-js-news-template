@@ -20,7 +20,8 @@ import {
 	Requestor,
 	ValidationStatus,
 } from "./model/article.model";
-import { SortBy, SortDirection } from "src/cms/cms-article/dto/articles.filter.dto";
+import { SortBy, SortDirection } from "./../../utils/types/types";
+import { AdminOpensearchService } from "../admin-opensearch/admin-opensearch.service";
 
 describe("AdminArticleController", () => {
 	let controller: AdminArticleController;
@@ -36,6 +37,18 @@ describe("AdminArticleController", () => {
 		getAllArticles: jest.fn(),
 		deleteArticle: jest.fn(),
 	};
+
+	const mockAdminOpensearchService = {
+		checkOpenSearchClusterHealth: jest.fn(),
+		createArticle: jest.fn(),
+		updateArticle: jest.fn(),
+		removeArticle: jest.fn(),
+		findOneArticle: jest.fn(),
+		findArticlesByFilter: jest.fn(),
+		formatArticlesByFilter: jest.fn(),
+	};
+
+
 
 	const mockAdminCategoryService = {
 		getCategoryById: jest.fn(),
@@ -54,6 +67,7 @@ describe("AdminArticleController", () => {
 			controllers: [AdminArticleController],
 			providers: [
 				{ provide: AdminArticleService, useValue: mockArticleService },
+				{ provide: AdminOpensearchService, useValue: mockAdminOpensearchService },
 				{
 					provide: AdminCategoryService,
 					useValue: mockAdminCategoryService,

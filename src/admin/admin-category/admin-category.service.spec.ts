@@ -15,6 +15,7 @@ describe("AdminCategoryService", () => {
 	let categoryModel: typeof Category;
 
 	beforeEach(async () => {
+		console.log('beforeEach ')
 		const module: TestingModule = await Test.createTestingModule({
 			providers: [
 				AdminCategoryService,

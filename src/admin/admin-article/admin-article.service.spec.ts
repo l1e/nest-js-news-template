@@ -30,6 +30,8 @@ import {
 	HttpStatus,
 } from "@nestjs/common";
 import { CreateArticleDto } from "./dto/article.create.dto";
+import { AdminOpensearchService } from "../admin-opensearch/admin-opensearch.service";
+import { SortBy, SortDirection } from "./../../../src/utils/types/types";
 
 describe("AdminArticleService", () => {
 	let service: AdminArticleService;
@@ -63,23 +65,9 @@ describe("AdminArticleService", () => {
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
-			// imports: [
-			// 	SequelizeModule.forRoot({
-			// 		dialect: "mysql",
-			// 		host: process.env.MYSQL_HOST,
-			// 		port: Number(process.env.MYSQL_PORT),
-			// 		username: process.env.MYSQL_USERNAME,
-			// 		password: process.env.MYSQL_PASSWORD,
-			// 		database: process.env.MYSQL_DATABASE,
-			// 		models: [User, Article, Category, Media],
-			// 		autoLoadModels: true,
-			// 		synchronize: true,
-			// 		sync: { alter: true },
-			// 	}),
-			// 	SequelizeModule.forFeature([Article, Category, User, Media]),
-			// ],
 			providers: [
 				AdminArticleService,
+				AdminOpensearchService,
 				{
 					provide: AdminCategoryService,
 					useValue: mockAdminCategoryService,
@@ -188,7 +176,7 @@ describe("AdminArticleService", () => {
 
 			const result = await service.createArticle(createArticleDto);
 
-			console.log("Create an article result:", result);
+			// console.log("Create an article result:", result);
 
 			expect(result).toEqual({
 				...createdArticle,
@@ -332,7 +320,7 @@ describe("AdminArticleService", () => {
 			const articles = [mockCreateArticleDtoCreated];
 			(articleModel.findAll as jest.Mock).mockResolvedValue(articles);
 
-			const result = await service.getAllArticles(Requestor.ADMIN);
+			const result = await service.getAllArticles(Requestor.ADMIN, SortBy.CREATED_AT, SortDirection.ASC, undefined, undefined, undefined, undefined);
 
 			expect(result).toEqual(articles);
 			expect(result[0].id).toEqual(1);

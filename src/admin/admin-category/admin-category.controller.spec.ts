@@ -80,11 +80,11 @@ describe("AdminCategoryController", () => {
 			);
 
 			const result = await controller.getAllCategories();
-			console.log("getAllCategories result:", result);
-			console.log(
-				"getAllCategories service.getAllCategories:",
-				await service.getAllCategories,
-			);
+			// console.log("getAllCategories result:", result);
+			// console.log(
+			// 	"getAllCategories service.getAllCategories:",
+			// 	await service.getAllCategories,
+			// );
 
 			expect(result).toEqual(categories);
 			expect(service.getAllCategories).toHaveBeenCalledWith("admin");

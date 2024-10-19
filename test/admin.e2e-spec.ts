@@ -70,7 +70,6 @@ describe("Admin (e2e)", () => {
 		});
 
 		it("Should return registration message.", async () => {
-			console.log('Should return registration message adminRegister:',adminRegister)
 			const response = await request(app.getHttpServer())
 				.post("/admin-auth/register")
 				.send(adminRegister)
@@ -240,7 +239,7 @@ describe("Admin (e2e)", () => {
 
 		it("/admin-article (GET) - should get all articles of the publisher", async () => {
 			const response = await request(app.getHttpServer())
-				.get("/admin-article")
+				.get("/admin-article?sortBy=createdAt&sortDirection=desc")
 				.set("Authorization", `Bearer ${adminToken}`)
 				.expect(HttpStatus.OK);
 

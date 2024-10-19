@@ -6,6 +6,7 @@ import { AdminCategoryService } from "./../../../src/admin/admin-category/admin-
 import { AdminMediaService } from "./../../../src/admin/admin-media/admin-media.service";
 import { AdminUserService } from "./../../../src/admin/admin-user/admin-user.service";
 import { DatabaseModule } from "./../../../src/database/database.module";
+import { AdminOpensearchService } from "./../../../src/admin/admin-opensearch/admin-opensearch.service";
 
 describe("PublisherArticleService", () => {
 	let service: PublisherArticleService;
@@ -16,6 +17,7 @@ describe("PublisherArticleService", () => {
 				PublisherArticleService,
 				AdminCategoryService,
 				AdminArticleService,
+				AdminOpensearchService,
 				AdminUserService,
 				AdminMediaService,
 			],
