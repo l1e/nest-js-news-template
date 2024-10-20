@@ -149,10 +149,12 @@ export class AdminArticleController {
 		@Query("categoryId") categoryId: number,
 		@Query("publisherId") publisherId: number,
 		@Query("textToSearch") textToSearch: string,
+		@Query("page") page: number = 1,
+		@Query("perPage") perPage: number = 2,
 		@Query("minPublishedArticles") minPublishedArticles: number,
 		@Query("minArticleVeiws") minArticleVeiws: number,
 		@Query("minSizeSymbols") minSizeSymbols: number,
-	): Promise<Article[]> {
+	): Promise<{ pagination: any; articles: Article[] }>  {
 		console.log('getAllArticles {sortBy, sortDirection, categoryId, publisherId, textToSearch, minPublishedArticles, minArticleVeiws, minSizeSymbols}:', {sortBy, sortDirection, categoryId, publisherId, textToSearch, minPublishedArticles, minArticleVeiws, minSizeSymbols})
 		if (!["views", "createdAt"].includes(sortBy)) {
 			throw new BadRequestException("Invalid sortBy value");
@@ -160,6 +162,9 @@ export class AdminArticleController {
 		if (!["asc", "desc"].includes(sortDirection)) {
 			throw new BadRequestException("Invalid sortDirection value");
 		}
+
+		const pageNumber = Number(page);  // Convert page to number
+		const perPageNumber = Number(perPage);  // Convert perPage to number
 
 		try {
 			const articles = await this.adminArticleService.getAllArticles(
@@ -169,15 +174,19 @@ export class AdminArticleController {
 				categoryId,
 				publisherId,
 				textToSearch,
-				minArticleVeiws
+				minArticleVeiws,
+				pageNumber,
+				perPageNumber,
 			);
-			if (articles.length === 0) {
+
+			if (articles && articles.articles && Object.keys(articles.articles).length === 0) {
 				throw new NotFoundException(
 					"No articles found matching the given criteria",
 				);
 			}
 			return articles;
 		} catch (error) {
+			// console.log('error getPublicArticles:',error)
 			throw new InternalServerErrorException(
 				"Error fetching public articles",
 			);

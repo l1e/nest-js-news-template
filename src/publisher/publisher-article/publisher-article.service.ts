@@ -10,6 +10,7 @@ import {
 	Requestor,
 } from "./../../admin/admin-article/model/article.model";
 import { UpdateArticleDto } from "./../../admin/admin-article/dto/update.article.dto";
+import { PaginationArticles, SoringArticles, SortBy, SortDirection } from "./../../utils/types/types";
 
 @Injectable()
 export class PublisherArticleService {
@@ -54,8 +55,9 @@ export class PublisherArticleService {
 		);
 	}
 
-	async getPublisherArticles(publisherEmail: string) {
-		return this.adminArticleService.getPublisherArticles(publisherEmail);
+	async getPublisherArticles(publisherEmail: string, sorting:SoringArticles, pagination:PaginationArticles): Promise<{ pagination: any, articles: Article[] }> {
+		let articles = this.adminArticleService.getPublisherArticles(publisherEmail, sorting, pagination);
+		return articles;
 	}
 
 	async sendForApproval(

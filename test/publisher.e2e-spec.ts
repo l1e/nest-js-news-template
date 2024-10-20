@@ -55,12 +55,12 @@ describe("Publisher Endpoints (e2e)", () => {
 			.get("/cms-category")
 			.expect(200);
 
-		expect(response.body.data.length).toBeGreaterThan(0);
-		categories = response.body.data;
+		expect(response.body.data.categories.length).toBeGreaterThan(0);
+		categories = response.body.data.categories;
 		expect(response.body).toEqual({
 			success: true,
 			status_code: 200,
-			data: expect.any(Array),
+			data: expect.any(Object),
 		});
 	});
 
@@ -214,11 +214,11 @@ describe("Publisher Endpoints (e2e)", () => {
 				.set("Authorization", `Bearer ${publisherToken}`)
 				.expect(HttpStatus.OK);
 
-			expect(response.body.data.length).toBeGreaterThan(0);
+			expect(response.body.data.articles.length).toBeGreaterThan(0);
 			expect(response.body.status_code).toEqual(200);
 			expect(response.body.success).toEqual(true);
 
-			const firstArticle = response.body.data[0];
+			const firstArticle = response.body.data.articles[0];
 			expect(firstArticle).toHaveProperty("id");
 			expect(firstArticle).toHaveProperty("title");
 			expect(firstArticle).toHaveProperty("description");

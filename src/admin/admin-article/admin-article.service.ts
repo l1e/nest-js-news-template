@@ -26,7 +26,7 @@ import { AdminMediaService } from "../admin-media/admin-media.service";
 import { UpdateArticleDto } from "./dto/update.article.dto";
 
 import { Op } from 'sequelize';
-import { SortBy, SortDirection } from './../../utils/types/types';
+import { PaginationArticles, SoringArticles, SortBy, SortDirection } from './../../utils/types/types';
 
 @Injectable()
 export class AdminArticleService {
@@ -357,64 +357,83 @@ export class AdminArticleService {
 		categoryId: number,
 		publisherId: number,
 		textToSearch: string,
-		minArticleVeiws: number,
-	): Promise<Article[]> {
-
+		minArticleViews: number,
+		page: number,
+		perPage: number,
+	): Promise<{ pagination: any; articles: Article[] }> {
+	
 		let whereConditionsGeneral = [];
 		if (categoryId) whereConditionsGeneral.push({ categoryId });
-		if (publisherId) whereConditionsGeneral.push({ creatorId : publisherId });
-		if (minArticleVeiws) whereConditionsGeneral.push({ views: { [Op.gte]: minArticleVeiws } });
-		
+		if (publisherId) whereConditionsGeneral.push({ creatorId: publisherId });
+		if (minArticleViews) whereConditionsGeneral.push({ views: { [Op.gte]: minArticleViews } });
+	
 		if (textToSearch) {
 			whereConditionsGeneral.push({
 				[Op.or]: [
 					{ title: { [Op.like]: `%${textToSearch}%` } },
-					{ description: { [Op.like]: `%${textToSearch}%` } }
-				]
+					{ description: { [Op.like]: `%${textToSearch}%` } },
+				],
 			});
 		}
-		
-
+	
 		const attributesToExcludeFromArticle =
 			requestor === Requestor.CMS
 				? [
-						// "creatorId",
-						// "requestor",
-						"publishStatus",
-						"categoryId",
-						"validationStatus",
-				  ]
+					"publishStatus",
+					"categoryId",
+					"validationStatus",
+				]
 				: [];
-
+	
 		const attributesToExcludeFromMedia =
 			requestor === Requestor.CMS
 				? ["isPhysicallyExist", "publishStatus", "articleId"]
 				: [];
-
-				const whereConditionsForArticle =
-				requestor === Requestor.CMS
-					? {
-						  validationStatus: "approved",
-						  publishStatus: "published",
-						  [Op.and]: whereConditionsGeneral
-					  }
-					: {
-						  [Op.and]: whereConditionsGeneral
-					  };
-
+	
+		const whereConditionsForArticle =
+			requestor === Requestor.CMS
+				? {
+					  validationStatus: "approved",
+					  publishStatus: "published",
+					  [Op.and]: whereConditionsGeneral,
+				  }
+				: {
+					  [Op.and]: whereConditionsGeneral,
+				  };
+	
 		const whereConditionsForMedia =
 			requestor === Requestor.CMS
-				? { isPhysicallyExist: isExsistFormat.YES }
+				// ? { isPhysicallyExist: isExsistFormat.YES }
+				? {}
 				: {};
-
-				// console.log('whereConditionsForArticle:', whereConditionsForArticle)
+	
 		try {
+
+			const totalArticles = await this.articleModel.count({
+				where: whereConditionsForArticle,
+				// include: [
+				// 	{
+				// 		model: Media,
+				// 		as: "media",
+				// 		where: whereConditionsForMedia,
+				// 		required: false,
+				// 	},
+				// ],
+			});
+	
+			const paginationResult = {
+				count: perPage,
+				total: totalArticles,
+				per_page: perPage,
+				current_page: page,
+				total_pages: Math.ceil(totalArticles / perPage),
+			};
+	
 			const articles = await this.articleModel.findAll({
 				attributes: {
 					exclude: attributesToExcludeFromArticle,
 				},
 				where: whereConditionsForArticle,
-
 				include: [
 					{
 						model: Category,
@@ -433,16 +452,19 @@ export class AdminArticleService {
 					},
 				],
 				order: [[sortBy, sortDirection]],
+				limit: perPage,
+				offset: (page - 1) * perPage, 
 			});
-
+	
 			if (articles.length === 0) {
 				throw new NotFoundException(
 					"No articles found matching the given criteria.",
 				);
 			}
-
-			return articles;
+	
+			return { pagination: paginationResult, articles: articles };
 		} catch (error) {
+			// console.log('getAllArticles error:',error)
 			if (error instanceof NotFoundException) {
 				throw error;
 			}
@@ -513,8 +535,13 @@ export class AdminArticleService {
         return article_to_save;
     }
 
-	async getPublisherArticles(publisherEmail: string): Promise<Article[]> {
+	async getPublisherArticles(
+		publisherEmail: string, 
+		sorting: SoringArticles, 
+		pagination: PaginationArticles
+	): Promise<{ pagination: any, articles: Article[] }> {
 		try {
+			// Find the publisher by email
 			const user = await this.adminUserService.findByEmail({
 				email: publisherEmail,
 			});
@@ -525,7 +552,14 @@ export class AdminArticleService {
 				);
 			}
 
-			return this.articleModel.findAll({
+
+			const totalArticles = await this.articleModel.count({
+				where: {
+					creatorId: user.id,
+				},
+			});
+	
+			const articles = await this.articleModel.findAll({
 				where: {
 					creatorId: user.id,
 				},
@@ -555,7 +589,24 @@ export class AdminArticleService {
 						where: { isPhysicallyExist: isExsistFormat.YES },
 					},
 				],
+				order: [[sorting.sortBy, sorting.sortDirection.toUpperCase()]], 
+				limit: pagination.perPage, 
+				offset: (pagination.page - 1) * pagination.perPage, 
 			});
+	
+			const paginationResult = {
+				count: articles.length, 
+				total: totalArticles, 
+				per_page: pagination.perPage, 
+				current_page: pagination.page, 
+				total_pages: Math.ceil(totalArticles / pagination.perPage),
+			};
+
+			return { 
+				pagination: paginationResult, 
+				articles 
+			};
+			
 		} catch (error) {
 			if (error instanceof NotFoundException) {
 				throw error;
@@ -654,9 +705,9 @@ export class AdminArticleService {
 	}
 
 	async pushArticleToOpenSearch() {
-        let articles = await this.getAllArticles(Requestor.ADMIN, SortBy.VIEWS, SortDirection.ASC, undefined,undefined,undefined,undefined)
+        let articles = await this.getAllArticles(Requestor.ADMIN, SortBy.VIEWS, SortDirection.ASC, undefined,undefined,undefined,undefined,1,1000)
 
-		for (const article of await articles) {
+		for (const article of await articles.articles) {
 			const is_alredy_saved_article = await this.adminOpensearchService.findOneArticle(article.id);
 			if (!is_alredy_saved_article) {
 				// If the product does not exist, create it in the OpenSearch index

@@ -24,7 +24,7 @@ import {
 import { Cache } from "cache-manager";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { FilterArticleDto } from "./dto/articles.filter.dto";
-import { SortBy, SortDirection } from "./../../utils/types/types";
+import { PaginationArticles, SortBy, SortDirection } from "./../../utils/types/types";
 
 
 @ApiTags("cms-article")
@@ -110,6 +110,8 @@ export class CmsArticleController {
 		@Query("categoryId") categoryId: number,
 		@Query("publisherId") publisherId: number,
 		@Query("textToSearch") textToSearch: string,
+		@Query("page") page: number = 1,
+		@Query("perPage") perPage: number = 2,
 		@Query("minPublishedArticles") minPublishedArticles: number,
 		@Query("minArticleVeiws") minArticleVeiws: number,
 		@Query("minArticleSizeSymbols") minArticleSizeSymbols: number,
@@ -124,6 +126,10 @@ export class CmsArticleController {
 			throw new BadRequestException("Invalid sortDirection value");
 		}
 
+		const pageNumber = Number(page); 
+		const perPageNumber = Number(perPage); 
+
+
 		let filterArticleDto: FilterArticleDto = {
 			sortBy: sortBy,
 			sortDirection: sortDirection,
@@ -132,7 +138,9 @@ export class CmsArticleController {
 			minPublishedArticles: minPublishedArticles,
 			minArticleVeiws: minArticleVeiws,
 			minArticleSizeSymbols: minArticleSizeSymbols,
-			textToSearch: textToSearch
+			textToSearch: textToSearch,
+			page: pageNumber,
+			perPage: perPageNumber
 		}
 
 		console.log('getPublicArticles filterArticleDto:',filterArticleDto)
@@ -144,7 +152,7 @@ export class CmsArticleController {
 			// 	sortDirection,
 			// );
 			let articles = await this.cmsArticleService.findArticlesByFilterWithTheHealthCheck(filterArticleDto)
-			if (articles.length === 0) {
+			if (articles.articles.length === 0) {
 				throw new NotFoundException(
 					"No articles found matching the given criteria",
 				);
@@ -152,7 +160,7 @@ export class CmsArticleController {
 
 			return articles;
 		} catch (error) {
-			// console.log('error getPublicArticles:',error)
+			console.log('error getPublicArticles 1:',error)
 			// Log the error or handle it as needed
 			throw new InternalServerErrorException(
 				"Error fetching public articles",

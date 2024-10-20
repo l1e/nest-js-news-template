@@ -26,6 +26,7 @@ import { AuthAdminhGuard } from "./../../utils/auth.admin.guard";
 
 import { Requestor } from "../admin-article/model/article.model";
 import { UpdateUserDto } from "./dto/update-user.dto";
+import { PaginationUsers, SortBy, SortDirection, UsersSortBy } from "./../../utils/types/types";
 
 @ApiBearerAuth()
 @ApiTags("users")
@@ -69,10 +70,38 @@ export class AdminUserController {
 		description: "Return all users.",
 		type: [User],
 	})
+	@ApiQuery({
+		name: "sortBy",
+		required: false,
+		enum: ["id", "createdAt", "publishedArticlesCount"],
+		description: "Field to sort by (views or createdAt)",
+	})
+	@ApiQuery({
+		name: "sortDirection",
+		required: false,
+		enum: ["asc", "desc"],
+		description: "Sort direction (ascending or descending)",
+	})
 	@Get()
 	@UseGuards(AuthGuard("jwt"), AuthAdminhGuard)
-	findAll(): Promise<User[]> {
-		return this.adminUserService.findAllUsers(Requestor.ADMIN);
+	findAll(
+		@Query("sortBy") sortBy: UsersSortBy = UsersSortBy.CREATED_AT,
+		@Query("sortDirection") sortDirection: SortDirection = SortDirection.ASC,
+		@Query("page") page: number = 1,
+		@Query("perPage") perPage: number = 2,
+		
+	) {
+
+		const pageNumber = Number(page);  // Convert page to number
+		const perPageNumber = Number(perPage);  // Convert perPage to number
+
+		let pagination: PaginationUsers = {
+			sortBy: sortBy,
+			sortDirection: sortDirection,
+			page: pageNumber,
+			perPage: perPageNumber
+		}
+		return this.adminUserService.findAllUsers(Requestor.ADMIN, pagination);
 	}
 
 	@ApiOperation({ summary: "Get a user by ID" })

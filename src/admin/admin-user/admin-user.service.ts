@@ -1,3 +1,4 @@
+import { PaginationUsers } from './../../utils/types/types';
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import * as bcrypt from "bcrypt";
@@ -67,10 +68,21 @@ export class AdminUserService {
 	}
 
 	async findAllUsers(
-		requestor?: Requestor,
-		sortDirection: "asc" | "desc" = "desc",
-		sortBy: "publishedArticlesCount" | "id" = "publishedArticlesCount",
-	): Promise<User[]> {
+		requestor: Requestor,
+		pagination: PaginationUsers
+	) {
+		console.log('findAllUsers pagination:', pagination);
+		
+		const { sortBy, sortDirection, page, perPage } = pagination;
+	
+		let paginationResult = {
+			count: perPage,
+			total: 0,
+			per_page: perPage,
+			current_page: page,
+			total_pages: 0,
+		};
+	
 		const queryOptions: any = {
 			where: {},
 			attributes: {
@@ -78,7 +90,94 @@ export class AdminUserService {
 				include: [
 					[
 						Sequelize.literal(
-							"(SELECT COUNT(*) FROM Articles WHERE Articles.creatorId = User.id AND Articles.publishStatus = 'published')",
+							"(SELECT COUNT(*) FROM Articles WHERE Articles.creatorId = User.id AND Articles.publishStatus = 'published')"
+						),
+						"publishedArticlesCount",
+					],
+				],
+			},
+			include: [
+				{
+					model: Article,
+					as: "articles",
+					attributes: [],
+					where: {
+						publishStatus: "published",
+					},
+					required: false, // Use LEFT JOIN
+				},
+			],
+			// Sorting
+			order: [
+				[
+					Sequelize.literal(
+						sortBy === "publishedArticlesCount"
+							? "publishedArticlesCount"
+							: "User.id"
+					),
+					sortDirection,
+				],
+			],
+		};
+	
+		// Filter for CMS requestor
+		if (requestor === Requestor.CMS) {
+			queryOptions.where = {
+				status: UserStatus.ACTIVE,
+			};
+			queryOptions.attributes.exclude = [
+				"email",
+				"password",
+				"status",
+				"role",
+				"createdAt",
+				"updatedAt",
+			];
+		}
+	
+		// First, count total number of users (without pagination)
+		const totalUsers = await this.userModel.count({
+			where: queryOptions.where,
+			// include: queryOptions.include,
+		});
+
+		// console.log('findAllUsers totalUsers:', totalUsers)
+	
+		paginationResult.total = totalUsers;
+		paginationResult.total_pages = Math.ceil(totalUsers / perPage);
+	
+		queryOptions.limit = perPage;
+		queryOptions.offset = (page - 1) * perPage;
+	
+		let users = await this.userModel.findAll(queryOptions);
+	
+		return { pagination: paginationResult, users: users };
+	}
+	
+
+	async findAllPublishers(
+		requestor: Requestor,
+		paginationUsers: PaginationUsers
+	) {
+		const { sortBy, sortDirection, page, perPage } = paginationUsers;
+	
+		// Initialize pagination result
+		let paginationResult = {
+			count: perPage,
+			total: 0,
+			per_page: perPage,
+			current_page: page,
+			total_pages: 0,
+		};
+	
+		const queryOptions: any = {
+			where: {},
+			attributes: {
+				exclude: [],
+				include: [
+					[
+						Sequelize.literal(
+							"(SELECT COUNT(*) FROM Articles WHERE Articles.creatorId = User.id AND Articles.publishStatus = 'published')"
 						),
 						"publishedArticlesCount",
 					],
@@ -96,26 +195,25 @@ export class AdminUserService {
 				},
 			],
 			group: ["User.id"],
-			having: Sequelize.literal("publishedArticlesCount > 0"),
+			// Sorting
 			order: [
 				[
 					Sequelize.literal(
 						sortBy === "publishedArticlesCount"
 							? "publishedArticlesCount"
-							: "User.id",
+							: "User.id"
 					),
 					sortDirection,
 				],
 			],
 		};
-
+	
+		// Filter for CMS requestor
 		if (requestor === Requestor.CMS) {
 			queryOptions.where = {
 				status: UserStatus.ACTIVE,
 			};
 			queryOptions.attributes.exclude = [
-				// 'firstName',
-				// 'lastName',
 				"email",
 				"password",
 				"status",
@@ -124,9 +222,26 @@ export class AdminUserService {
 				"updatedAt",
 			];
 		}
+	
 
-		return this.userModel.findAll(queryOptions);
+		const totalPublishers = await this.userModel.count({
+			where: queryOptions.where,
+			include: queryOptions.include,
+			group: ["User.id"],
+		});
+	
+		paginationResult.total = totalPublishers.length || 0;
+		paginationResult.total_pages = Math.ceil(paginationResult.total / perPage);
+
+		queryOptions.limit = perPage;
+		queryOptions.offset = (page - 1) * perPage;
+	
+		// Fetch publishers with pagination
+		let publishers = await this.userModel.findAll(queryOptions);
+	
+		return { pagination: paginationResult, publishers: publishers };
 	}
+	
 
 	async findUserById(id: string): Promise<User> {
 		try {

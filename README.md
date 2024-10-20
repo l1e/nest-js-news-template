@@ -72,6 +72,8 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 
 Nest is [MIT licensed](LICENSE).
 
+This is a Nest.js template for a news agency website where you can sign in as an admin or publisher and view articles as a regular user. In this template, you can publish articles as an admin and allow publishers to create and publish their own articles. The template is efficient and integrated with various technologies. We use OpenSearch for searching articles on the CMS side ("/cms-article/public") and for individual article pages ("/cms-article/public/articleId"). Redis is also implemented in this project, which can be seen on the CMS side of the API.
+
 This is a nest.js you can see News template where you can create your articles, attach to the category, donwload picture of the article. That project include 3 parts. Admin part where you are abale to manage articles, users, categories. On the publisher side, you are able to create article, attach image and publish article. On the CMS site you are able to get list of articles, filter them, get list of categories, get the most popular articles. We also prepared database data for seeeding.
 
 

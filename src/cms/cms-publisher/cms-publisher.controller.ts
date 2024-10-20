@@ -12,6 +12,7 @@ import { CACHE_MANAGER} from "@nestjs/cache-manager";
 import { CmsPublisherService } from "./cms-publisher.service";
 import { User } from "./../../admin/admin-user/model/user.model";
 import { Requestor } from "./../../admin/admin-article/model/article.model";
+import { PaginationUsers, SortDirection, UsersSortBy } from "./../../utils/types/types";
 
 
 @ApiTags("cms-publisher")
@@ -24,12 +25,12 @@ export class CmsPublisherController {
 	) {}
 
 	@Get()
-	@ApiOperation({ summary: "Get all users" })
+	@ApiOperation({ summary: "Get all Publishers" })
 	@ApiQuery({
 		name: "sortBy",
 		required: false,
-		enum: ["publishedArticlesCount", "id"],
-		description: "Field to sort by (publishedArticlesCount or id)",
+		enum: ["id", "createdAt", "publishedArticlesCount"],
+		description: "Field to sort by (views or createdAt)",
 	})
 	@ApiQuery({
 		name: "sortDirection",
@@ -52,23 +53,33 @@ export class CmsPublisherController {
 		description: "Internal server error. An unexpected error occurred.",
 	})
 	async findUsers(
-		@Query("sortBy")
-		sortBy: "publishedArticlesCount" | "id" = "publishedArticlesCount",
-		@Query("sortDirection") sortDirection: "asc" | "desc" = "desc",
-	): Promise<User[]> {
+		@Query("sortBy") sortBy: UsersSortBy = UsersSortBy.CREATED_AT,
+		@Query("sortDirection") sortDirection: SortDirection = SortDirection.ASC,
+		@Query("page") page: number = 1,
+		@Query("perPage") perPage: number = 2,
+	){
 		try {
 
-			let hashRequest = 'sortBy='+sortBy+'&sortDirection='+sortDirection;
-			let cachedUsers = await this.cacheManager.get<User[]>(`cms_users?${hashRequest}`);
+			const pageNumber = Number(page);
+			const perPageNumber = Number(perPage);
+
+			let pagination: PaginationUsers = {
+				sortBy: sortBy,
+				sortDirection: sortDirection,
+				page: pageNumber,
+				perPage: perPageNumber
+			}
+
+			let hashRequest = 'sortBy='+sortBy+'&sortDirection='+sortDirection+'&page='+page+'&perPage='+perPage;
+			let cachedUsers = await this.cacheManager.get(`cms_users?${hashRequest}`);
 
 			if(cachedUsers) return cachedUsers;
 
 			const users = await this.cmsPublisherService.findAllUsers(
 				Requestor.CMS,
-				sortDirection,
-				sortBy,
+				pagination
 			);
-			if (users.length === 0) {
+			if (users.publishers.length=== 0) {
 				throw new NotFoundException("No users found");
 			}
 			this.cacheManager.set(`cms_users?${hashRequest}`, users, 100);

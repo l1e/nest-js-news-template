@@ -7,6 +7,7 @@ import { AdminMediaService } from "../admin-media/admin-media.service";
 import { CreateArticleDto } from "./dto/article.create.dto";
 
 import {
+	articlesAll,
 	categoryMockDataCreated,
 	mockCreateArticleDtoCreated,
 	mockUser,
@@ -169,18 +170,18 @@ describe("AdminArticleController", () => {
 
 	describe("getAllArticles", () => {
 		it("should return all articles", async () => {
-			const articles: Article[] = [
-				mockCreateArticleDtoCreated,
-			] as unknown as Article[];
+			const articles = articlesAll;
 
-			mockArticleService.getAllArticles.mockResolvedValue(articles);
+			jest.spyOn(service, "getAllArticles").mockResolvedValue(
+				articlesAll,
+			);
 
-			const result = await controller.getAllArticles(SortBy.VIEWS, SortDirection.ASC,undefined,undefined,undefined,undefined,undefined,undefined);
+			const result = await controller.getAllArticles(SortBy.VIEWS, SortDirection.ASC,undefined,undefined,undefined,undefined,undefined,undefined,1,100);
 
-			console.log("controller getAllArticles result:", result);
+			// console.log("controller getAllArticles result:", result);
 
 			expect(result).toEqual(articles);
-			expect(mockArticleService.getAllArticles).toHaveBeenCalled();
+			expect(service.getAllArticles).toHaveBeenCalled();
 		});
 	});
 

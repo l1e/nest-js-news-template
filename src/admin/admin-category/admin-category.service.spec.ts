@@ -9,6 +9,8 @@ import {
 	categoryMockDataCreated,
 	categoryMockDataNew,
 } from "../../../test/test.mock.data";
+import { Requestor } from "../admin-article/model/article.model";
+import { SortByGeneral, SortDirection } from "./../../utils/types/types";
 
 describe("AdminCategoryService", () => {
 	let service: AdminCategoryService;
@@ -26,6 +28,7 @@ describe("AdminCategoryService", () => {
 						findByPk: jest.fn(),
 						findAll: jest.fn(),
 						destroy: jest.fn(),
+						count: jest.fn(), 
 					},
 				},
 			],
@@ -83,11 +86,28 @@ describe("AdminCategoryService", () => {
 	describe("getAllCategories", () => {
 		it("should return all categories", async () => {
 			const categories = [categoryMockDataCreated];
+
+			// Mock the return value for count and findAll
+			(categoryModel.count as jest.Mock).mockResolvedValue(categories.length);
 			(categoryModel.findAll as jest.Mock).mockResolvedValue(categories);
 
-			const result = await service.getAllCategories();
+			const result = await service.getAllCategories(
+				Requestor.ADMIN,
+				{ sortBy: SortByGeneral.ID, sortDirection: SortDirection.ASC },
+				{ page: 1, perPage: 2 }
+			);
 
-			expect(result).toEqual(categories);
+			expect(result).toEqual({
+				pagination: {
+					count: categories.length,
+					total: categories.length,
+					per_page: 2,
+					current_page: 1,
+					total_pages: 1,
+				},
+				categories,
+			});
+			expect(categoryModel.count).toHaveBeenCalled(); 
 			expect(categoryModel.findAll).toHaveBeenCalled();
 		});
 	});

@@ -14,6 +14,9 @@ export class FilterArticleDto {
 
 	textToSearch: string
 
+	page: number
+	
+	perPage: number
 
 	// will be added later 
 	minArticleSizeSymbols: number

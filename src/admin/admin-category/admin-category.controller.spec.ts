@@ -5,9 +5,12 @@ import { AdminCategoryService } from "./admin-category.service";
 import { CreateCategoryDto } from "./dto/category.create.dto";
 import { Category } from "./model/category.model";
 import {
+	categoryAll,
 	categoryMockDataCreated,
 	categoryMockDataNew,
 } from "../../../test/test.mock.data";
+import { SortByGeneral, SortDirection } from "./../../utils/types/types";
+import { Requestor } from "../admin-article/model/article.model";
 
 describe("AdminCategoryController", () => {
 	let controller: AdminCategoryController;
@@ -71,23 +74,16 @@ describe("AdminCategoryController", () => {
 
 	describe("getAllCategories", () => {
 		it("should call AdminCategoryService.getAllCategories and return the result", async () => {
-			const categories: Category[] = [
-				categoryMockDataCreated,
-			] as Category[];
-
+			const categories = categoryAll; 
+	
 			jest.spyOn(service, "getAllCategories").mockResolvedValue(
-				categories,
+				categoryAll,
 			);
-
-			const result = await controller.getAllCategories();
-			// console.log("getAllCategories result:", result);
-			// console.log(
-			// 	"getAllCategories service.getAllCategories:",
-			// 	await service.getAllCategories,
-			// );
+	
+			const result = await controller.getAllCategories(SortByGeneral.CREATED_AT,  SortDirection.ASC, 1, 2);
 
 			expect(result).toEqual(categories);
-			expect(service.getAllCategories).toHaveBeenCalledWith("admin");
+			expect(service.getAllCategories).toHaveBeenCalledWith(Requestor.ADMIN, {sortBy: SortByGeneral.CREATED_AT,sortDirection: SortDirection.ASC },{page: 1, perPage: 2});
 		});
 	});
 

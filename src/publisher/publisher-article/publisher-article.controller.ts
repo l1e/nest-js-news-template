@@ -9,11 +9,13 @@ import {
 	UseGuards,
 	Delete,
 	HttpStatus,
+	Query,
 } from "@nestjs/common";
 import {
 	ApiBearerAuth,
 	ApiExcludeEndpoint,
 	ApiOperation,
+	ApiQuery,
 	ApiResponse,
 	ApiTags,
 } from "@nestjs/swagger";
@@ -28,6 +30,7 @@ import {
 import { AuthPublisherGuard } from "./../../utils/auth.publisher.guard";
 import { EmailToken } from "./../../utils/email.from.token.decorator";
 import { UpdateArticleDto } from "./../../admin/admin-article/dto/update.article.dto";
+import { PaginationArticles, SoringArticles, SortBy, SortDirection } from "./../../utils/types/types";
 
 @ApiBearerAuth()
 @Controller("publisher-article")
@@ -108,9 +111,39 @@ export class PublisherArticleController {
 		status: 500,
 		description: "Failed to fetch articles",
 	})
+	@ApiQuery({
+		name: "sortBy",
+		required: false,
+		enum: ["views", "createdAt"],
+		description: "Field to sort by (views or createdAt)",
+	})
+	@ApiQuery({
+		name: "sortDirection",
+		required: false,
+		enum: ["asc", "desc"],
+		description: "Sort direction (ascending or descending)",
+	})
 	@UseGuards(AuthGuard("jwt"), AuthPublisherGuard)
-	async getAllArticles(@EmailToken("decodedEmail") decodedEmail: string) {
-		return this.publisherArticleService.getPublisherArticles(decodedEmail);
+	async getAllArticles(
+		@EmailToken("decodedEmail") decodedEmail: string,
+		@Query("sortBy") sortBy: SortBy = SortBy.CREATED_AT,
+		@Query("sortDirection") sortDirection: SortDirection = SortDirection.ASC,
+		@Query("page") page: number = 1,
+		@Query("perPage") perPage: number = 2,
+	): Promise<{ pagination: any, articles: Article[] }> {
+
+		let sorting: SoringArticles = {
+			sortBy: sortBy,
+			sortDirection: sortDirection
+		}
+		
+		let pagination: PaginationArticles = {
+			page: Number(page),
+			perPage: Number(perPage)
+		}
+
+		let publishers = this.publisherArticleService.getPublisherArticles(decodedEmail, sorting, pagination);
+		return publishers;
 	}
 
 	@Put(":id/send-for-approval")

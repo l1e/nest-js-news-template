@@ -1,4 +1,5 @@
 import {
+	articlesAll,
 	categoryMockDataCreated,
 	mockCreateArticleDtoCreated,
 	mockCreateArticleDtoNew,
@@ -49,6 +50,7 @@ describe("AdminArticleService", () => {
 		destroy: jest.fn(),
 		update: jest.fn(),
 		reload: jest.fn(),
+		count: jest.fn(), 
 	};
 
 	const mockAdminCategoryService = {
@@ -141,7 +143,7 @@ describe("AdminArticleService", () => {
 		it("should create an article", async () => {
 			const createArticleDto: CreateArticleDto = mockCreateArticleDtoNew;
 			const createdArticle = {
-				...categoryMockDataCreated,
+				...mockCreateArticleDtoCreated,
 				$set: jest.fn(),
 			};
 			const mockCategory = {
@@ -317,15 +319,30 @@ describe("AdminArticleService", () => {
 
 	describe("getAllArticles", () => {
 		it("should return all articles", async () => {
-			const articles = [mockCreateArticleDtoCreated];
+			const articles = [mockCreateArticleDtoCreated]; 
+			const totalArticlesCount = articles.length;
+
 			(articleModel.findAll as jest.Mock).mockResolvedValue(articles);
-
-			const result = await service.getAllArticles(Requestor.ADMIN, SortBy.CREATED_AT, SortDirection.ASC, undefined, undefined, undefined, undefined);
-
-			expect(result).toEqual(articles);
-			expect(result[0].id).toEqual(1);
-
+			(articleModel.count as jest.Mock).mockResolvedValue(totalArticlesCount); // Mock the count method
+	
+			const result = await service.getAllArticles(
+				Requestor.ADMIN,
+				SortBy.CREATED_AT,
+				SortDirection.ASC,
+				undefined,
+				undefined,
+				undefined,
+				undefined,
+				1,
+				100
+			);
+	
+			expect(result.articles).toEqual(articles);
+			expect(result.articles[0].id).toEqual(1);
+			expect(result.pagination.total).toEqual(totalArticlesCount);
+	
 			expect(articleModel.findAll).toHaveBeenCalled();
+			expect(articleModel.count).toHaveBeenCalled(); // Verify that count was called
 		});
 	});
 

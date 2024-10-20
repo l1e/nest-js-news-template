@@ -9,6 +9,7 @@ import { InjectModel } from "@nestjs/sequelize";
 import { Article } from "./../admin-article/model/article.model";
 import { Category, PublishStatus } from "./model/category.model";
 import { CreateCategoryDto } from "./dto/category.create.dto";
+import { PaginationCategories, SoringCategories } from "./../../utils/types/types";
 
 @Injectable()
 export class AdminCategoryService {
@@ -64,22 +65,44 @@ export class AdminCategoryService {
 
 	async getAllCategories(
 		requestor: Requestor = Requestor.PUBLISHER,
-	): Promise<Category[]> {
+		sorting: SoringCategories, 
+		pagination: PaginationCategories
+	): Promise<{ pagination: any, categories: Category[] }> {
 		try {
 			const attributes =
 				requestor === Requestor.ADMIN
 					? undefined
 					: { exclude: ["publishStatus"] };
-
+	
 			const whereClause =
 				requestor === Requestor.PUBLISHER
 					? { publishStatus: PublishStatus.PUBLISHED }
 					: {};
-
-			return await this.categoryModel.findAll({
-				attributes,
+	
+			const totalCategories = await this.categoryModel.count({
 				where: whereClause,
 			});
+	
+			const categories = await this.categoryModel.findAll({
+				attributes,
+				where: whereClause,
+				order: [[sorting.sortBy, sorting.sortDirection.toUpperCase()]], 
+				limit: pagination.perPage, 
+				offset: (pagination.page - 1) * pagination.perPage, 
+			});
+	
+			const paginationResult = {
+				count: categories.length, 
+				total: totalCategories, 
+				per_page: pagination.perPage, 
+				current_page: pagination.page, 
+				total_pages: Math.ceil(totalCategories / pagination.perPage), 
+			};
+	
+			return {
+				pagination: paginationResult, 
+				categories,
+			};
 		} catch (error) {
 			throw new InternalServerErrorException(
 				"An error occurred while retrieving categories",

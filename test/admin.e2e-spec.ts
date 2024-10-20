@@ -90,12 +90,12 @@ describe("Admin (e2e)", () => {
 				.set("Authorization", `Bearer ${adminToken}`)
 				.expect(200);
 
-			expect(response.body.data.length).toBeGreaterThan(0);
-			categories = response.body.data;
+			expect(response.body.data.categories.length).toBeGreaterThan(0);
+			categories = response.body.data.categories;
 			expect(response.body).toEqual({
 				success: true,
 				status_code: 200,
-				data: expect.any(Array), // Ensure data is an array
+				data: expect.any(Object),
 			});
 		});
 
@@ -172,11 +172,11 @@ describe("Admin (e2e)", () => {
 				.set("Authorization", `Bearer ${adminToken}`)
 				.expect(HttpStatus.OK);
 
-			expect(response.body.data.length).toBeGreaterThan(0);
+			expect(response.body.data.articles.length).toBeGreaterThan(0);
 			expect(response.body.status_code).toEqual(200);
 			expect(response.body.success).toEqual(true);
 
-			const firstArticle = response.body.data[0];
+			const firstArticle = response.body.data.articles[0];
 			expect(firstArticle).toHaveProperty("id");
 			expect(firstArticle).toHaveProperty("title");
 			expect(firstArticle).toHaveProperty("description");
@@ -239,15 +239,15 @@ describe("Admin (e2e)", () => {
 
 		it("/admin-article (GET) - should get all articles of the publisher", async () => {
 			const response = await request(app.getHttpServer())
-				.get("/admin-article?sortBy=createdAt&sortDirection=desc")
+				.get("/admin-article?sortBy=createdAt&sortDirection=desc&page=1&perPage=2")
 				.set("Authorization", `Bearer ${adminToken}`)
 				.expect(HttpStatus.OK);
 
-			expect(response.body.data.length).toBeGreaterThan(0);
+			expect(response.body.data.articles.length).toBeGreaterThan(0);
 			expect(response.body.status_code).toEqual(200);
 			expect(response.body.success).toEqual(true);
 
-			const firstArticle = response.body.data[0];
+			const firstArticle = response.body.data.articles[0];
 
 			expect(firstArticle).toHaveProperty("id");
 			expect(firstArticle).toHaveProperty("title");

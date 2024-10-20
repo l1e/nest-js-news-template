@@ -9,10 +9,12 @@ import {
 	ParseIntPipe,
 	UseGuards,
 	HttpStatus,
+	Query,
 } from "@nestjs/common";
 import {
 	ApiBearerAuth,
 	ApiOperation,
+	ApiQuery,
 	ApiResponse,
 	ApiTags,
 } from "@nestjs/swagger";
@@ -23,6 +25,7 @@ import { CreateCategoryDto } from "./dto/category.create.dto";
 import { Category } from "./model/category.model";
 import { AuthAdminhGuard } from "./../../utils/auth.admin.guard";
 import { Requestor } from "../admin-article/model/article.model";
+import { PaginationCategories, SoringCategories, SortByGeneral, SortDirection } from "./../../utils/types/types";
 
 @ApiBearerAuth()
 @ApiTags("categories")
@@ -74,9 +77,38 @@ export class AdminCategoryController {
 		status: HttpStatus.INTERNAL_SERVER_ERROR,
 		description: "An error occurred while retrieving categories.",
 	})
+	@ApiQuery({
+		name: "sortBy",
+		required: false,
+		enum: ["id", "createdAt"],
+		description: "Field to sort by (views or createdAt)",
+	})
+	@ApiQuery({
+		name: "sortDirection",
+		required: false,
+		enum: ["asc", "desc"],
+		description: "Sort direction (ascending or descending)",
+	})
 	@UseGuards(AuthGuard("jwt"), AuthAdminhGuard)
-	async getAllCategories(): Promise<Category[]> {
-		return this.adminCategoryService.getAllCategories(Requestor.ADMIN);
+	async getAllCategories(
+		@Query("sortBy") sortBy: SortByGeneral = SortByGeneral.CREATED_AT,
+		@Query("sortDirection") sortDirection: SortDirection = SortDirection.ASC,
+		@Query("page") page: number = 1,
+		@Query("perPage") perPage: number = 2,
+	): Promise<{ pagination: any, categories: Category[] }>  {
+
+
+		let sorting: SoringCategories = {
+			sortBy: sortBy,
+			sortDirection: sortDirection
+		}
+		
+		let pagination: PaginationCategories = {
+			page: Number(page),
+			perPage: Number(perPage)
+		}
+
+		return this.adminCategoryService.getAllCategories(Requestor.ADMIN, sorting, pagination);
 	}
 
 	@Put(":id")

@@ -3,7 +3,7 @@ import { INestApplication } from "@nestjs/common";
 import * as request from "supertest";
 import { AppModule } from "../src/app.module"; // Adjust the path as needed
 import { Category } from "./../src/admin/admin-category/model/category.model";
-import { Article } from "src/admin/admin-article/model/article.model";
+import { Article } from "./../src/admin/admin-article/model/article.model";
 
 describe("CMS Endpoints (e2e)", () => {
 
@@ -31,41 +31,41 @@ describe("CMS Endpoints (e2e)", () => {
 			.get("/cms-category")
 			.expect(200);
 
-		if (response.body.data.length > 0) {
-			categories = response.body.data;
+		if (response.body.data.categories.length > 0) {
+			categories = response.body.data.categories;
 		}
 
-		expect(response.body.data.length).toBeGreaterThan(0); // Assert that categories are returned
+		expect(response.body.data.categories.length).toBeGreaterThan(0); 
 		expect(response.body).toEqual({
 			success: true,
 			status_code: 200,
-			data: expect.any(Array),
+			data: expect.any(Object),
 		});
 	});
 
 	// Test the default sorting by publishedArticlesCount in descending order
 	it("/cms-publisher (GET) - should return users sorted by publishedArticlesCount (default)", async () => {
 		const response = await request(app.getHttpServer())
-			.get("/cms-publisher")
+			.get("/cms-publisher?page=1&perPage=2")
 			.expect(200);
 
-		expect(response.body.data.length).toBeGreaterThan(0); 
-		const sorted = response.body.data.sort(
+		expect(response.body.data.publishers.length).toBeGreaterThan(0); 
+		const sorted = response.body.data.publishers.sort(
 			(a, b) => b.publishedArticlesCount - a.publishedArticlesCount,
 		);
-		expect(response.body.data).toEqual(sorted);
+		expect(response.body.data.publishers).toEqual(sorted);
 	});
 
 	// Test custom sorting by id in ascending order
 	it("/cms-publisher (GET) - should return users sorted by id in ascending order", async () => {
 		const response = await request(app.getHttpServer())
 			.get("/cms-publisher")
-			.query({ sortBy: "id", sortDirection: "asc" })
+			.query({ sortBy: "id", sortDirection: "asc", page: 1, perPage: 2 })
 			.expect(200);
 
-		expect(response.body.data.length).toBeGreaterThan(0);
-		const sorted = response.body.data.sort((a, b) => a.id - b.id);
-		expect(response.body.data).toEqual(sorted);
+		expect(response.body.data.publishers.length).toBeGreaterThan(0);
+		const sorted = response.body.data.publishers.sort((a, b) => a.id - b.id);
+		expect(response.body.data.publishers).toEqual(sorted);
 	});
 
 	// Test scenario where no users are found
@@ -75,7 +75,7 @@ describe("CMS Endpoints (e2e)", () => {
 			.get("/cms-publisher")
 			.expect(200);
 
-		expect(response.body.data.length).toBeGreaterThan(0);
+		expect(response.body.data.publishers.length).toBeGreaterThan(0);
 	});
 
 	it("should return a list of public articles", async () => {
@@ -84,8 +84,8 @@ describe("CMS Endpoints (e2e)", () => {
 			.get("/cms-article/public")
 			.expect(200);
 
-		articles = response.body.data;
-		expect(response.body.data.length).toBeGreaterThan(0);
+		articles = response.body.data.articles;
+		expect(response.body.data.articles.length).toBeGreaterThan(0);
 
 	});
 
@@ -94,6 +94,7 @@ describe("CMS Endpoints (e2e)", () => {
 		const response = await request(app.getHttpServer())
 			.get(`/cms-article/public/${articles[0].id}`)
 			.expect(200);
+
 		expect(response.body.success).toEqual(true);
 		expect(response.body.data.id).toBe(articles[0].id);
 		expect(response.body.data.title).toBe(articles[0].title);

@@ -115,9 +115,13 @@ export class AdminOpensearchService {
             throw error;
         }
     }
-	async findArticlesByFilter(filterArticleDto: FilterArticleDto) {
+	async findArticlesByFilter(filterArticleDto: FilterArticleDto): Promise<{ pagination: any; articles: Article[] }> {
 		// console.log('findArticlesByFilter openSearch filterArticleDto:', filterArticleDto);
-	
+		
+		// Calculate pagination values
+		const from = (filterArticleDto.page - 1) * filterArticleDto.perPage;
+		const size = filterArticleDto.perPage;
+		
 		// Build the query based on filterArticleDto
 		const query = {
 			bool: {
@@ -144,20 +148,20 @@ export class AdminOpensearchService {
 							publishStatus: "published",
 						},
 					},
-                    ...(filterArticleDto.categoryId !== null && filterArticleDto.categoryId !== undefined
-                        ? [
-                              {
-                                  match: { "categoryId": filterArticleDto.categoryId },
-                              },
-                          ]
-                        : []),
-                    ...(filterArticleDto.publisherId !== null && filterArticleDto.publisherId !== undefined
-                        ? [
-                              {
-                                  match: { "creatorId": filterArticleDto.publisherId },
-                              },
-                          ]
-                        : []),
+					...(filterArticleDto.categoryId !== null && filterArticleDto.categoryId !== undefined
+						? [
+							  {
+								  match: { "categoryId": filterArticleDto.categoryId },
+							  },
+						  ]
+						: []),
+					...(filterArticleDto.publisherId !== null && filterArticleDto.publisherId !== undefined
+						? [
+							  {
+								  match: { "creatorId": filterArticleDto.publisherId },
+							  },
+						  ]
+						: []),
 					...(filterArticleDto.minArticleVeiws !== null && filterArticleDto.minArticleVeiws !== undefined
 						? [
 							{
@@ -174,32 +178,45 @@ export class AdminOpensearchService {
 		// console.log('findArticlesByFilter query:', query);
 	
 		try {
-			// Send the search request to OpenSearch
+
 			let articles = await this.client.search({
 				index: process.env.OPENSEARCH_ARTICLE_INDEX_NAME,
 				body: {
-					from: 0, // Pagination
-					size: 10, // Limit number of results
+					from: from, // Pagination: starting point
+					size: size, // Pagination: number of results per page
 					query: query,
-					// sort: filterArticleDto.sortDirection || [{ createdAt: 'desc' }] // Sorting
+					sort: [{ [filterArticleDto.sortBy]: { order: filterArticleDto.sortDirection.toLowerCase() } }] // Sorting
 				}
 			});
 	
-			// Log the full response to inspect its structure
-			// console.log('OpenSearch full response:', articles);
 
 	
-			// Make sure to access the correct part of the response
+			
 			if (articles && articles.body && articles.body.hits) {
+				
+				
+				const totalHits = articles.body.hits.total.value;
+				const totalPages = Math.ceil(totalHits / filterArticleDto.perPage);
+	
+				const pagination = {
+					total: totalHits,
+					perPage: filterArticleDto.perPage,
+					currentPage: filterArticleDto.page,
+					totalPages: totalPages,
+				};
+	
 				// console.log('findArticlesByFilter articles:', articles.body.hits.hits);
-				return this.formatArticlesByFilter(articles.body.hits.hits); // Return the relevant article hits
+				return { 
+					pagination, // Include pagination info
+					articles: await this.formatArticlesByFilter(articles.body.hits.hits) // Return the relevant article hits
+				};
 			} else {
-				console.error('Unexpected response structure:', articles);
-				return [];
+				// console.error('Unexpected response structure:', articles);
+				return { pagination: {}, articles: [] };
 			}
 		} catch (error) {
-			console.error('Error while fetching articles:', error);
-			return [];
+			// console.error('Error while fetching articles:', error);
+			return { pagination: {}, articles: [] };
 		}
 	}
 	
