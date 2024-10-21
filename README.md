@@ -14,16 +14,16 @@ The project uses **Docker** for streamlined setup and deployment. With the help 
 
 ### Features
 
-- [x] Database support using [Sequelize](https://www.npmjs.com/package/sequelize).
-- [x] Data seeding for easy setup.
-- [x] Config service using [@nestjs/config](https://www.npmjs.com/package/@nestjs/config).
-- [x] Sign-in and sign-up functionality via email.
-- [x] Separate Swagger documentation for Admin, Publishers, and CMS sections.
-- [x] Image uploads for articles via S3 using [nestjs-s3](https://www.npmjs.com/package/nestjs-s3).
-- [x] Full E2E test coverage and partial unit tests.
-- [x] Docker support for containerized deployment.
-- [x] Redis caching using [redis](https://www.npmjs.com/package/redis) and [cache-manager-redis-store](https://www.npmjs.com/package/cache-manager-redis-store).
-- [x] OpenSearch integration using [@opensearch-project/opensearch](https://www.npmjs.com/package/@opensearch-project/opensearch).
+:white_check_mark: Database support using [Sequelize](https://www.npmjs.com/package/sequelize).
+:white_check_mark: Data seeding for easy setup.
+:white_check_mark: Config service using [@nestjs/config](https://www.npmjs.com/package/@nestjs/config).
+:white_check_mark: Sign-in and sign-up functionality via email.
+:white_check_mark: Separate Swagger documentation for Admin, Publishers, and CMS sections.
+:white_check_mark: Image uploads for articles via S3 using [nestjs-s3](https://www.npmjs.com/package/nestjs-s3).
+:white_check_mark: Full E2E test coverage and partial unit tests.
+:white_check_mark: Docker support for containerized deployment.
+:white_check_mark: Redis caching using [redis](https://www.npmjs.com/package/redis) and [cache-manager-redis-store](https://www.npmjs.com/package/cache-manager-redis-store).
+:white_check_mark: OpenSearch integration using [@opensearch-project/opensearch](https://www.npmjs.com/package/@opensearch-project/opensearch).
 
 ---
 
@@ -44,7 +44,7 @@ cd nest-js-news-template
 
 ---
 
-## Running the app
+## Running the app :running:
 
 
 ### Fill in your Environment Variables (.env)
@@ -108,7 +108,7 @@ $ docker-compose up
 
 ---
 
-### Running the Tests
+### Running the Tests :factory:
 
 ```bash
 # Run unit tests with file watching
@@ -124,7 +124,7 @@ npm run teste2e:watch
 ----
 
 
-### APi's sections
+### APi's sections :airplane:
 
 #### Admin 
 http://localhost:3009/api/admin
@@ -142,6 +142,6 @@ http://localhost:3009/api/cms
 
 ----
 
-## Contributing
+## Contributing :question:
 
 We welcome your feedback! Whether you want to suggest improvements, report a bug, or ask a question, feel free to do so here: [https://github.com/l1e/nest-js-news-template/issues](https://github.com/l1e/nest-js-news-template/issues)

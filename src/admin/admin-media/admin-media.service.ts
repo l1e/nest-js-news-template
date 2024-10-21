@@ -2,6 +2,7 @@ import {
 	HttpException,
 	HttpStatus,
 	Injectable,
+	InternalServerErrorException,
 	NotFoundException,
 } from "@nestjs/common";
 import { InjectS3, S3 } from "nestjs-s3";
@@ -88,18 +89,49 @@ export class AdminMediaService {
 
 	// Find media by ID
 	async findOne(id: number) {
-		return this.mediaModel.findByPk(id);
+		try {
+
+			let media = await this.mediaModel.findByPk(id);
+
+			if(!media){
+				throw new HttpException(
+					`Media with ID ${id} not found`,
+					HttpStatus.NOT_FOUND,
+				);
+			}
+			return media
+		} catch (error) {
+			throw new InternalServerErrorException(
+				`An error occurred while retrieving media. ${error}`,
+			);
+		}
+
 	}
 
 	async getMediaById(id: number, requestor: Requestor) {
-		let excludeFields =
+		try {
+			let excludeFields =
 			requestor === Requestor.ADMIN ? undefined : ["isPhysicallyExist"];
 
-		let media = await this.mediaModel.findByPk(id, {
-			attributes: { exclude: excludeFields },
-		});
+			let media = await this.mediaModel.findByPk(id, {
+				attributes: { exclude: excludeFields },
+			});
 
-		return media;
+			if(!media){
+				throw new HttpException(
+					`Media with ID ${id} not found`,
+					HttpStatus.NOT_FOUND,
+				);
+			}
+
+			return media;
+		} catch (error) {
+			throw new InternalServerErrorException(
+				`An error occurred while retrieving media. ${error}`,
+			);
+		}
+
+
 	}
 
 	// Update media details

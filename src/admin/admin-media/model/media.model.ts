@@ -26,11 +26,7 @@ export enum PublishStatus {
 	DRAFT = "draft",
 }
 
-@Table({
-	// tableName: "talent_mediaa",
-	// timestamps: true, // Enables createdAt and updatedAt automatically
-	// underscored: true, // For snake_case column naming convention
-})
+@Table({})
 export class Media extends Model<Media> {
 	@Column({
 		type: DataType.STRING,

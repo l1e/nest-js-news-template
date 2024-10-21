@@ -4,6 +4,7 @@ import {
 	HttpStatus,
 	Injectable,
 	InternalServerErrorException,
+	NotFoundException,
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { Article } from "./../admin-article/model/article.model";
@@ -21,7 +22,14 @@ export class AdminCategoryService {
 	async createCategory(
 		createCategoryDto: CreateCategoryDto,
 	): Promise<Category> {
-		return this.categoryModel.create(createCategoryDto);
+		try {
+			return this.categoryModel.create(createCategoryDto);
+		} catch (error) {
+			throw new InternalServerErrorException(
+				"An error occurred while creating category",
+			);
+		}
+
 	}
 
 	async getCategoryById(
@@ -58,7 +66,6 @@ export class AdminCategoryService {
 				throw error;
 			}
 
-			// console.log(" getCategoryById error:", error);
 			throw new InternalServerErrorException("Failed to fetch category");
 		}
 	}
@@ -116,15 +123,36 @@ export class AdminCategoryService {
 		updateCategoryDto: CreateCategoryDto,
 	): Promise<Category> {
 
-		const category = await this.getCategoryById(id);
-		return category.update(updateCategoryDto);
+		try {
+
+			const category = await this.getCategoryById(id);
+			if (!category) {
+				throw new NotFoundException(`Category with ID ${id} not found`);
+			}
+			return category.update(updateCategoryDto);
+
+		} catch (error) {
+			throw new InternalServerErrorException(
+				`An error occurred while updating category. ${error}`,
+			);
+		}
+
 
 	}
 
 	async deleteCategory(id: number): Promise<void> {
+		try {
 
-		const category = await this.getCategoryById(id);
-		await category.destroy();
-		
+			const category = await this.getCategoryById(id);
+			if (!category) {
+				throw new NotFoundException(`Category with ID ${id} not found`);
+			}
+			await category.destroy();
+
+		} catch (error) {
+			throw new InternalServerErrorException(
+				`An error occurred while deleting category. ${error}`, 
+			);
+		}
 	}
 }
