@@ -10,6 +10,8 @@ import {
 	UseGuards,
 	HttpStatus,
 	Query,
+	BadRequestException,
+	InternalServerErrorException,
 } from "@nestjs/common";
 import {
 	ApiBearerAuth,
@@ -25,7 +27,7 @@ import { CreateCategoryDto } from "./dto/category.create.dto";
 import { Category } from "./model/category.model";
 import { AuthAdminhGuard } from "./../../utils/auth.admin.guard";
 import { Requestor } from "../admin-article/model/article.model";
-import { PaginationCategories, SoringCategories, SortByGeneral, SortDirection } from "./../../utils/types/types";
+import { Pagination, SoringCategories, SortByGeneral, SortDirection } from "./../../utils/types/types";
 
 @ApiBearerAuth()
 @ApiTags("categories")
@@ -98,17 +100,32 @@ export class AdminCategoryController {
 	): Promise<{ pagination: any, categories: Category[] }>  {
 
 
-		let sorting: SoringCategories = {
-			sortBy: sortBy,
-			sortDirection: sortDirection
-		}
-		
-		let pagination: PaginationCategories = {
-			page: Number(page),
-			perPage: Number(perPage)
+		try {
+
+			// Validate query parameters 
+			if (!["id", "createdAt"].includes(sortBy)) {
+				throw new BadRequestException("Invalid sortBy value");
+			}
+			if (!["asc", "desc"].includes(sortDirection)) {
+				throw new BadRequestException("Invalid sortDirection value");
+			}
+
+			let sorting: SoringCategories = {
+				sortBy: sortBy,
+				sortDirection: sortDirection
+			}
+			
+			let pagination: Pagination = {
+				page: Number(page),
+				perPage: Number(perPage)
+			}
+
+			return this.adminCategoryService.getAllCategories(Requestor.ADMIN, sorting, pagination);
+			
+		} catch (error) {
+			throw new InternalServerErrorException("Error retrieving categories");
 		}
 
-		return this.adminCategoryService.getAllCategories(Requestor.ADMIN, sorting, pagination);
 	}
 
 	@Put(":id")

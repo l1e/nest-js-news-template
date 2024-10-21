@@ -24,7 +24,7 @@ import {
 import { Cache } from "cache-manager";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { FilterArticleDto } from "./dto/articles.filter.dto";
-import { PaginationArticles, SortBy, SortDirection } from "./../../utils/types/types";
+import { Pagination, SoringArticles, SortByArticles, SortDirection } from "./../../utils/types/types";
 
 
 @ApiTags("cms-article")
@@ -105,7 +105,7 @@ export class CmsArticleController {
 			"Internal server error. An unexpected error occurred while fetching the articles.",
 	})
 	async getPublicArticles(
-		@Query("sortBy") sortBy: SortBy = SortBy.CREATED_AT,
+		@Query("sortBy") sortBy: SortByArticles = SortByArticles.CREATED_AT,
 		@Query("sortDirection") sortDirection: SortDirection = SortDirection.ASC,
 		@Query("categoryId") categoryId: number,
 		@Query("publisherId") publisherId: number,
@@ -126,21 +126,24 @@ export class CmsArticleController {
 			throw new BadRequestException("Invalid sortDirection value");
 		}
 
-		const pageNumber = Number(page); 
-		const perPageNumber = Number(perPage); 
+		let sorting: SoringArticles = {
+			sortBy: sortBy,
+			sortDirection: sortDirection
+		}
+		
+		let pagination: Pagination = {
+			page: Number(page),
+			perPage: Number(perPage)
+		}
 
 
 		let filterArticleDto: FilterArticleDto = {
-			sortBy: sortBy,
-			sortDirection: sortDirection,
 			categoryId: categoryId,
 			publisherId: publisherId,
 			minPublishedArticles: minPublishedArticles,
 			minArticleVeiws: minArticleVeiws,
 			minArticleSizeSymbols: minArticleSizeSymbols,
 			textToSearch: textToSearch,
-			page: pageNumber,
-			perPage: perPageNumber
 		}
 
 		console.log('getPublicArticles filterArticleDto:',filterArticleDto)
@@ -151,7 +154,7 @@ export class CmsArticleController {
 			// 	sortBy,
 			// 	sortDirection,
 			// );
-			let articles = await this.cmsArticleService.findArticlesByFilterWithTheHealthCheck(filterArticleDto)
+			let articles = await this.cmsArticleService.findArticlesByFilterWithTheHealthCheck(filterArticleDto, sorting, pagination)
 			if (articles.articles.length === 0) {
 				throw new NotFoundException(
 					"No articles found matching the given criteria",

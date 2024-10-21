@@ -26,7 +26,7 @@ import { AdminMediaService } from "../admin-media/admin-media.service";
 import { UpdateArticleDto } from "./dto/update.article.dto";
 
 import { Op } from 'sequelize';
-import { PaginationArticles, SoringArticles, SortBy, SortDirection } from './../../utils/types/types';
+import { Pagination, SoringArticles, SortByArticles, SortDirection } from './../../utils/types/types';
 
 @Injectable()
 export class AdminArticleService {
@@ -352,14 +352,12 @@ export class AdminArticleService {
 
 	async getAllArticles(
 		requestor: Requestor,
-		sortBy: SortBy,
-		sortDirection: SortDirection,
+		sorting: SoringArticles,
 		categoryId: number,
 		publisherId: number,
 		textToSearch: string,
 		minArticleViews: number,
-		page: number,
-		perPage: number,
+		pagination:Pagination,
 	): Promise<{ pagination: any; articles: Article[] }> {
 	
 		let whereConditionsGeneral = [];
@@ -409,8 +407,25 @@ export class AdminArticleService {
 	
 		try {
 
-			const totalArticles = await this.articleModel.count({
+			const totalArticles = await this.articleModel.findAll({
 				where: whereConditionsForArticle,
+				include: [
+					{
+						model: Category,
+						as: "category",
+						attributes: {
+							exclude: ["publishStatus"],
+						},
+					},
+					{
+						model: Media,
+						as: "media",
+						attributes: {
+							exclude: attributesToExcludeFromMedia,
+						},
+						where: whereConditionsForMedia,
+					},
+				]
 				// include: [
 				// 	{
 				// 		model: Media,
@@ -422,11 +437,11 @@ export class AdminArticleService {
 			});
 	
 			const paginationResult = {
-				count: perPage,
-				total: totalArticles,
-				per_page: perPage,
-				current_page: page,
-				total_pages: Math.ceil(totalArticles / perPage),
+				count: pagination.perPage, //fix it!!!!!!
+				total: totalArticles.length,
+				perPage: pagination.perPage,
+				currentPage: pagination.page,
+				totalPages: Math.ceil(totalArticles.length / pagination.perPage),
 			};
 	
 			const articles = await this.articleModel.findAll({
@@ -451,10 +466,24 @@ export class AdminArticleService {
 						where: whereConditionsForMedia,
 					},
 				],
-				order: [[sortBy, sortDirection]],
-				limit: perPage,
-				offset: (page - 1) * perPage, 
+				order: [[sorting.sortBy, sorting.sortDirection]],
+				limit: pagination.perPage,
+				offset: (pagination.page - 1) * pagination.perPage, 
 			});
+
+			
+			
+			// console.log('getAllArticles totalArticles :', totalArticles)
+			// console.log('getAllArticles whereConditionsForArticle :', whereConditionsForArticle)
+			// console.log('getAllArticles paginationResult :', paginationResult)
+			// console.log('getAllArticles articles.length :', articles.length)
+			// console.log('getAllArticles articles :', articles)
+
+
+			if(articles.length){
+				paginationResult.count = articles.length;
+			}
+			
 	
 			if (articles.length === 0) {
 				throw new NotFoundException(
@@ -538,7 +567,7 @@ export class AdminArticleService {
 	async getPublisherArticles(
 		publisherEmail: string, 
 		sorting: SoringArticles, 
-		pagination: PaginationArticles
+		pagination: Pagination
 	): Promise<{ pagination: any, articles: Article[] }> {
 		try {
 			// Find the publisher by email
@@ -597,9 +626,9 @@ export class AdminArticleService {
 			const paginationResult = {
 				count: articles.length, 
 				total: totalArticles, 
-				per_page: pagination.perPage, 
-				current_page: pagination.page, 
-				total_pages: Math.ceil(totalArticles / pagination.perPage),
+				perPage: pagination.perPage, 
+				currentPage: pagination.page, 
+				totalPages: Math.ceil(totalArticles / pagination.perPage),
 			};
 
 			return { 
@@ -705,7 +734,18 @@ export class AdminArticleService {
 	}
 
 	async pushArticleToOpenSearch() {
-        let articles = await this.getAllArticles(Requestor.ADMIN, SortBy.VIEWS, SortDirection.ASC, undefined,undefined,undefined,undefined,1,1000)
+
+		let sorting: SoringArticles = {
+			sortBy: SortByArticles.VIEWS,
+			sortDirection: SortDirection.ASC
+		}
+		
+		let pagination: Pagination = {
+			page: Number(1),
+			perPage: Number(1000)
+		}
+
+        let articles = await this.getAllArticles(Requestor.ADMIN, sorting, undefined,undefined,undefined,undefined,pagination)
 
 		for (const article of await articles.articles) {
 			const is_alredy_saved_article = await this.adminOpensearchService.findOneArticle(article.id);

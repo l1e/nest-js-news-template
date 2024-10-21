@@ -101,9 +101,9 @@ describe("AdminCategoryService", () => {
 				pagination: {
 					count: categories.length,
 					total: categories.length,
-					per_page: 2,
-					current_page: 1,
-					total_pages: 1,
+					perPage: 2,
+					currentPage: 1,
+					totalPages: 1,
 				},
 				categories,
 			});

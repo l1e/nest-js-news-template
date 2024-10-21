@@ -32,7 +32,7 @@ import {
 } from "@nestjs/common";
 import { CreateArticleDto } from "./dto/article.create.dto";
 import { AdminOpensearchService } from "../admin-opensearch/admin-opensearch.service";
-import { SortBy, SortDirection } from "./../../../src/utils/types/types";
+import { Pagination, SoringArticles, SortByArticles, SortDirection } from "./../../../src/utils/types/types";
 
 describe("AdminArticleService", () => {
 	let service: AdminArticleService;
@@ -322,19 +322,27 @@ describe("AdminArticleService", () => {
 			const articles = [mockCreateArticleDtoCreated]; 
 			const totalArticlesCount = articles.length;
 
+			let sorting: SoringArticles = {
+				sortBy: SortByArticles.VIEWS,
+				sortDirection: SortDirection.ASC
+			};
+			
+			let pagination: Pagination = {
+				page: Number(1),
+				perPage: Number(1000)
+			};
+
 			(articleModel.findAll as jest.Mock).mockResolvedValue(articles);
 			(articleModel.count as jest.Mock).mockResolvedValue(totalArticlesCount); // Mock the count method
 	
 			const result = await service.getAllArticles(
 				Requestor.ADMIN,
-				SortBy.CREATED_AT,
-				SortDirection.ASC,
+				sorting,
 				undefined,
 				undefined,
 				undefined,
 				undefined,
-				1,
-				100
+				pagination
 			);
 	
 			expect(result.articles).toEqual(articles);

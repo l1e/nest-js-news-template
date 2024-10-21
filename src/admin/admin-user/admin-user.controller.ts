@@ -26,7 +26,7 @@ import { AuthAdminhGuard } from "./../../utils/auth.admin.guard";
 
 import { Requestor } from "../admin-article/model/article.model";
 import { UpdateUserDto } from "./dto/update-user.dto";
-import { PaginationUsers, SortBy, SortDirection, UsersSortBy } from "./../../utils/types/types";
+import { PaginationUsers, SortDirection, UsersSortBy } from "./../../utils/types/types";
 
 @ApiBearerAuth()
 @ApiTags("users")

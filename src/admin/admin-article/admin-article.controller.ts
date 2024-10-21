@@ -29,7 +29,7 @@ import { Article, Requestor } from "./model/article.model";
 import { AuthAdminhGuard } from "./../../utils/auth.admin.guard";
 import { EmailToken } from "./../../utils/email.from.token.decorator";
 import { UpdateArticleDto } from "./dto/update.article.dto";
-import { SortBy, SortDirection } from "./../../utils/types/types";
+import { Pagination, SoringArticles, SortByArticles, SortDirection } from "./../../utils/types/types";
 
 @ApiBearerAuth()
 @ApiTags("articles")
@@ -144,7 +144,7 @@ export class AdminArticleController {
 	})
 	@UseGuards(AuthGuard("jwt"), AuthAdminhGuard)
 	async getAllArticles(
-		@Query("sortBy") sortBy: SortBy = SortBy.CREATED_AT,
+		@Query("sortBy") sortBy: SortByArticles = SortByArticles.CREATED_AT,
 		@Query("sortDirection") sortDirection: SortDirection = SortDirection.ASC,
 		@Query("categoryId") categoryId: number,
 		@Query("publisherId") publisherId: number,
@@ -163,20 +163,25 @@ export class AdminArticleController {
 			throw new BadRequestException("Invalid sortDirection value");
 		}
 
-		const pageNumber = Number(page);  // Convert page to number
-		const perPageNumber = Number(perPage);  // Convert perPage to number
+		let sorting: SoringArticles = {
+			sortBy: sortBy,
+			sortDirection: sortDirection
+		}
+		
+		let pagination: Pagination = {
+			page: Number(page),
+			perPage: Number(perPage)
+		}
 
 		try {
 			const articles = await this.adminArticleService.getAllArticles(
 				Requestor.ADMIN,
-				sortBy,
-				sortDirection,
+				sorting,
 				categoryId,
 				publisherId,
 				textToSearch,
 				minArticleVeiws,
-				pageNumber,
-				perPageNumber,
+				pagination,
 			);
 
 			if (articles && articles.articles && Object.keys(articles.articles).length === 0) {

@@ -25,9 +25,9 @@ export const categoryAll: { pagination: any, categories: any } ={
 	  pagination: {
 		count: 2,
 		total: 5,
-		per_page: 2,
-		current_page: 1,
-		total_pages: 3
+		perPage: 2,
+		currentPage: 1,
+		totalPages: 3
 	  },
 	  categories: [
 		{
@@ -82,9 +82,9 @@ export const articlesAll: { pagination: any, articles: any } = {
 	pagination: {
 	  count: 3,
 	  total: 14,
-	  per_page: 3,
-	  current_page: 1,
-	  total_pages: 5
+	  perPage: 3,
+	  currentPage: 1,
+	  totalPages: 5
 	},
 	articles: [
 	  {

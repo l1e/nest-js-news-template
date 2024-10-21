@@ -1,10 +1,10 @@
-import { SortBy, SortDirection } from "./../../../utils/types/types";
+// import { SortByArticles, SortDirection } from "./../../../utils/types/types";
 
 export class FilterArticleDto {
 
-	sortBy: SortBy;
+	// sortBy: SortByArticles;
 
-	sortDirection: SortDirection
+	// sortDirection: SortDirection
 	
 	publisherId: number
 
@@ -14,9 +14,9 @@ export class FilterArticleDto {
 
 	textToSearch: string
 
-	page: number
+	// page: number
 	
-	perPage: number
+	// perPage: number
 
 	// will be added later 
 	minArticleSizeSymbols: number

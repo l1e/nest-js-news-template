@@ -8,7 +8,7 @@ import { Cache } from "cache-manager";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { FilterArticleDto } from "./dto/articles.filter.dto";
 import { AdminOpensearchService } from "./../../admin/admin-opensearch/admin-opensearch.service";
-import { SortBy, SortDirection } from "./../../utils/types/types";
+import { Pagination, SoringArticles, SortByArticles, SortDirection } from "./../../utils/types/types";
 
 
 @Injectable()
@@ -22,14 +22,12 @@ export class CmsArticleService {
 
 	// Method to get articles for the public.
 	async getPublicArticles(
-		sortBy: SortBy, 
-		sortDirection: SortDirection,
+		sorting: SoringArticles,
 		categoryId: number,
 		publisherId: number,
 		textToSearch: string,
 		minArticleVeiws: number,
-		page: number,
-		perPage: number,
+		pagination:Pagination,
 	): Promise<{ pagination: any; articles: Article[] }> {
 
 		// console.log('getPublicArticles {sortBy, sortDirection, categoryId, publisherId, textToSearch}:' ,{sortBy, sortDirection, categoryId, publisherId, textToSearch})
@@ -43,14 +41,12 @@ export class CmsArticleService {
 
 		let articles = await this.adminArticleService.getAllArticles(
 			Requestor.CMS,
-			sortBy,
-			sortDirection,
+			sorting,
 			categoryId,
 			publisherId,
 			textToSearch,
 			minArticleVeiws,
-			page,
-			perPage
+			pagination
 		);
 
 		// this.cacheManager.set(`cms_articles?${hashRequest}`, articles, 100);
@@ -58,7 +54,11 @@ export class CmsArticleService {
 		return articles;
 	}
 
-	async findArticlesByFilterWithTheHealthCheck(filterArticleDto : FilterArticleDto): Promise<{ pagination: any; articles: Article[] }> {
+	async findArticlesByFilterWithTheHealthCheck(
+		filterArticleDto : FilterArticleDto,
+		sorting: SoringArticles,
+		pagination:Pagination,
+	): Promise<{ pagination: any; articles: Article[] }> {
 
 		let openSearcHealthCheck = await this.adminOpenSearchService.checkOpenSearchClusterHealth(process.env.OPENSEARCH_ARTICLE_INDEX_NAME);
 
@@ -71,30 +71,26 @@ export class CmsArticleService {
 		if(openSearcHealthCheck.opensearch === true) {
 		// if(false) {
 
-			articles = await this.adminOpenSearchService.findArticlesByFilter(filterArticleDto)
+			articles = await this.adminOpenSearchService.findArticlesByFilter(filterArticleDto, sorting, pagination)
 
 			// console.log('findArticlesByFilterWithTheHealthCheck articless:', articles)
 		}else if(openSearcHealthCheck.opensearch === false){
 			articles =  await this.getPublicArticles(
-				SortBy.VIEWS, 
-				SortDirection.ASC, 
+				sorting,
 				filterArticleDto.categoryId,
 				filterArticleDto.publisherId,
 				filterArticleDto.textToSearch,
 				filterArticleDto.minArticleVeiws,
-				filterArticleDto.page,
-				filterArticleDto.perPage,
+				pagination,
 			);
 		}else{
 			articles =  await this.getPublicArticles(
-				SortBy.VIEWS, 
-				SortDirection.ASC, 
+				sorting, 
 				filterArticleDto.categoryId,
 				filterArticleDto.publisherId,
 				filterArticleDto.textToSearch,
 				filterArticleDto.minArticleVeiws,
-				filterArticleDto.page,
-				filterArticleDto.perPage,
+				pagination,
 			);
 
 		}

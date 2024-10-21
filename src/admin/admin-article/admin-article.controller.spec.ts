@@ -21,7 +21,7 @@ import {
 	Requestor,
 	ValidationStatus,
 } from "./model/article.model";
-import { SortBy, SortDirection } from "./../../utils/types/types";
+import { SortByArticles, SortDirection } from "./../../utils/types/types";
 import { AdminOpensearchService } from "../admin-opensearch/admin-opensearch.service";
 
 describe("AdminArticleController", () => {
@@ -176,7 +176,7 @@ describe("AdminArticleController", () => {
 				articlesAll,
 			);
 
-			const result = await controller.getAllArticles(SortBy.VIEWS, SortDirection.ASC,undefined,undefined,undefined,undefined,undefined,undefined,1,100);
+			const result = await controller.getAllArticles(SortByArticles.VIEWS, SortDirection.ASC,undefined,undefined,undefined,undefined,undefined,undefined,1,100);
 
 			// console.log("controller getAllArticles result:", result);
 

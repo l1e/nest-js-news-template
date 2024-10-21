@@ -3,6 +3,7 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { Client } from '@opensearch-project/opensearch';
 import { Article } from '../admin-article/model/article.model';
 import { from } from 'rxjs';
+import { Pagination, SoringArticles } from 'src/utils/types/types';
 
 @Injectable()
 export class AdminOpensearchService {
@@ -115,12 +116,16 @@ export class AdminOpensearchService {
             throw error;
         }
     }
-	async findArticlesByFilter(filterArticleDto: FilterArticleDto): Promise<{ pagination: any; articles: Article[] }> {
+	async findArticlesByFilter(
+		filterArticleDto: FilterArticleDto,
+		sorting: SoringArticles,
+		pagination: Pagination,
+	): Promise<{ pagination: any; articles: Article[] }> {
 		// console.log('findArticlesByFilter openSearch filterArticleDto:', filterArticleDto);
 		
 		// Calculate pagination values
-		const from = (filterArticleDto.page - 1) * filterArticleDto.perPage;
-		const size = filterArticleDto.perPage;
+		const from = (pagination.page - 1) * pagination.perPage;
+		const size = pagination.perPage;
 		
 		// Build the query based on filterArticleDto
 		const query = {
@@ -185,7 +190,7 @@ export class AdminOpensearchService {
 					from: from, // Pagination: starting point
 					size: size, // Pagination: number of results per page
 					query: query,
-					sort: [{ [filterArticleDto.sortBy]: { order: filterArticleDto.sortDirection.toLowerCase() } }] // Sorting
+					sort: [{ [sorting.sortBy]: { order: sorting.sortDirection.toLowerCase() } }] // Sorting
 				}
 			});
 	
@@ -196,18 +201,18 @@ export class AdminOpensearchService {
 				
 				
 				const totalHits = articles.body.hits.total.value;
-				const totalPages = Math.ceil(totalHits / filterArticleDto.perPage);
+				const totalPages = Math.ceil(totalHits / pagination.perPage);
 	
-				const pagination = {
+				const paginationResult = {
 					total: totalHits,
-					perPage: filterArticleDto.perPage,
-					currentPage: filterArticleDto.page,
+					perPage: pagination.perPage,
+					currentPage: pagination.page,
 					totalPages: totalPages,
 				};
 	
 				// console.log('findArticlesByFilter articles:', articles.body.hits.hits);
 				return { 
-					pagination, // Include pagination info
+					pagination: paginationResult, // Include pagination info
 					articles: await this.formatArticlesByFilter(articles.body.hits.hits) // Return the relevant article hits
 				};
 			} else {

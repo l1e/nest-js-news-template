@@ -1,4 +1,4 @@
-import { Controller, Get, HttpStatus, Inject, InternalServerErrorException, Query } from "@nestjs/common";
+import { BadRequestException, Controller, Get, HttpStatus, Inject, InternalServerErrorException, Query } from "@nestjs/common";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { CmsCategoryService } from "./cms-category.service";
 import { Category } from "./../../admin/admin-category/model/category.model";
@@ -6,7 +6,7 @@ import { Category } from "./../../admin/admin-category/model/category.model";
 
 import { Cache } from "cache-manager";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
-import { PaginationCategories, SoringCategories, SortByGeneral, SortDirection } from "./../../utils/types/types";
+import { Pagination, SoringCategories, SortByGeneral, SortDirection } from "./../../utils/types/types";
 import { Requestor } from "./../../admin/admin-article/model/article.model";
 
 @ApiTags("cms-category")
@@ -32,7 +32,7 @@ export class CmsCategoryController {
 		name: "sortBy",
 		required: false,
 		enum: ["id", "createdAt"],
-		description: "Field to sort by (views or createdAt)",
+		description: "Field to sort by (id or createdAt)",
 	})
 	@ApiQuery({
 		name: "sortDirection",
@@ -49,28 +49,35 @@ export class CmsCategoryController {
 
 		try {
 
+			// Validate query parameters 
+			if (!["id", "createdAt"].includes(sortBy)) {
+				throw new BadRequestException("Invalid sortBy value");
+			}
+			if (!["asc", "desc"].includes(sortDirection)) {
+				throw new BadRequestException("Invalid sortDirection value");
+			}
+
 			let sorting: SoringCategories = {
 				sortBy: sortBy,
 				sortDirection: sortDirection
 			}
 			
-			let pagination: PaginationCategories = {
+			let pagination: Pagination = {
 				page: Number(page),
 				perPage: Number(perPage)
 			}
 			
-			let hashRequest = `categories`;
+			let hashRequest = `?sortBy=${sorting.sortBy}&sortDirection=${sorting.sortDirection}&page=${pagination.page}&perPage=${pagination.perPage}`;
 			let cachedCategories = await this.cacheManager.get<{ pagination: any, categories: Category[] }>(`cms_categories/${hashRequest}`);
 	
 			if(cachedCategories) return cachedCategories;
 
 			let categories = await this.publisherCategoryService.getAllCategories(Requestor.CMS, sorting, pagination);
-			this.cacheManager.set(`cms_categories/${hashRequest}`, categories, 100);
+			this.cacheManager.set(`cms_categories${hashRequest}`, categories, 100);
 			return categories
 		} catch (error) {
 			throw new InternalServerErrorException("Error retrieving categories");
 		}
-
 
 	}
 }

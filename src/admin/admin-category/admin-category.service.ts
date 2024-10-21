@@ -9,7 +9,7 @@ import { InjectModel } from "@nestjs/sequelize";
 import { Article } from "./../admin-article/model/article.model";
 import { Category, PublishStatus } from "./model/category.model";
 import { CreateCategoryDto } from "./dto/category.create.dto";
-import { PaginationCategories, SoringCategories } from "./../../utils/types/types";
+import { Pagination, SoringCategories } from "./../../utils/types/types";
 
 @Injectable()
 export class AdminCategoryService {
@@ -66,7 +66,7 @@ export class AdminCategoryService {
 	async getAllCategories(
 		requestor: Requestor = Requestor.PUBLISHER,
 		sorting: SoringCategories, 
-		pagination: PaginationCategories
+		pagination: Pagination
 	): Promise<{ pagination: any, categories: Category[] }> {
 		try {
 			const attributes =
@@ -94,9 +94,9 @@ export class AdminCategoryService {
 			const paginationResult = {
 				count: categories.length, 
 				total: totalCategories, 
-				per_page: pagination.perPage, 
-				current_page: pagination.page, 
-				total_pages: Math.ceil(totalCategories / pagination.perPage), 
+				perPage: pagination.perPage, 
+				currentPage: pagination.page, 
+				totalPages: Math.ceil(totalCategories / pagination.perPage), 
 			};
 	
 			return {

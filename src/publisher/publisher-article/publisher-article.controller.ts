@@ -30,7 +30,7 @@ import {
 import { AuthPublisherGuard } from "./../../utils/auth.publisher.guard";
 import { EmailToken } from "./../../utils/email.from.token.decorator";
 import { UpdateArticleDto } from "./../../admin/admin-article/dto/update.article.dto";
-import { PaginationArticles, SoringArticles, SortBy, SortDirection } from "./../../utils/types/types";
+import { Pagination, SoringArticles, SortByArticles, SortDirection } from "./../../utils/types/types";
 
 @ApiBearerAuth()
 @Controller("publisher-article")
@@ -47,7 +47,6 @@ export class PublisherArticleController {
 		@Body() createArticleDto: CreateArticleDto,
 		@EmailToken("decodedEmail") decodedEmail: string,
 	): Promise<Article> {
-		console.log("createArticle decodedEmail:", decodedEmail);
 		createArticleDto.creatorEmail = decodedEmail;
 		createArticleDto.validationStatus = ValidationStatus.APPROVED;
 		return this.publisherArticleService.createArticle(createArticleDto);
@@ -126,7 +125,7 @@ export class PublisherArticleController {
 	@UseGuards(AuthGuard("jwt"), AuthPublisherGuard)
 	async getAllArticles(
 		@EmailToken("decodedEmail") decodedEmail: string,
-		@Query("sortBy") sortBy: SortBy = SortBy.CREATED_AT,
+		@Query("sortBy") sortBy: SortByArticles = SortByArticles.CREATED_AT,
 		@Query("sortDirection") sortDirection: SortDirection = SortDirection.ASC,
 		@Query("page") page: number = 1,
 		@Query("perPage") perPage: number = 2,
@@ -137,7 +136,7 @@ export class PublisherArticleController {
 			sortDirection: sortDirection
 		}
 		
-		let pagination: PaginationArticles = {
+		let pagination: Pagination = {
 			page: Number(page),
 			perPage: Number(perPage)
 		}

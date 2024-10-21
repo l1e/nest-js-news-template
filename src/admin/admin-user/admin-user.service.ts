@@ -78,9 +78,9 @@ export class AdminUserService {
 		let paginationResult = {
 			count: perPage,
 			total: 0,
-			per_page: perPage,
-			current_page: page,
-			total_pages: 0,
+			perPage: perPage,
+			currentPage: page,
+			totalPages: 0,
 		};
 	
 		const queryOptions: any = {
@@ -144,7 +144,7 @@ export class AdminUserService {
 		// console.log('findAllUsers totalUsers:', totalUsers)
 	
 		paginationResult.total = totalUsers;
-		paginationResult.total_pages = Math.ceil(totalUsers / perPage);
+		paginationResult.totalPages = Math.ceil(totalUsers / perPage);
 	
 		queryOptions.limit = perPage;
 		queryOptions.offset = (page - 1) * perPage;
@@ -165,9 +165,9 @@ export class AdminUserService {
 		let paginationResult = {
 			count: perPage,
 			total: 0,
-			per_page: perPage,
-			current_page: page,
-			total_pages: 0,
+			perPage: perPage,
+			currentPage: page,
+			totalPages: 0,
 		};
 	
 		const queryOptions: any = {
@@ -231,7 +231,7 @@ export class AdminUserService {
 		});
 	
 		paginationResult.total = totalPublishers.length || 0;
-		paginationResult.total_pages = Math.ceil(paginationResult.total / perPage);
+		paginationResult.totalPages = Math.ceil(paginationResult.total / perPage);
 
 		queryOptions.limit = perPage;
 		queryOptions.offset = (page - 1) * perPage;

@@ -1,6 +1,11 @@
-export enum SortBy{
-	CREATED_AT = 'createdAt',
-	VIEWS = 'views',
+export interface Pagination {
+	page: number,
+	perPage: number
+}
+
+export enum SortDirection{
+	ASC = 'asc',
+	DESC = 'desc',
 }
 
 export enum SortByGeneral{
@@ -8,19 +13,16 @@ export enum SortByGeneral{
 	ID = 'id',
 }
 
+export enum SortByArticles{
+	CREATED_AT = 'createdAt',
+	VIEWS = 'views',
+}
+
 export enum UsersSortBy{
 	ID = 'id',
 	CREATED_AT = 'createdAt',
 	publishedArticlesCount = 'publishedArticlesCount'
 }
-
-
-
-export enum SortDirection{
-	ASC = 'asc',
-	DESC = 'desc',
-}
-
 export interface PaginationUsers {
 	sortBy: UsersSortBy,
 	sortDirection: SortDirection,
@@ -29,21 +31,15 @@ export interface PaginationUsers {
 }
 
 
-export interface PaginationArticles {
-	page: number,
-	perPage: number
-}
+// export interface PaginationArticles {
+// 	page: number,
+// 	perPage: number
+// }
 
 export interface SoringArticles{
-	sortBy: SortBy,
+	sortBy: SortByArticles,
 	sortDirection: SortDirection
 }
-
-export interface PaginationCategories {
-	page: number,
-	perPage: number
-}
-
 export interface SoringCategories{
 	sortBy: SortByGeneral,
 	sortDirection: SortDirection

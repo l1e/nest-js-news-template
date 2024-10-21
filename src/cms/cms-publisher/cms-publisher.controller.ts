@@ -5,6 +5,7 @@ import {
 	InternalServerErrorException,
 	NotFoundException,
 	Inject,
+	BadRequestException,
 } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags, ApiQuery } from "@nestjs/swagger";
 import { Cache } from "cache-manager";
@@ -58,6 +59,15 @@ export class CmsPublisherController {
 		@Query("page") page: number = 1,
 		@Query("perPage") perPage: number = 2,
 	){
+
+		// Validate query parameters 
+		if (!["id", "createdAt", "publishedArticlesCount"].includes(sortBy)) {
+			throw new BadRequestException("Invalid sortBy value");
+		}
+		if (!["asc", "desc"].includes(sortDirection)) {
+			throw new BadRequestException("Invalid sortDirection value");
+		}
+
 		try {
 
 			const pageNumber = Number(page);
