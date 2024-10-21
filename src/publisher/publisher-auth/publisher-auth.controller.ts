@@ -9,7 +9,7 @@ import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { PublisherAuthService } from "./publisher-auth.service";
 import { CreateUserDto } from "./../../admin/admin-user/dto/create-user.dto";
 import { UserStatus } from "./../../admin/admin-user/model/user.model";
-import { PortalAuthTalantLoginStandartDTO } from "./dto/portal-auth.login.dto";
+import { PortalAuthLoginStandartDTO } from "./dto/portal-auth.login.dto";
 
 @ApiTags("publisher-auth")
 @Controller("publisher-auth")
@@ -55,28 +55,23 @@ export class PublisherAuthController {
 	@ApiResponse({ status: 403, description: "Forbidden." })
 	async login(
 		@Body()
-		portalAuthTalantLoginStandartDTO: PortalAuthTalantLoginStandartDTO,
+		portalAuthLoginStandartDTO: PortalAuthLoginStandartDTO,
 	) {
-		console.log(
-			"portalAuthTalantLoginStandartDTO ",
-			portalAuthTalantLoginStandartDTO,
-		);
-		// console.log('req request:::', request);
 
 		if (
-			portalAuthTalantLoginStandartDTO.role === null ||
-			portalAuthTalantLoginStandartDTO.role === undefined
+			portalAuthLoginStandartDTO.role === null ||
+			portalAuthLoginStandartDTO.role === undefined
 		) {
 			throw new HttpException("Role is required.", HttpStatus.CONFLICT);
 		}
 
 		let allowedRoles = ["admin", "publisher"];
-		if (!allowedRoles.includes(portalAuthTalantLoginStandartDTO.role)) {
+		if (!allowedRoles.includes(portalAuthLoginStandartDTO.role)) {
 			throw new HttpException("You use wrong role", HttpStatus.CONFLICT);
 		}
 
 		const token = await this.publisherAuthService.loginEmail(
-			portalAuthTalantLoginStandartDTO,
+			portalAuthLoginStandartDTO,
 		);
 
 		return token;

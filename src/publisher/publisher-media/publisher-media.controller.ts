@@ -56,7 +56,7 @@ export class PublisherMediaController {
 			limits: { fileSize: 20200000 },
 		}),
 	)
-	@ApiOperation({ description: "Upload media file to S3" })
+	@ApiOperation({ summary: "Upload media file to S3" })
 	async mediaUploadToS3(
 		@UploadedFile() file,
 		@Body() createMediaDto: CreateMediaDto,

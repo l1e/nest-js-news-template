@@ -10,7 +10,7 @@ import {
 
 export class AdminUserLoginDTO {
 	@ApiProperty({
-		default: "test.admin@dev.com",
+		default: "admin@example.com",
 	})
 	@IsEmail(undefined, {
 		message: "Write valid email",
@@ -20,7 +20,7 @@ export class AdminUserLoginDTO {
 	readonly email: string;
 
 	@ApiProperty({
-		default: "mySecretMega9Password0Venus",
+		default: "password123",
 	})
 	@IsNotEmpty()
 	@Length(8, 30, { each: true, message: "Incorrect $property length" })

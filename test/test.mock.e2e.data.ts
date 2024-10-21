@@ -5,19 +5,14 @@ import {
 } from "./../src/admin/admin-user/model/user.model";
 import {
 	ArticleOfTheDay,
-	ArticleSpecial,
 	PublishStatus,
-	Requestor,
 	ValidationStatus,
 } from "./../src/admin/admin-article/model/article.model";
 import { CreateCategoryDto } from "./../src/admin/admin-category/dto/category.create.dto";
 
 let randomEmailPrefix = (Math.random() + 1).toString(36).substring(7);
 let randomEmailPrefixPassword = (Math.random() + 1).toString(36).substring(7);
-
 let randomNickNamePrefix = (Math.random() + 1).toString(36).substring(7);
-
-
 let randomArticleTitlePrefix = (Math.random() + 1).toString(36).substring(7);
 
 export const userLogIn = {

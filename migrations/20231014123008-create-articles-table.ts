@@ -77,6 +77,11 @@ export = {
   },
 
   down: async (queryInterface: QueryInterface): Promise<void> => {
+
+	// Remove all Users
+	await queryInterface.bulkDelete('Articles', null, {});
+
+	// Drop the Articles table
     await queryInterface.dropTable('Articles');
   },
 };

@@ -1,6 +1,6 @@
 import { CreateArticleDto } from "../src/admin/admin-article/dto/article.create.dto";
 import { CreateCategoryDto } from "../src/admin/admin-category/dto/category.create.dto";
-import { Category, PublishStatus } from "../src/admin/admin-category/model/category.model";
+import { PublishStatus } from "../src/admin/admin-category/model/category.model";
 import {
 	ArticleOfTheDay,
 	ArticleSpecial,
@@ -21,31 +21,32 @@ export const categoryMockDataCreated: CreateCategoryDto = {
 	description: "test",
 	publishStatus: PublishStatus.PUBLISHED,
 };
+
 export const categoryAll: { pagination: any, categories: any } ={
-	  pagination: {
+	pagination: {
 		count: 2,
 		total: 5,
 		perPage: 2,
 		currentPage: 1,
 		totalPages: 3
-	  },
-	  categories: [
-		{
-		  id: 1,
-		  name: "Military",
-		  description: "Articles covering the latest advancements in military robotics and their use in warfare.",
-		  createdAt: "2024-10-19T23:31:14.000Z",
-		  updatedAt: "2024-10-19T23:31:14.000Z"
-		},
-		{
-		  id: 2,
-		  name: "AI and Robot",
-		  description: "Articles focusing on artificial intelligence and robotics integration in various industries.",
-		  createdAt: "2024-10-19T23:31:14.000Z",
-		  updatedAt: "2024-10-19T23:31:14.000Z"
-		}
-	  ]
-	};
+	},
+	categories: [
+	{
+		id: 1,
+		name: "Military",
+		description: "Articles covering the latest advancements in military robotics and their use in warfare.",
+		createdAt: "2024-10-19T23:31:14.000Z",
+		updatedAt: "2024-10-19T23:31:14.000Z"
+	},
+	{
+		id: 2,
+		name: "AI and Robot",
+		description: "Articles focusing on artificial intelligence and robotics integration in various industries.",
+		createdAt: "2024-10-19T23:31:14.000Z",
+		updatedAt: "2024-10-19T23:31:14.000Z"
+	}
+	]
+};
 
 export const mockCreateArticleDtoNew: CreateArticleDto = {
 	title: "Test Article",
@@ -196,7 +197,7 @@ export const articlesAll: { pagination: any, articles: any } = {
 		]
 	  }
 	]
-  }
+}
 
 export const mockUser = {
 	id: 1,

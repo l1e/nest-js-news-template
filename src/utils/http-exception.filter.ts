@@ -4,10 +4,9 @@ import {
 	ArgumentsHost,
 	HttpException,
 } from "@nestjs/common";
-import { Request, Response } from "express";
+import { Response } from "express";
 
 // Output formater if we response error.
-
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
 	catch(exception: HttpException, host: ArgumentsHost) {

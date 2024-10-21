@@ -3,7 +3,7 @@ import { AdminAuthService } from "./../../admin/admin-auth/admin-auth.service";
 import { AdminUserService } from "./../../admin/admin-user/admin-user.service";
 import { CreateUserDto } from "./../../admin/admin-user/dto/create-user.dto";
 import { Payload } from "./../../utils/types/payload.dto";
-import { PortalAuthTalantLoginStandartDTO } from "./dto/portal-auth.login.dto";
+import { PortalAuthLoginStandartDTO } from "./dto/portal-auth.login.dto";
 
 @Injectable()
 export class PublisherAuthService {
@@ -32,15 +32,15 @@ export class PublisherAuthService {
 	}
 
 	async loginEmail(
-		portalAuthTalantLoginStandartDTO: PortalAuthTalantLoginStandartDTO,
+		portalAuthLoginStandartDTO: PortalAuthLoginStandartDTO,
 	) {
 		const user = await this.adminUserService.findByEmailAndRole(
-			portalAuthTalantLoginStandartDTO,
+			portalAuthLoginStandartDTO,
 		);
 
 		const payload = {
 			email: user.email,
-			role: portalAuthTalantLoginStandartDTO.role,
+			role: portalAuthLoginStandartDTO.role,
 			provider: "email",
 		};
 

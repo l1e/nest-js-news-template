@@ -15,7 +15,7 @@ export class AdminAuthController {
 	) {}
 
 	@Post("register")
-	@ApiOperation({ description: "Registration to be an admin." })
+	@ApiOperation({ summary: "Registration to be an admin." })
 	@ApiResponse({
 		status: 201,
 		description: "The record has been successfully created.",
@@ -44,7 +44,7 @@ export class AdminAuthController {
 	}
 
 	@Post("login")
-	@ApiOperation({ description: "Log in into admin account." })
+	@ApiOperation({ summary: "Log in into admin account." })
 	@ApiResponse({ status: 201, description: "Success" })
 	@ApiResponse({ status: 400, description: "User does not exists" })
 	@ApiResponse({ status: 403, description: "Forbidden." })

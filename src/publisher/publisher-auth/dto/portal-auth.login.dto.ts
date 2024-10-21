@@ -9,7 +9,7 @@ import {
 	MinLength,
 } from "class-validator";
 
-export class PortalAuthTalantLoginStandartDTO {
+export class PortalAuthLoginStandartDTO {
 	@ApiProperty({
 		default: "test.publisher@dev.com",
 	})

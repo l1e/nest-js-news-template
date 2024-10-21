@@ -4,11 +4,9 @@ import {
 	Post,
 	Delete,
 	UploadedFile,
-	UploadedFiles,
 	UseGuards,
 	UseInterceptors,
 	Param,
-	Query,
 	Body,
 	ParseIntPipe,
 } from "@nestjs/common";
@@ -21,7 +19,7 @@ import {
 } from "@nestjs/swagger";
 import { AuthGuard } from "@nestjs/passport";
 import { diskStorage } from "multer";
-import { FileInterceptor, AnyFilesInterceptor } from "@nestjs/platform-express";
+import { FileInterceptor } from "@nestjs/platform-express";
 
 import { AdminMediaService } from "./admin-media.service";
 import { editFileName, ImgFileFilter } from "../../utils/file-upload.utils";
@@ -57,7 +55,7 @@ export class AdminMediaController {
 			limits: { fileSize: 20200000 },
 		}),
 	)
-	@ApiOperation({ description: "Upload media file to S3" })
+	@ApiOperation({ summary: "Upload media file to S3" })
 	async mediaUploadToS3(
 		@UploadedFile() file,
 		@Body() createMediaDto: CreateMediaDto,
@@ -109,7 +107,7 @@ export class AdminMediaController {
 	// Get all media
 	@Get()
 	@UseGuards(AuthGuard("jwt"))
-	@ApiOperation({ description: "Retrieve all media" })
+	@ApiOperation({ summary: "Retrieve all media" })
 	async getAllMedia() {
 		return this.adminMediaService.getAll(Requestor.ADMIN);
 	}
@@ -124,7 +122,7 @@ export class AdminMediaController {
 	// Delete media by id
 	@Delete(":id")
 	@UseGuards(AuthGuard("jwt"))
-	@ApiOperation({ description: "Delete a media file by name" })
+	@ApiOperation({ summary: "Delete a media" })
 	async deleteMedia(@Param("id") id: number) {
 		return await this.adminMediaService.delete(id);
 	}

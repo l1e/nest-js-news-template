@@ -99,7 +99,6 @@ export class AdminCategoryController {
 		@Query("perPage") perPage: number = 2,
 	): Promise<{ pagination: any, categories: Category[] }>  {
 
-
 		try {
 
 			// Validate query parameters 

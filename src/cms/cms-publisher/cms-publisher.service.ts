@@ -1,14 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { Requestor } from "./../../admin/admin-article/model/article.model";
 import { AdminUserService } from "./../../admin/admin-user/admin-user.service";
-import { PaginationUsers } from "./../../utils/types/types";
+import { PaginationAndSortUsers } from "./../../utils/types/types";
 
 @Injectable()
 export class CmsPublisherService {
 	constructor(private readonly adminUserService: AdminUserService) {}
 	async findAllUsers(
 		requestor: Requestor,
-		paginationUsers: PaginationUsers
+		paginationUsers: PaginationAndSortUsers
 	) {
 		return this.adminUserService.findAllPublishers(
 			requestor,

@@ -26,7 +26,7 @@ import { AuthAdminhGuard } from "./../../utils/auth.admin.guard";
 
 import { Requestor } from "../admin-article/model/article.model";
 import { UpdateUserDto } from "./dto/update-user.dto";
-import { PaginationUsers, SortDirection, UsersSortBy } from "./../../utils/types/types";
+import { PaginationAndSortUsers, SortDirection, UsersSortBy } from "./../../utils/types/types";
 
 @ApiBearerAuth()
 @ApiTags("users")
@@ -92,14 +92,11 @@ export class AdminUserController {
 		
 	) {
 
-		const pageNumber = Number(page);  // Convert page to number
-		const perPageNumber = Number(perPage);  // Convert perPage to number
-
-		let pagination: PaginationUsers = {
+		let pagination: PaginationAndSortUsers = {
 			sortBy: sortBy,
 			sortDirection: sortDirection,
-			page: pageNumber,
-			perPage: perPageNumber
+			page: Number(page),
+			perPage: Number(perPage)
 		}
 		return this.adminUserService.findAllUsers(Requestor.ADMIN, pagination);
 	}

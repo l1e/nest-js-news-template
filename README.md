@@ -1,101 +1,147 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+## Description and Features
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+This **Nest.js project** is a fully functional backend template for a **news agency website**, designed to efficiently manage articles, users, and categories. The project is divided into three parts:
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+- **Admin Panel:** Admins can manage articles, users, and categories. They have the authority to publish articles and oversee content submitted by publishers.
+  
+- **Publisher Section:** Publishers can create articles, attach images, categorize them, and submit content for publication.
 
-## Description
+- **CMS (Content Management System):** Regular users can view and filter articles, explore categories, and see the most popular articles. The CMS offers features like searching for articles using **OpenSearch** and retrieving individual article details by ID.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+The project integrates several technologies for efficiency. **OpenSearch** is used for powerful article search functionality in both the CMS article list and individual article pages. **Redis** enhances performance on the CMS side by caching relevant data, optimizing API performance. It also supports attaching images to articles via **S3** for storage.
 
-## Installation
+The project uses **Docker** for streamlined setup and deployment. With the help of **Docker Compose**, we launch and manage containers for Redis, OpenSearch, and MariaDB. During the initial Docker Compose launch, the service automatically migrates database tables and seeds data for articles, users, and categories, making setup for development and testing easy.
+
+### Features
+
+- [x] Database support using [Sequelize](https://www.npmjs.com/package/sequelize).
+- [x] Data seeding for easy setup.
+- [x] Config service using [@nestjs/config](https://www.npmjs.com/package/@nestjs/config).
+- [x] Sign-in and sign-up functionality via email.
+- [x] Separate Swagger documentation for Admin, Publishers, and CMS sections.
+- [x] Image uploads for articles via S3 using [nestjs-s3](https://www.npmjs.com/package/nestjs-s3).
+- [x] Full E2E test coverage and partial unit tests.
+- [x] Docker support for containerized deployment.
+- [x] Redis caching using [redis](https://www.npmjs.com/package/redis) and [cache-manager-redis-store](https://www.npmjs.com/package/cache-manager-redis-store).
+- [x] OpenSearch integration using [@opensearch-project/opensearch](https://www.npmjs.com/package/@opensearch-project/opensearch).
+
+---
+
+## Prerequisites:
+
+- Docker
+- Docker Compose
+
+---
+
+## Clone the Repository
 
 ```bash
-$ npm install
+git clone https://github.com/l1e/nest-js-news-template.git
+
+cd nest-js-news-template
 ```
+
+---
 
 ## Running the app
 
-```bash
-# development
-$ npm run start
 
-# watch mode
-$ npm run start:dev
+### Fill in your Environment Variables (.env)
 
-# production mode
-$ npm run start:prod
-```
-
-## Test
+First, create a `.env` file. Copy the contents of the .`env.example` file (or from the bottom section) into your `.env` file and update variables according to your configuration.
 
 ```bash
-# unit tests
-$ npm run test
+# General environment settings
+NODE_ENV=development
+NEST_APP_PORT=3003
+SECRET_KEY=sadsaAdsadsa12AsaV
 
-# e2e tests
-$ npm run test:e2e
 
-# test coverage
-$ npm run test:cov
+# AWS S3 keys for image uploads (NEED TO BE CHANGED TO YOURS)
+AWS_S3_ACCESS_KEY=AKIA43V4dsaAadAd3
+AWS_S3_SECRET_ACCESS_KEY=7bgkXyr8q+awYz/AdgAfsMBxSL3ocyGwgQY199+cal
+AWS_S3_ENDPOINT=https://s3.eu-central-1.amazonaws.com
+AWS_S3_REGION=eu-central-1
+AWS_S3_BUCKET=nest-js-news
+AWS_S3_BUCKET_URL= https://s3.eu-central-1.amazonaws.com/nest-js-news-v0.1/
+
+
+# MySQL database configuration
+MYSQL_PORT=3306
+MYSQL_HOST=mariadb
+MYSQL_USERNAME=root
+MYSQL_PASSWORD=root
+MYSQL_DATABASE=nest_js_news_template
+
+
+# Redis configuration
+REDIS_SERVER_NODE_URL=redis://redis
+REDIS_PORT=6379
+
+
+# Temporary folder for storing photos
+TEMPORARY_FOLDER=./temporary
+
+
+# OpenSearch configuration
+OPENSERACH_NODE=https://localhost:9200
+OPENSEARCH_INITIAL_ADMIN_USERNAME=admin
+OPENSEARCH_INITIAL_ADMIN_PASSWORD=daavqaSAdwqwdq
+OPENSEARCH_ARTICLE_INDEX_NAME=articles
 ```
 
-## Support
+---
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### Then, run the following commands:
 
-## Stay in touch
+```bash
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+# Install project dependencies
+$ npm install
 
-## License
-
-Nest is [MIT licensed](LICENSE).
-
-This is a Nest.js template for a news agency website where you can sign in as an admin or publisher and view articles as a regular user. In this template, you can publish articles as an admin and allow publishers to create and publish their own articles. The template is efficient and integrated with various technologies. We use OpenSearch for searching articles on the CMS side ("/cms-article/public") and for individual article pages ("/cms-article/public/articleId"). Redis is also implemented in this project, which can be seen on the CMS side of the API.
-
-This is a nest.js you can see News template where you can create your articles, attach to the category, donwload picture of the article. That project include 3 parts. Admin part where you are abale to manage articles, users, categories. On the publisher side, you are able to create article, attach image and publish article. On the CMS site you are able to get list of articles, filter them, get list of categories, get the most popular articles. We also prepared database data for seeeding.
+# Start OpenSearch, Opensearch Dashboards, Redis, Redis-commander, phpMyAdmin, and MariaDB with database seeding
+$ docker-compose up
 
 
-## To start project you have to: 
+```
 
-1) Instal packages
-npm i
+---
 
-2) rename .env.example to .env and update db and S3 acceses. 
+### Running the Tests
 
-3) seed data to the current database with commandb to seed: npm run sequelize-seed
+```bash
+# Run unit tests with file watching
+npm run test:watch 
 
-4) Lounch the project npm run start:dev
+# Run E2E tests, which fully cover the template's functionality
+npm run teste2e:watch
 
-## To launch Unit tests you should  npm run test. I made partly Unit tests for: 
-	- admin/admin-article.controller.spec.ts, 
-	  admin/admin-article.service.spec.ts 
-	- admin/admin-category.controller.spec.ts
-	  admin/admin-category.service.spec.ts
-	 
 
-## To launch e2e tests you should  npm run teste2e. I made full unit tests of admin part, CMS part, publisher part you can find there: 
-	- test/admin.e2e-spec.ts
-	- test/cms.e2e-spec.ts
-	- test/publisher.e2e-spec.ts
+```
+
+
+----
+
+
+### APi's sections
+
+#### Admin 
+http://localhost:3009/api/admin
+![](/images/admin_1.png)
+![](/images/admin_2.png)
+
+#### Publisher 
+http://localhost:3003/api/publisher
+![](/images/publisher_1.png)
+![](/images/publisher_2_3.png)
+
+#### CMS 
+http://localhost:3009/api/cms 
+![](/images/cms_1.png)
+
+----
+
+## Contributing
+
+We welcome your feedback! Whether you want to suggest improvements, report a bug, or ask a question, feel free to do so here: [https://github.com/l1e/nest-js-news-template/issues](https://github.com/l1e/nest-js-news-template/issues)

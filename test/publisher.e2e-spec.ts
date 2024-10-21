@@ -5,27 +5,19 @@ import * as request from "supertest";
 import { AppModule } from "../src/app.module"; // Adjust the path as needed
 import { Category } from "./../src/admin/admin-category/model/category.model";
 import {
-	Article,
-	Requestor,
+	Article
 } from "./../src/admin/admin-article/model/article.model";
-import {
-	UserRole,
-	UserStatus,
-} from "./../src/admin/admin-user/model/user.model";
 import { CreateUserDto } from "./../src/admin/admin-user/dto/create-user.dto";
 import {
 	mockCreateArticleAsPublisher,
-	userLogIn,
 	userRegister,
 } from "./test.mock.e2e.data";
 import { CreateArticleDto } from "./../src/publisher/publisher-article/dto/create.publisher-article.dto";
-import { title } from "node:process";
 import { UpdateArticleDto } from "./../src/admin/admin-article/dto/update.article.dto";
 
 describe("Publisher Endpoints (e2e)", () => {
 	let app: INestApplication;
 	let categories: Category[];
-	let articles: Article[];
 	let publisherToken: string;
 	let publishedArticle: Article;
 	let publishedArticleUpdated: Article;

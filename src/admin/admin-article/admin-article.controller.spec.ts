@@ -8,7 +8,6 @@ import { CreateArticleDto } from "./dto/article.create.dto";
 
 import {
 	articlesAll,
-	categoryMockDataCreated,
 	mockCreateArticleDtoCreated,
 	mockUser,
 } from "../../../test/test.mock.data";
@@ -48,8 +47,6 @@ describe("AdminArticleController", () => {
 		findArticlesByFilter: jest.fn(),
 		formatArticlesByFilter: jest.fn(),
 	};
-
-
 
 	const mockAdminCategoryService = {
 		getCategoryById: jest.fn(),
@@ -91,6 +88,7 @@ describe("AdminArticleController", () => {
 	});
 
 	describe("createArticle", () => {
+
 		it("should create an article", async () => {
 			const createArticleDto: CreateArticleDto = {
 				title: "New Article",
@@ -102,7 +100,6 @@ describe("AdminArticleController", () => {
 				creatorId: mockUser.id,
 			};
 			const createdArticle = { id: 1, ...createArticleDto };
-
 			mockArticleService.createArticle.mockResolvedValue(createdArticle);
 
 			const result = await controller.createArticle(
@@ -133,9 +130,7 @@ describe("AdminArticleController", () => {
 				media: [1, 2],
 			};
 			const updatedArticle = { id: 1, ...updateArticleDto };
-
 			mockArticleService.updateArticle.mockResolvedValue(updatedArticle);
-
 			const result = await controller.updateArticle(
 				1,
 				updateArticleDto,
@@ -156,7 +151,6 @@ describe("AdminArticleController", () => {
 				mockCreateArticleDtoCreated as unknown as Article;
 
 			mockArticleService.getArticleById.mockResolvedValue(article);
-
 			const result = await controller.getArticleById(1, mockUser.email);
 
 			expect(result).toEqual(article);
@@ -171,32 +165,28 @@ describe("AdminArticleController", () => {
 	describe("getAllArticles", () => {
 		it("should return all articles", async () => {
 			const articles = articlesAll;
-
 			jest.spyOn(service, "getAllArticles").mockResolvedValue(
 				articlesAll,
 			);
-
 			const result = await controller.getAllArticles(SortByArticles.VIEWS, SortDirection.ASC,undefined,undefined,undefined,undefined,undefined,undefined,1,100);
-
-			// console.log("controller getAllArticles result:", result);
-
 			expect(result).toEqual(articles);
 			expect(service.getAllArticles).toHaveBeenCalled();
 		});
 	});
 
 	describe("deleteArticle", () => {
+
 		it("should delete an article", async () => {
-			// mockArticleService.deleteArticle.mockResolvedValue(undefined);
+
 			jest.spyOn(service, "deleteArticle").mockResolvedValue();
-
 			await controller.deleteArticle(1, mockUser.email);
-
 			expect(mockArticleService.deleteArticle).toHaveBeenCalledWith(
 				1,
 				Requestor.ADMIN,
 				"test.creator@dev.com",
 			);
+
 		});
+
 	});
 });

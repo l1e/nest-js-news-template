@@ -1,7 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { INestApplication } from "@nestjs/common";
 import * as request from "supertest";
-import { AppModule } from "../src/app.module"; // Adjust the path as needed
+import { AppModule } from "../src/app.module";
 import { Category } from "./../src/admin/admin-category/model/category.model";
 import { Article } from "./../src/admin/admin-article/model/article.model";
 

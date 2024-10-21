@@ -23,18 +23,12 @@ export enum UsersSortBy{
 	CREATED_AT = 'createdAt',
 	publishedArticlesCount = 'publishedArticlesCount'
 }
-export interface PaginationUsers {
+export interface PaginationAndSortUsers {
 	sortBy: UsersSortBy,
 	sortDirection: SortDirection,
 	page: number,
 	perPage: number
 }
-
-
-// export interface PaginationArticles {
-// 	page: number,
-// 	perPage: number
-// }
 
 export interface SoringArticles{
 	sortBy: SortByArticles,

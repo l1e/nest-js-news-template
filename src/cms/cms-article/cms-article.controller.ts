@@ -146,14 +146,8 @@ export class CmsArticleController {
 			textToSearch: textToSearch,
 		}
 
-		console.log('getPublicArticles filterArticleDto:',filterArticleDto)
-
 		try {
 			
-			// const articles = await this.cmsArticleService.getPublicArticles(
-			// 	sortBy,
-			// 	sortDirection,
-			// );
 			let articles = await this.cmsArticleService.findArticlesByFilterWithTheHealthCheck(filterArticleDto, sorting, pagination)
 			if (articles.articles.length === 0) {
 				throw new NotFoundException(
@@ -187,20 +181,14 @@ export class CmsArticleController {
 				throw new BadRequestException("Invalid article ID");
 			}
 
-
-
 			const article = await this.cmsArticleService.getArticleByIdByFilterWithTheHealthCheck(
 				id,
 				Requestor.CMS,
 			);
 
-			console.log('getPublicArticleById article :',article)
-
-			
 			if (!article) {
 				throw new NotFoundException(`Article with ID ${id} not found`);
 			}
-
 
 			return article;
 		} catch (error) {

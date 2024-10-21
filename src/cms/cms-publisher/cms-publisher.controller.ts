@@ -13,7 +13,7 @@ import { CACHE_MANAGER} from "@nestjs/cache-manager";
 import { CmsPublisherService } from "./cms-publisher.service";
 import { User } from "./../../admin/admin-user/model/user.model";
 import { Requestor } from "./../../admin/admin-article/model/article.model";
-import { PaginationUsers, SortDirection, UsersSortBy } from "./../../utils/types/types";
+import { PaginationAndSortUsers, SortDirection, UsersSortBy } from "./../../utils/types/types";
 
 
 @ApiTags("cms-publisher")
@@ -73,7 +73,7 @@ export class CmsPublisherController {
 			const pageNumber = Number(page);
 			const perPageNumber = Number(perPage);
 
-			let pagination: PaginationUsers = {
+			let pagination: PaginationAndSortUsers = {
 				sortBy: sortBy,
 				sortDirection: sortDirection,
 				page: pageNumber,

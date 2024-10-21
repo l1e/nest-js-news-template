@@ -103,6 +103,7 @@ export class AdminCategoryService {
 				pagination: paginationResult, 
 				categories,
 			};
+
 		} catch (error) {
 			throw new InternalServerErrorException(
 				"An error occurred while retrieving categories",
@@ -114,12 +115,16 @@ export class AdminCategoryService {
 		id: number,
 		updateCategoryDto: CreateCategoryDto,
 	): Promise<Category> {
+
 		const category = await this.getCategoryById(id);
 		return category.update(updateCategoryDto);
+
 	}
 
 	async deleteCategory(id: number): Promise<void> {
+
 		const category = await this.getCategoryById(id);
 		await category.destroy();
+		
 	}
 }

@@ -38,7 +38,7 @@ export class AdminArticleController {
 	constructor(private readonly adminArticleService: AdminArticleService) {}
 
 	@Get("push-to-opensearch")
-    @ApiOperation({ summary: "Push blogs to opensearch" })
+    @ApiOperation({ summary: "Push articles to the OpenSearch" })
     @UseGuards(AuthGuard("jwt"), AuthAdminhGuard)
     async pushModelsToOpenSearch() {
         return await this.adminArticleService.pushArticleToOpenSearch();

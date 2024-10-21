@@ -59,6 +59,11 @@ export default {
   },
 
   down: async (queryInterface: QueryInterface) => {
+	
+	// Remove all Media
+	await queryInterface.bulkDelete('Media', null, {});
+
+	// Drop the Media table
     return queryInterface.dropTable('Media');
   },
 };

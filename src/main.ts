@@ -30,7 +30,7 @@ async function bootstrap() {
 	// Admin API Swagger Setup
 	const adminConfig = new DocumentBuilder()
 		.setTitle("Admin API")
-		.setDescription("The Admin API documentation")
+		.setDescription("Admin Section API Documentation")
 		.setVersion("1.0")
 		.addBearerAuth()
 		// .addTag('Admin panel')
@@ -50,7 +50,7 @@ async function bootstrap() {
 	// Publisher API Swagger Setup
 	const publisherConfig = new DocumentBuilder()
 		.setTitle("Publisher API")
-		.setDescription("The Publisher part API documentation")
+		.setDescription("Publisher Section API Documentation")
 		.setVersion("1.0")
 		.addBearerAuth()
 		// .addTag('publisher')
@@ -73,7 +73,7 @@ async function bootstrap() {
 	// CMS API Swagger Setup
 	const cmsConfig = new DocumentBuilder()
 		.setTitle("CMS API")
-		.setDescription("The Publisher part API documentation")
+		.setDescription("CMS Section API Documentation")
 		.setVersion("1.0")
 		.build();
 	const cmsDocument = SwaggerModule.createDocument(app, cmsConfig, {

@@ -1,7 +1,7 @@
+import { ConfigModule } from "@nestjs/config";
 import { Test, TestingModule } from "@nestjs/testing";
 import { HttpStatus, INestApplication } from "@nestjs/common";
 import * as request from "supertest";
-import { sign } from "jsonwebtoken";
 import { AppModule } from "../src/app.module";
 import { Category } from "./../src/admin/admin-category/model/category.model";
 import { Article } from "./../src/admin/admin-article/model/article.model";
@@ -10,13 +10,12 @@ import {
 	adminRegister,
 	createCategoryAsAdminDto,
 	mockCreateArticleAsAdmin,
-	updateCategoryAsAdminDto,
-	userRegister,
+	updateCategoryAsAdminDto
 } from "./test.mock.e2e.data";
 import { CreateCategoryDto } from "./../src/admin/admin-category/dto/category.create.dto";
 import { CreateArticleDto } from "src/admin/admin-article/dto/article.create.dto";
 import { UpdateArticleDto } from "src/admin/admin-article/dto/update.article.dto";
-import { ConfigModule } from "@nestjs/config";
+
 
 describe("Admin (e2e)", () => {
 
@@ -54,6 +53,7 @@ describe("Admin (e2e)", () => {
 			.expect({ success: true, status_code: 200, data: "Hello World!" });
 	});
 	describe("/admin-auth ", () => {
+
 		it("Should return token that we get from authentication.", async () => {
 
 			const response = await request(app.getHttpServer())
@@ -70,6 +70,7 @@ describe("Admin (e2e)", () => {
 		});
 
 		it("Should return registration message.", async () => {
+
 			const response = await request(app.getHttpServer())
 				.post("/admin-auth/register")
 				.send(adminRegister)
@@ -80,11 +81,13 @@ describe("Admin (e2e)", () => {
 			expect(response.body.data).toEqual(
 				"Your email account with that type admin was created. Write to an administrative about account activation.",
 			);
+
 		});
 	});
 	describe("/admin-category (GET,PUT,POST,DELETE)", () => {
 
 		it("/admin-category (GET) - should return all categories and validate quantity", async () => {
+
 			const response = await request(app.getHttpServer())
 				.get("/admin-category")
 				.set("Authorization", `Bearer ${adminToken}`)
@@ -97,9 +100,11 @@ describe("Admin (e2e)", () => {
 				status_code: 200,
 				data: expect.any(Object),
 			});
+
 		});
 
 		it("/admin-category (POST) - should create a category", async () => {
+
 			const createCategoryDto: CreateCategoryDto =
 				createCategoryAsAdminDto;
 
@@ -114,6 +119,7 @@ describe("Admin (e2e)", () => {
 
 			expect(response.body.data).toHaveProperty("id");
 			expect(response.body.data.name).toEqual(createCategoryDto.name);
+
 		});
 
 		it("/admin-category/:id (GET) - should get a created category by ID", async () => {
@@ -127,9 +133,11 @@ describe("Admin (e2e)", () => {
 			expect(response.body.data.name).toEqual(
 				createCategoryAsAdminDto.name,
 			);
+
 		});
 
 		it("/admin-category (PUT) - should update a category", async () => {
+
 			const updateCategoryDto: CreateCategoryDto =
 				updateCategoryAsAdminDto;
 
@@ -147,26 +155,31 @@ describe("Admin (e2e)", () => {
 			expect(response.body.data.description).toEqual(
 				updateCategoryDto.description,
 			);
+
 		});
 
 		it("/admin-category/:id (DELETE) - should delete a category", async () => {
-			// Now, delete the category
+
 			const response = await request(app.getHttpServer())
 				.delete(`/admin-category/${categoryCreated.id}`)
 				.set("Authorization", `Bearer ${adminToken}`)
 				.expect(HttpStatus.OK);
+
 		});
 
 		it("/admin-category/:id (GET) - category does not exsist", async () => {
+
 			const response = await request(app.getHttpServer())
 				.get(`/admin-category/${categoryCreated.id}`)
 				.set("Authorization", `Bearer ${adminToken}`)
 				.expect(HttpStatus.NOT_FOUND);
+
 		});
 	});
 
 	describe("/admin-article (GET,PUT,POST,DELETE)", () => {
 		it("/admin-article (GET) - should get all articles of the website", async () => {
+
 			const response = await request(app.getHttpServer())
 				.get("/admin-article?sortBy=createdAt&sortDirection=desc")
 				.set("Authorization", `Bearer ${adminToken}`)
@@ -180,8 +193,10 @@ describe("Admin (e2e)", () => {
 			expect(firstArticle).toHaveProperty("id");
 			expect(firstArticle).toHaveProperty("title");
 			expect(firstArticle).toHaveProperty("description");
+
 		});
 		it("/admin-article (POST) - should create a new article", async () => {
+
 			const createArticleDto: CreateArticleDto = {
 				...mockCreateArticleAsAdmin,
 				categoryId: categories[0].id,
@@ -196,9 +211,11 @@ describe("Admin (e2e)", () => {
 			publishedArticle = response.body.data; // Store the article ID for further tests
 			expect(response.body.data).toHaveProperty("id");
 			expect(response.body.data.title).toEqual(createArticleDto.title);
+
 		});
 
 		it("/admin-article/:id (GET) - should get an article by ID", async () => {
+
 			const response = await request(app.getHttpServer())
 				.get(`/admin-article/${publishedArticle.id}`)
 				.set("Authorization", `Bearer ${adminToken}`)
@@ -215,9 +232,11 @@ describe("Admin (e2e)", () => {
 				status_code: 200,
 				success: true,
 			});
+
 		});
 
 		it("/admin-article/:id (PUT) - should update an article", async () => {
+
 			const updateArticleDto: UpdateArticleDto = {
 				title: "Updated Magic Article Title",
 				description: "Updated Magic content of the article",
@@ -235,9 +254,11 @@ describe("Admin (e2e)", () => {
 			expect(response.body.data.description).toEqual(
 				updateArticleDto.description,
 			);
+
 		});
 
 		it("/admin-article (GET) - should get all articles of the publisher", async () => {
+
 			const response = await request(app.getHttpServer())
 				.get("/admin-article?sortBy=createdAt&sortDirection=desc&page=1&perPage=2")
 				.set("Authorization", `Bearer ${adminToken}`)
@@ -258,9 +279,11 @@ describe("Admin (e2e)", () => {
 			expect(firstArticle.description).toEqual(
 				publishedArticleUpdated.description,
 			);
+
 		});
 
 		it("/admin-article/:id (DELETE) - should delete an article", async () => {
+
 			const response = await request(app.getHttpServer())
 				.delete(`/admin-article/${publishedArticle.id}`)
 				.set("Authorization", `Bearer ${adminToken}`)
@@ -268,6 +291,7 @@ describe("Admin (e2e)", () => {
 
 			expect(response.body.status_code).toEqual(200);
 			expect(response.body.success).toEqual(true);
+			
 		});
 	});
 });

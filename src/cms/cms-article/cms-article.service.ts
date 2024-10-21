@@ -62,18 +62,14 @@ export class CmsArticleService {
 
 		let openSearcHealthCheck = await this.adminOpenSearchService.checkOpenSearchClusterHealth(process.env.OPENSEARCH_ARTICLE_INDEX_NAME);
 
-		
-		// console.log('findArticlesByFilterWithTheHealthCheck openSearcHealthCheck :', openSearcHealthCheck)
-
 		let articles: { pagination: any; articles: Article[] }
- 
  
 		if(openSearcHealthCheck.opensearch === true) {
 		// if(false) {
 
 			articles = await this.adminOpenSearchService.findArticlesByFilter(filterArticleDto, sorting, pagination)
-
 			// console.log('findArticlesByFilterWithTheHealthCheck articless:', articles)
+
 		}else if(openSearcHealthCheck.opensearch === false){
 			articles =  await this.getPublicArticles(
 				sorting,
@@ -92,18 +88,13 @@ export class CmsArticleService {
 				filterArticleDto.minArticleVeiws,
 				pagination,
 			);
-
 		}
 
 		// console.log('findArticlesByFilterWithTheHealthCheck articles:',articles)
-		
 		return {articles:(await articles).articles, pagination: (await articles).pagination};
-
 	}
 
 	async getArticleById(id: number, requestor: Requestor):Promise<Article> {
-
-		// console.log('getArticleById id:',id)
 
 		let hashRequest = `${id}`;
 		let cachedArticle: Article = await this.cacheManager.get(`cms_article/${hashRequest}`);

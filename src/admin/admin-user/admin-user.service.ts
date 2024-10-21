@@ -1,4 +1,4 @@
-import { PaginationUsers } from './../../utils/types/types';
+import { PaginationAndSortUsers } from './../../utils/types/types';
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import * as bcrypt from "bcrypt";
@@ -69,7 +69,7 @@ export class AdminUserService {
 
 	async findAllUsers(
 		requestor: Requestor,
-		pagination: PaginationUsers
+		pagination: PaginationAndSortUsers
 	) {
 		console.log('findAllUsers pagination:', pagination);
 		
@@ -157,7 +157,7 @@ export class AdminUserService {
 
 	async findAllPublishers(
 		requestor: Requestor,
-		paginationUsers: PaginationUsers
+		paginationUsers: PaginationAndSortUsers
 	) {
 		const { sortBy, sortDirection, page, perPage } = paginationUsers;
 	

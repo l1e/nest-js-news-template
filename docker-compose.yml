@@ -2,7 +2,8 @@ version: "3.8"
 
 services:
     app:
-        container_name: news_auth_sequilize
+        container_name: nest_js_news_template
+
         build:
             dockerfile: Dockerfile
             context: .
@@ -26,7 +27,7 @@ services:
             - news-net
     # we need that stage for data migration and seeding
     seed:
-        container_name: news_auth_sequilize_seed
+        container_name: nest_js_news_template_seed
         build:
             dockerfile: Dockerfile
             context: .
@@ -46,7 +47,7 @@ services:
             - news-net
 
     mariadb:
-        container_name: news_auth_sequilize_mariadb
+        container_name: nest_js_news_template_mariadb
         build:
             context: .
             dockerfile: Dockerfile
@@ -65,7 +66,7 @@ services:
         networks:
             - news-net
     phpmyadmin:
-        container_name: news_auth_sequilize_phpmyadmin
+        container_name: nest_js_news_template_phpmyadmin
         image: phpmyadmin:latest
         restart: always
         ports:

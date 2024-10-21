@@ -1,15 +1,15 @@
-import { FilterArticleDto } from './../../cms/cms-article/dto/articles.filter.dto';
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { Client } from '@opensearch-project/opensearch';
+import { FilterArticleDto } from './../../cms/cms-article/dto/articles.filter.dto';
 import { Article } from '../admin-article/model/article.model';
-import { from } from 'rxjs';
-import { Pagination, SoringArticles } from 'src/utils/types/types';
+import { Pagination, SoringArticles } from './../../utils/types/types';
 
 @Injectable()
 export class AdminOpensearchService {
+
 	private readonly client: Client;
+
 	constructor() {
-        // Initialize the OpenSearch client with the node URL, authentication, and SSL settings
         this.client = new Client({
             node: process.env.OPENSERACH_NODE,
             auth: {
@@ -30,9 +30,6 @@ export class AdminOpensearchService {
             clusterHealthResponse = await this.client.cluster.health({});
 			indexExists = await this.client.indices.exists({ index: searchIndex });
 
-			// console.log('checkOpenSearchClusterHealth indexExists:', indexExists)
-			// console.log('checkOpenSearchClusterHealth clusterHealthResponse:', clusterHealthResponse)
-
 			if(clusterHealthResponse.body.status==="green" && indexExists.statusCode ===200){
 				return { opensearch: true };
 			}else{
@@ -43,26 +40,20 @@ export class AdminOpensearchService {
             // console.log("no healthy claster");
         }
 
-        // console.log("Get Cluster Health", clusterHealthResponse);
-
         return { opensearch: false };
     }
 
 
 	async createArticle(article: Article) {
         try {
+
             await this.client.index({
                 index: process.env.OPENSEARCH_ARTICLE_INDEX_NAME,
                 body: article,
                 id: String(article.id),
             });
 
-            // console.log("createArticle article.id:", article.id);
         } catch (e) {
-            // console.log("createArticle create e:", e);
-            // console.log("createArticle article :", article);
-
-            // Throw an HttpException if there's an error during indexing
             throw new HttpException(e, HttpStatus.BAD_REQUEST);
         }
     }
@@ -76,7 +67,6 @@ export class AdminOpensearchService {
             });
             return article_to_update;
         } catch (e) {
-            // Throw an HttpException if there's an error during updating
             throw new HttpException(e, HttpStatus.BAD_REQUEST);
         }
     }
@@ -89,14 +79,12 @@ export class AdminOpensearchService {
             });
             return `Article with id ${id} was removed.`;
         } catch (e) {
-            // Throw an HttpException if there's an error during deletion
             throw new HttpException(e, HttpStatus.BAD_REQUEST);
         }
     }
 
 	async findOneArticle(id: number) {
         if (!id) {
-            // Throw an HttpException if the ID is not provided
             throw new HttpException("id does not exsist", HttpStatus.BAD_REQUEST);
         }
         try {
@@ -104,15 +92,11 @@ export class AdminOpensearchService {
                 index: process.env.OPENSEARCH_ARTICLE_INDEX_NAME,
                 id: String(id),
             });
-			// console.log('findOneArticle response:', response)
-            return response; // Return the document source data
+            return response; 
         } catch (error) {
-            // console.log("create error:", error);
             if (error.statusCode === 404) {
-                // If the document is not found, return null
                 return null;
             }
-            // Rethrow other errors
             throw error;
         }
     }
@@ -121,13 +105,11 @@ export class AdminOpensearchService {
 		sorting: SoringArticles,
 		pagination: Pagination,
 	): Promise<{ pagination: any; articles: Article[] }> {
-		// console.log('findArticlesByFilter openSearch filterArticleDto:', filterArticleDto);
-		
-		// Calculate pagination values
+
+
 		const from = (pagination.page - 1) * pagination.perPage;
 		const size = pagination.perPage;
 		
-		// Build the query based on filterArticleDto
 		const query = {
 			bool: {
 				must: [
@@ -172,15 +154,13 @@ export class AdminOpensearchService {
 							{
 								range: { 
 									views: { gte: filterArticleDto.minArticleVeiws } 
-								}, // Use range for minimum views filter
+								}, 
 							},
 						]
 						: []),
 				],
 			},
 		};
-	
-		// console.log('findArticlesByFilter query:', query);
 	
 		try {
 
@@ -194,11 +174,7 @@ export class AdminOpensearchService {
 				}
 			});
 	
-
-	
-			
 			if (articles && articles.body && articles.body.hits) {
-				
 				
 				const totalHits = articles.body.hits.total.value;
 				const totalPages = Math.ceil(totalHits / pagination.perPage);
@@ -210,17 +186,14 @@ export class AdminOpensearchService {
 					totalPages: totalPages,
 				};
 	
-				// console.log('findArticlesByFilter articles:', articles.body.hits.hits);
 				return { 
-					pagination: paginationResult, // Include pagination info
-					articles: await this.formatArticlesByFilter(articles.body.hits.hits) // Return the relevant article hits
+					pagination: paginationResult,
+					articles: await this.formatArticlesByFilter(articles.body.hits.hits)
 				};
 			} else {
-				// console.error('Unexpected response structure:', articles);
 				return { pagination: {}, articles: [] };
 			}
 		} catch (error) {
-			// console.error('Error while fetching articles:', error);
 			return { pagination: {}, articles: [] };
 		}
 	}
