@@ -146,7 +146,39 @@ export class CmsArticleController {
 			textToSearch: textToSearch,
 		}
 
+		
+
 		try {
+
+			let hashRequest = `public?sortBy=${sortBy}&sortDirection=${sortDirection}&page=${pagination.page}&perPage=${pagination.perPage}`;
+			
+			if(filterArticleDto.categoryId!==null && filterArticleDto.categoryId!==undefined && filterArticleDto.categoryId!==0){
+				hashRequest +=`&categoryId=${categoryId}`
+			}
+
+			if(filterArticleDto.publisherId!==null && filterArticleDto.publisherId!==undefined && filterArticleDto.publisherId!==0){
+				hashRequest +=`&publisherId=${publisherId}`
+			}
+
+			if(filterArticleDto.minPublishedArticles!==null && filterArticleDto.minPublishedArticles!==undefined && filterArticleDto.minPublishedArticles!==0){
+				hashRequest +=`&minPublishedArticles=${minPublishedArticles}`
+			}
+
+			if(filterArticleDto.minArticleVeiws!==null && filterArticleDto.minArticleVeiws!==undefined && filterArticleDto.minArticleVeiws!==0){
+				hashRequest +=`&minArticleVeiws=${minArticleVeiws}`
+			}
+
+			if(filterArticleDto.minArticleSizeSymbols!==null && filterArticleDto.minArticleSizeSymbols!==undefined && filterArticleDto.minArticleSizeSymbols!==0){
+				hashRequest +=`&minArticleSizeSymbols=${minArticleSizeSymbols}`
+			}
+
+			if(filterArticleDto.textToSearch!==null && filterArticleDto.textToSearch!==undefined && filterArticleDto.textToSearch!==''){
+				hashRequest +=`&textToSearch=${textToSearch}`
+			}
+
+			let cachedArticles = await this.cacheManager.get<{ pagination: any; articles: Article[] }>(`cms_articles/${hashRequest}`);
+
+			if(cachedArticles) return cachedArticles;
 			
 			let articles = await this.cmsArticleService.findArticlesByFilterWithTheHealthCheck(filterArticleDto, sorting, pagination)
 			if (articles.articles.length === 0) {
@@ -154,7 +186,7 @@ export class CmsArticleController {
 					"No articles found matching the given criteria",
 				);
 			}
-
+			await this.cacheManager.set(`cms_articles/${hashRequest}`, articles, 100)
 			return articles;
 		} catch (error) {
 			console.log('error getPublicArticles 1:',error)
