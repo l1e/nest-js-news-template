@@ -14,16 +14,16 @@ The project uses **Docker** for streamlined setup and deployment. With the help 
 
 ### Features
 
-✅ Database support using [Sequelize](https://www.npmjs.com/package/sequelize).
-✅ Data seeding for easy setup.
-✅ Config service using [@nestjs/config](https://www.npmjs.com/package/@nestjs/config).
-✅ Sign-in and sign-up functionality via email.
-✅ Separate Swagger documentation for Admin, Publishers, and CMS sections.
-✅ Image uploads for articles via S3 using [nestjs-s3](https://www.npmjs.com/package/nestjs-s3).
-✅ Full E2E test coverage and partial unit tests.
-✅ Docker support for containerized deployment.
-✅ Redis caching using [redis](https://www.npmjs.com/package/redis) and [cache-manager-redis-store](https://www.npmjs.com/package/cache-manager-redis-store).
-✅ OpenSearch integration using [@opensearch-project/opensearch](https://www.npmjs.com/package/@opensearch-project/opensearch).
+✅ Database support using [Sequelize](https://www.npmjs.com/package/sequelize).\
+✅ Data seeding for easy setup.\
+✅ Config service using [@nestjs/config](https://www.npmjs.com/package/@nestjs/config).\
+✅ Sign-in and sign-up functionality via email.\
+✅ Separate Swagger documentation for Admin, Publishers, and CMS sections.\
+✅ Image uploads for articles via S3 using [nestjs-s3](https://www.npmjs.com/package/nestjs-s3).\
+✅ Full E2E test coverage and partial unit tests.\
+✅ Docker support for containerized deployment.\
+✅ Redis caching using [redis](https://www.npmjs.com/package/redis) and [cache-manager-redis-store](https://www.npmjs.com/package/cache-manager-redis-store).\
+✅ OpenSearch integration using [@opensearch-project/opensearch](https://www.npmjs.com/package/@opensearch-project/opensearch).\
 
 ---
 
