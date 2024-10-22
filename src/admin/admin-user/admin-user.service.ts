@@ -301,17 +301,11 @@ export class AdminUserService {
 			);
 		}
 
-		const hashedInputPassword = bcrypt.hashSync(
-			adminUserLoginDTO.password,
-			10,
-		);
-
 		const passwordMatches = await bcrypt.compare(
 			adminUserLoginDTO.password,
 			user.password,
 		);
 
-		console.log("Password Matches:", passwordMatches);
 
 		if (!passwordMatches) {
 			throw new HttpException(

@@ -23,7 +23,7 @@ The project uses **Docker** for streamlined setup and deployment. With the help 
 ✅ Full E2E test coverage and partial unit tests.\
 ✅ Docker support for containerized deployment.\
 ✅ Redis caching using [redis](https://www.npmjs.com/package/redis) and [cache-manager-redis-store](https://www.npmjs.com/package/cache-manager-redis-store).\
-✅ OpenSearch integration using [@opensearch-project/opensearch](https://www.npmjs.com/package/@opensearch-project/opensearch).\
+✅ OpenSearch integration using [@opensearch-project/opensearch](https://www.npmjs.com/package/@opensearch-project/opensearch).
 
 ---
 

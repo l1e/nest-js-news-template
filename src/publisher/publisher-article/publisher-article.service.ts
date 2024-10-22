@@ -40,7 +40,6 @@ export class PublisherArticleService {
 		id: number,
 		updateArticleDto: UpdateArticleDto,
 	): Promise<Article> {
-		console.log("updateArticle updateArticleDto:", updateArticleDto);
 		return this.adminArticleService.updateArticle(id, updateArticleDto);
 	}
 	async deleteArticle(

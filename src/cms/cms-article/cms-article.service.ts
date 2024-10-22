@@ -65,11 +65,7 @@ export class CmsArticleService {
 		let articles: { pagination: any; articles: Article[] }
  
 		if(openSearcHealthCheck.opensearch === true) {
-		// if(false) {
-
 			articles = await this.adminOpenSearchService.findArticlesByFilter(filterArticleDto, sorting, pagination)
-			// console.log('findArticlesByFilterWithTheHealthCheck articless:', articles)
-
 		}else if(openSearcHealthCheck.opensearch === false){
 			articles =  await this.getPublicArticles(
 				sorting,
@@ -90,7 +86,6 @@ export class CmsArticleService {
 			);
 		}
 
-		// console.log('findArticlesByFilterWithTheHealthCheck articles:',articles)
 		return {articles:(await articles).articles, pagination: (await articles).pagination};
 	}
 
@@ -98,8 +93,6 @@ export class CmsArticleService {
 
 		let hashRequest = `${id}`;
 		let cachedArticle: Article = await this.cacheManager.get(`cms_article/${hashRequest}`);
-
-		// console.log('getArticleById cachedArticle:', cachedArticle)
 
 		if(cachedArticle) return cachedArticle;
 
@@ -112,17 +105,14 @@ export class CmsArticleService {
 
 		let openSearcHealthCheck = await this.adminOpenSearchService.checkOpenSearchClusterHealth(process.env.OPENSEARCH_ARTICLE_INDEX_NAME);
 		let article: Article;
-		// console.log('findArticlesByFilterWithTheHealthCheck openSearcHealthCheck:', openSearcHealthCheck)
 		if(openSearcHealthCheck.opensearch === true) {
 			article = (await this.adminOpenSearchService.findOneArticle(id)).body._source;
-			// console.log('getArticleByIdByFilterWithTheHealthCheck if article:', article)
 		}else{
 
 			article = await this.getArticleById(
 				id,
 				Requestor.CMS,
 			);
-			// console.log('getArticleByIdByFilterWithTheHealthCheck else article:', article)
 		}
 		return article
 	}
