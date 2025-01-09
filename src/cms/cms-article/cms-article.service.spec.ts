@@ -11,6 +11,7 @@ import { AdminMediaService } from "./../../../src/admin/admin-media/admin-media.
 import { AdminUserService } from "./../../../src/admin/admin-user/admin-user.service";
 import { AdminCategoryService } from "./../../../src/admin/admin-category/admin-category.service";
 import { AdminOpensearchService } from "./../../../src/admin/admin-opensearch/admin-opensearch.service";
+import { AdminTagService } from "./../../../src/admin/admin-tag/admin-tag.service";
 
 
 
@@ -26,7 +27,8 @@ describe("CmsArticleService", () => {
 				AdminOpensearchService,
 				AdminUserService,
 				AdminMediaService,
-				ConfigService
+				ConfigService,
+                AdminTagService
 			],
 			imports: [
 				DatabaseModule,

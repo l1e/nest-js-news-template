@@ -257,17 +257,24 @@ export class CmsArticleController {
 		@Param("categoryId") categoryId: number,
 		@Query("sortBy") sortBy: "views" | "createdAt" = "createdAt",
 		@Query("sortDirection") sortDirection: "asc" | "desc" = "desc",
-	): Promise<Article[]> {
+        @Query("page") page: number = 1,
+		@Query("perPage") perPage: number = 2,
+	): Promise<{ pagination: any; articles: Article[] }> {
 		try {
 			// Ensure categoryId is a valid number
 			if (isNaN(categoryId) || categoryId <= 0) {
 				throw new BadRequestException("Invalid category ID");
 			}
 
-			let hashRequest = `cms_articles_by_category/${categoryId}?sortBy=${sortBy}&${sortDirection}=sortDirection`;
-			let cachedArticles = await this.cacheManager.get<Article[]>(`cms_category/${hashRequest}`);
+			let hashRequest = `cms_articles_by_category/${categoryId}?sortBy=${sortBy}&${sortDirection}=sortDirection&page=${page}&perPage=${perPage}`;
+			let cachedArticles = await this.cacheManager.get<{ pagination: any; articles: Article[] }>(`cms_articles_by_category/${hashRequest}`);
 
 			if(cachedArticles) return cachedArticles;
+
+            let pagination: Pagination = {
+                page: Number(page),
+                perPage: Number(perPage)
+            }
 
 			const articles =
 				await this.cmsArticleService.getArticlesByCategoryId(
@@ -275,9 +282,10 @@ export class CmsArticleController {
 					sortBy,
 					sortDirection,
 					Requestor.CMS,
+                    pagination
 				);
 
-			if (!articles || articles.length === 0) {
+			if (!articles || articles.articles.length === 0) {
 				throw new NotFoundException(
 					`No articles found for category ID: ${categoryId}`,
 				);
@@ -287,6 +295,81 @@ export class CmsArticleController {
 			return articles;
 		} catch (error) {
 			throw new BadRequestException("Error fetching articles");
+		}
+	}
+
+
+	@Get("tag/:tagId")
+	@ApiOperation({ summary: "Get articles by tag ID" })
+	@ApiParam({
+		name: "tagId",
+		type: "number",
+		description: "Tag ID",
+	})
+	@ApiQuery({
+		name: "sortBy",
+		required: false,
+		enum: ["views", "createdAt"],
+		description: "Field to sort by (views or createdAt)",
+	})
+	@ApiQuery({
+		name: "sortDirection",
+		required: false,
+		enum: ["asc", "desc"],
+		description: "Sort direction (ascending or descending)",
+	})
+	@ApiResponse({ status: 200, description: "Successfully fetched articles" })
+	@ApiResponse({
+		status: 404,
+		description: "No articles found for the given tag",
+	})
+	@ApiResponse({ status: 400, description: "Invalid tag ID" })
+	async getArticlesByTagId(
+		@Param("tagId") tagId: number,
+		@Query("sortBy") sortBy: "views" | "createdAt" = "createdAt",
+		@Query("sortDirection") sortDirection: "asc" | "desc" = "desc",
+        @Query("page") page: number = 1,
+		@Query("perPage") perPage: number = 2,
+	): Promise<{ pagination: any; articles: Article[] }>{
+		try {
+			// Ensure categoryId is a valid number
+			if (isNaN(tagId) || tagId <= 0) {
+				throw new BadRequestException("Invalid tag ID");
+			}
+
+			let hashRequest = `cms_articles_by_tag/${tagId}?sortBy=${sortBy}&${sortDirection}=sortDirection&page=${page}&perPage=${perPage}`;
+			let cachedArticles = await this.cacheManager.get<{ pagination: any; articles: Article[] }>(`cms_articles_by_tag/${hashRequest}`);
+
+			if(cachedArticles) return cachedArticles;
+
+            let pagination: Pagination = {
+                page: Number(page),
+                perPage: Number(perPage)
+            }
+
+			const articles =
+				await this.cmsArticleService.getArticlesByTagId(
+					tagId,
+					sortBy,
+					sortDirection,
+					Requestor.CMS,
+                    pagination
+				);
+
+			if (!articles || articles.articles.length === 0) {
+				throw new NotFoundException(
+					`No articles found for tag ID: ${tagId}`,
+				);
+			}
+
+			await this.cacheManager.set(`cms_articles_by_tag/${hashRequest}`, articles, 100)
+			return articles;
+		} catch (error) {
+            console.error('getArticlesByTagId error:', error);
+            if (error instanceof BadRequestException || error instanceof NotFoundException) {
+                throw error; // Re-throw specific exceptions
+            }
+            throw new InternalServerErrorException("Error fetching articles");
 		}
 	}
 

@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Logger, Module } from "@nestjs/common";
 import { SequelizeModule } from "@nestjs/sequelize";
 import { S3Module } from "nestjs-s3";
 
@@ -26,6 +26,11 @@ import { AdminMediaModule } from "./admin/admin-media/admin-media.module";
 import { Media } from "./admin/admin-media/model/media.model";
 import { PublisherMediaModule } from "./publisher/publisher-media/publisher-media.module";
 import { AdminOpensearchModule } from './admin/admin-opensearch/admin-opensearch.module';
+import { AdminTagModule } from './admin/admin-tag/admin-tag.module';
+import { Tag } from "./admin/admin-tag/model/tag.model";
+import { TagArticle } from "./admin/admin-tag/model/tag,article.model";
+import { CmsTagModule } from './cms/cms-tag/cms-tag.module';
+import { PublisherTagModule } from './publisher/publisher-tag/publisher-tag.module';
 
 
 @Module({
@@ -39,10 +44,15 @@ import { AdminOpensearchModule } from './admin/admin-opensearch/admin-opensearch
                 username: configService.get<string>("MYSQL_USERNAME"),
                 password: configService.get<string>("MYSQL_PASSWORD"),
                 database: configService.get<string>("MYSQL_DATABASE"),
-                models: [User, Article, Category, Media],
-                autoLoadModels: false,
-                synchronize: false,
+                models: [User, Article, Category, Tag, TagArticle, Media],
+                autoLoadModels: true,
+                synchronize: true,
+                logging: (sql) => {
+                    const logger = new Logger('Sequelize');
+                    logger.log(sql); // Logs the raw SQL queries to the console
+                },
             }),
+
             inject: [ConfigService],
         }),
 		S3Module.forRoot({
@@ -60,7 +70,7 @@ import { AdminOpensearchModule } from './admin/admin-opensearch/admin-opensearch
 			isGlobal: true,
 			envFilePath: process.env.NODE_ENV === 'development' ? '.env' : `.env.${process.env.NODE_ENV}`,
 		}),
-		SequelizeModule.forFeature([User, Article, Category, Media]),
+		SequelizeModule.forFeature([User, Article, Tag, TagArticle, Category, Media]),
 		AdminCategoryModule,
 		CmsCategoryModule,
 		PublisherArticleModule,
@@ -74,6 +84,9 @@ import { AdminOpensearchModule } from './admin/admin-opensearch/admin-opensearch
 		AdminMediaModule,
 		PublisherMediaModule,
 		AdminOpensearchModule,
+		AdminTagModule,
+		CmsTagModule,
+		PublisherTagModule,
 	],
 	controllers: [AppController],
 	providers: [

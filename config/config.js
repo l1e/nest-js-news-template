@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+// we need it for database migration and seeding.
 module.exports = {
   development: {
     username: process.env.MYSQL_USERNAME,

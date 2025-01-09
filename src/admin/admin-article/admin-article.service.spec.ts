@@ -33,10 +33,13 @@ import {
 import { CreateArticleDto } from "./dto/article.create.dto";
 import { AdminOpensearchService } from "../admin-opensearch/admin-opensearch.service";
 import { Pagination, SoringArticles, SortByArticles, SortDirection } from "./../../../src/utils/types/types";
+import { AdminTagService } from "../admin-tag/admin-tag.service";
+import { Tag } from "../admin-tag/model/tag.model";
 
 describe("AdminArticleService", () => {
 	let service: AdminArticleService;
 	let adminCategoryService: AdminCategoryService;
+    let adminTagService: AdminTagService;
 	let adminUserService: AdminUserService;
 	let adminMediaService: AdminMediaService;
 
@@ -57,11 +60,19 @@ describe("AdminArticleService", () => {
 		getCategoryById: jest.fn(),
 	};
 
+    // const mockAdminTagService = {
+	// 	getTagById: jest.fn(),
+	// };
+
 	const mockAdminUserService = {
 		findByEmail: jest.fn(),
 	};
 
 	const mockAdminMediaService = {
+		findOne: jest.fn(),
+	};
+
+    const mockAdminTagService = {
 		findOne: jest.fn(),
 	};
 
@@ -74,6 +85,10 @@ describe("AdminArticleService", () => {
 					provide: AdminCategoryService,
 					useValue: mockAdminCategoryService,
 				},
+				{
+					provide: AdminTagService,
+					useValue: mockAdminTagService,
+				},
 				{ provide: AdminUserService, useValue: mockAdminUserService },
 				{ provide: AdminMediaService, useValue: mockAdminMediaService },
 				{ provide: getModelToken(Article), useValue: mockArticleModel },
@@ -83,6 +98,8 @@ describe("AdminArticleService", () => {
 		service = module.get<AdminArticleService>(AdminArticleService);
 		adminCategoryService =
 			module.get<AdminCategoryService>(AdminCategoryService);
+		adminTagService =
+			module.get<AdminTagService>(AdminTagService);
 		adminUserService = module.get<AdminUserService>(AdminUserService);
 		adminMediaService = module.get<AdminMediaService>(AdminMediaService);
 		articleModel = module.get<typeof Article>(getModelToken(Article));
@@ -104,6 +121,7 @@ describe("AdminArticleService", () => {
 				id: createArticleDto.categoryId,
 				name: "Tech",
 			};
+			const mockTags = [{ id: 1 }, { id: 2 }];
 			const mockMedia = [{ id: 1 }, { id: 2 }];
 
 			(
@@ -120,6 +138,14 @@ describe("AdminArticleService", () => {
 			(adminMediaService.findOne as jest.Mock).mockResolvedValueOnce(
 				mockMedia[1],
 			);
+
+			(adminTagService.findOne as jest.Mock).mockResolvedValueOnce(
+				mockTags[0],
+			);
+			(adminTagService.findOne as jest.Mock).mockResolvedValueOnce(
+				mockTags[1],
+			);
+
 			(articleModel.create as jest.Mock).mockResolvedValue(
 				createdArticle,
 			);
@@ -128,6 +154,7 @@ describe("AdminArticleService", () => {
 			(articleModel.findByPk as jest.Mock).mockResolvedValue({
 				...createdArticle,
 				media: mockMedia,
+                tag: mockTags,
 			});
 
 			const result = await service.createArticle(createArticleDto);
@@ -137,6 +164,7 @@ describe("AdminArticleService", () => {
 			expect(result).toEqual({
 				...createdArticle,
 				media: mockMedia,
+                tag: mockTags,
 			});
 
 			// Ensure the correct external service calls were made
@@ -144,6 +172,12 @@ describe("AdminArticleService", () => {
 				createArticleDto.categoryId,
 				Requestor.ADMIN,
 			);
+
+			// expect(adminTagService.getTagById).toHaveBeenCalledWith(
+			// 	createArticleDto.tags,
+			// 	Requestor.ADMIN,
+			// );
+
 			expect(adminUserService.findByEmail).toHaveBeenCalledWith({
 				email: createArticleDto.creatorEmail,
 			});
@@ -166,6 +200,11 @@ describe("AdminArticleService", () => {
 				mockMedia,
 			);
 
+			expect(createdArticle.$set).toHaveBeenCalledWith(
+				"tags",
+				mockTags,
+			);
+
 			// Ensure the final sanitized article was fetched
 			expect(articleModel.findByPk).toHaveBeenCalledWith(
 				createdArticle.id,
@@ -173,7 +212,7 @@ describe("AdminArticleService", () => {
 					attributes: {
 						exclude: ["requestor", "validationStatus", "creatorId"],
 					},
-					include: [Category, { model: Media, as: "media" }],
+					include: [Category, { model: Media, as: "media" },{ model: Tag, as: "tags" }],
 				},
 			);
 		});

@@ -9,6 +9,7 @@ import { AdminArticleService } from "./../../../src/admin/admin-article/admin-ar
 import { AdminUserService } from "./../../../src/admin/admin-user/admin-user.service";
 import { AdminMediaService } from "./../../../src/admin/admin-media/admin-media.service";
 import { AdminOpensearchService } from "./../../../src/admin/admin-opensearch/admin-opensearch.service";
+import { AdminTagModule } from "./../../../src/admin/admin-tag/admin-tag.module";
 
 describe("PublisherArticleController", () => {
 	let controller: PublisherArticleController;
@@ -20,6 +21,7 @@ describe("PublisherArticleController", () => {
 				DatabaseModule,
 				PublisherArticleModule,
 				AdminCategoryModule,
+                AdminTagModule,
 				S3Module.forRoot({
 					config: {
 						credentials: {

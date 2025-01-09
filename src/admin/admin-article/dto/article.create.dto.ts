@@ -90,6 +90,12 @@ export class CreateArticleDto {
 	})
 	media: number[] | null;
 
+	@ApiProperty({
+		example: [1],
+		description: "The ID of the tag the article belongs to",
+	})
+	tags: number[] | null;
+
 	creatorId: number;
 	creatorEmail: string;
 	requestor?: Requestor = Requestor.PUBLISHER;

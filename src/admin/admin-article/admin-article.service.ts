@@ -27,6 +27,8 @@ import { UpdateArticleDto } from "./dto/update.article.dto";
 
 import { Op } from 'sequelize';
 import { Pagination, SoringArticles, SortByArticles, SortDirection } from './../../utils/types/types';
+import { Tag } from '../admin-tag/model/tag.model';
+import { AdminTagService } from '../admin-tag/admin-tag.service';
 
 @Injectable()
 export class AdminArticleService {
@@ -36,6 +38,7 @@ export class AdminArticleService {
 		private adminCategoryService: AdminCategoryService,
 		private adminUserService: AdminUserService,
 		private adminMediaService: AdminMediaService,
+        private adminTagService: AdminTagService,
 		private adminOpensearchService: AdminOpensearchService,
 	) {}
 
@@ -76,6 +79,23 @@ export class AdminArticleService {
 			);
 		}
 
+        let tags: Tag[] = [];
+		if (createArticleDto.tags && createArticleDto.tags.length > 0) {
+			tags = await Promise.all(
+				createArticleDto.tags.map(async (tagId) => {
+					const tagItem = await this.adminTagService.findOne(
+						tagId,
+					);
+					if (!tagItem) {
+						throw new NotFoundException(
+							`Tags with ID ${tagId} not found`,
+						);
+					}
+					return tagItem;
+				}),
+			);
+		}
+
 		console.log('createArticle createArticleDto:', createArticleDto)
 
 		let articleToSave = {
@@ -111,11 +131,16 @@ export class AdminArticleService {
 			await article.$set("media", media); // Assuming a Many-to-Many relationship with media
 		}
 
+
+        if (tags.length > 0) {
+			await article.$set("tags", tags); // Assuming a Many-to-Many relationship with media
+		}
+
 		const articleSanitized = await this.articleModel.findByPk(article.id, {
 			attributes: {
 				exclude: ["requestor", "validationStatus", "creatorId"],
 			},
-			include: [Category, { model: Media, as: "media" }],
+			include: [Category, { model: Media, as: "media" }, { model: Tag, as: "tags" }],
 		});
 
 		console.log('createArticle article:',article)
@@ -169,13 +194,11 @@ export class AdminArticleService {
 						as: "creator",
 						attributes: ["id", "email", "firstName", "lastName"],
 					},
-					{
-						model: Media,
-						as: "media",
-						attributes: {
-							exclude: attributesToExcludeFromMedia,
-						},
-					},
+                    {
+                        model: Tag,
+                        as: "tags", // Matches the alias in @BelongsToMany
+                        through: { attributes: [] }, // Exclude the pivot table fields if not needed
+                    },
 				],
 			});
 
@@ -226,7 +249,7 @@ export class AdminArticleService {
 			if (error instanceof NotFoundException) {
 				console.log("0: Error fetching article", error);
 				throw error;
-			}
+            }
 
 			// console.log("1: Error fetching article", error);
 
@@ -344,6 +367,11 @@ export class AdminArticleService {
 					},
 					where: whereConditionsForMedia,
 				},
+                {
+                    model: Tag,
+                    as: "tags", // Matches the alias in @BelongsToMany
+                    through: { attributes: [] }, // Exclude the pivot table fields if not needed
+                },
 			],
 		});
 
@@ -425,6 +453,11 @@ export class AdminArticleService {
 						},
 						where: whereConditionsForMedia,
 					},
+                    {
+                        model: Tag,
+                        as: "tags", // Matches the alias in @BelongsToMany
+                        through: { attributes: [] }, // Exclude the pivot table fields if not needed
+                    },
 				]
 				// include: [
 				// 	{
@@ -465,6 +498,11 @@ export class AdminArticleService {
 						},
 						where: whereConditionsForMedia,
 					},
+                    {
+                        model: Tag,
+                        as: "tags", // Matches the alias in @BelongsToMany
+                        through: { attributes: [] }, // Exclude the pivot table fields if not needed
+                    },
 				],
 				order: [[sorting.sortBy, sorting.sortDirection]],
 				limit: pagination.perPage,
@@ -509,7 +547,8 @@ export class AdminArticleService {
 		sortBy: "views" | "createdAt" = "createdAt",
 		sortDirection: "asc" | "desc" = "desc",
 		requestor: Requestor,
-	): Promise<Article[]> {
+        pagination: Pagination
+	): Promise<{ pagination: any; articles: Article[] }>{
 		const attributesToExcludeFromMedia =
 			requestor === Requestor.CMS
 				? ["isPhysicallyExist", "publishStatus", "articleId"]
@@ -520,7 +559,7 @@ export class AdminArticleService {
 				? { isPhysicallyExist: isExsistFormat.YES }
 				: {};
 
-		return this.articleModel.findAll({
+        const totalArticles = await this.articleModel.findAll({
 			attributes: {
 				exclude: [
 					"requestor",
@@ -552,8 +591,204 @@ export class AdminArticleService {
 					},
 					where: whereConditionsForMedia,
 				},
+                {
+                    model: Tag,
+                    as: "tags", // Matches the alias in @BelongsToMany
+                    through: { attributes: [] }, // Exclude the pivot table fields if not needed
+                },
 			],
 		});
+
+
+        const paginationResult = {
+            count: pagination.perPage, //fix it!!!!!!
+            total: totalArticles.length,
+            perPage: pagination.perPage,
+            currentPage: pagination.page,
+            totalPages: Math.ceil(totalArticles.length / pagination.perPage),
+        };
+
+        let articles = await  this.articleModel.findAll({
+			attributes: {
+				exclude: [
+					"requestor",
+					"validationStatus",
+					"categoryId",
+					"publishStatus",
+					"creatorId",
+				],
+			},
+            limit: pagination.perPage,
+            offset: (pagination.page - 1) * pagination.perPage, 
+			where: {
+				categoryId,
+				validationStatus: "approved",
+				publishStatus: "published",
+			},
+			order: [[sortBy, sortDirection]],
+			include: [
+				{
+					model: Category,
+					as: "category",
+					attributes: {
+						exclude: ["publishStatus"],
+					},
+				},
+				{
+					model: Media,
+					as: "media",
+					attributes: {
+						exclude: attributesToExcludeFromMedia,
+					},
+					where: whereConditionsForMedia,
+				},
+                {
+                    model: Tag,
+                    as: "tags", // Matches the alias in @BelongsToMany
+                    through: { attributes: [] }, // Exclude the pivot table fields if not needed
+                },
+			],
+		});
+
+
+        if(articles.length){
+            paginationResult.count = articles.length;
+        }
+        
+
+        if (articles.length === 0) {
+            throw new NotFoundException(
+                "No articles found matching the given criteria.",
+            );
+        }
+
+        return { pagination: paginationResult, articles: articles };
+	}
+
+    async getArticlesByTagId(
+		tagId: number,
+		sortBy: "views" | "createdAt" = "createdAt",
+		sortDirection: "asc" | "desc" = "desc",
+		requestor: Requestor,
+        pagination: Pagination
+	): Promise<{ pagination: any; articles: Article[] }> {
+		const attributesToExcludeFromMedia =
+			requestor === Requestor.CMS
+				? ["isPhysicallyExist", "publishStatus", "articleId"]
+				: [];
+
+		const whereConditionsForMedia =
+			requestor === Requestor.CMS
+				? { isPhysicallyExist: isExsistFormat.YES }
+				: {};
+
+        const totalArticles =await this.articleModel.findAll({
+			attributes: {
+				exclude: [
+					"requestor",
+					"validationStatus",
+					"categoryId",
+					"publishStatus",
+					"creatorId",
+				],
+			},
+			where: {
+				validationStatus: "approved",
+				publishStatus: "published",
+			},
+			order: [[sortBy, sortDirection]],
+			include: [
+				{
+					model: Category,
+					as: "category",
+					attributes: {
+						exclude: ["publishStatus"],
+					},
+				},
+				{
+					model: Media,
+					as: "media",
+					attributes: {
+						exclude: attributesToExcludeFromMedia,
+					},
+					where: whereConditionsForMedia,
+				},
+                {
+                    model: Tag,
+                    as: "tags",
+                    through: { attributes: [] },
+                    where: {
+                        id: tagId,
+                    },
+                    required: true,
+                },
+			],
+		});
+
+        const paginationResult = {
+            count: pagination.perPage, //fix it!!!!!!
+            total: totalArticles.length,
+            perPage: pagination.perPage,
+            currentPage: pagination.page,
+            totalPages: Math.ceil(totalArticles.length / pagination.perPage),
+        };
+
+		let articles = await this.articleModel.findAll({
+			attributes: {
+				exclude: [
+					"requestor",
+					"validationStatus",
+					"categoryId",
+					"publishStatus",
+					"creatorId",
+				],
+			},
+			where: {
+				validationStatus: "approved",
+				publishStatus: "published",
+			},
+			order: [[sortBy, sortDirection]],
+            limit: pagination.perPage,
+            offset: (pagination.page - 1) * pagination.perPage, 
+			include: [
+				{
+					model: Category,
+					as: "category",
+					attributes: {
+						exclude: ["publishStatus"],
+					},
+				},
+				{
+					model: Media,
+					as: "media",
+					attributes: {
+						exclude: attributesToExcludeFromMedia,
+					},
+					where: whereConditionsForMedia,
+				},
+                {
+                    model: Tag,
+                    as: "tags",
+                    through: { attributes: [] },
+                    where: {
+                        id: tagId,
+                    },
+                    required: true,
+                },
+			],
+		});
+        if(articles.length){
+            paginationResult.count = articles.length;
+        }
+        
+
+        if (articles.length === 0) {
+            throw new NotFoundException(
+                "No articles found matching the given criteria.",
+            );
+        }
+
+        return { pagination: paginationResult, articles: articles };
 	}
 
     async trigetToUpdateTalentByIdOpenSearch(id: number) {
@@ -617,6 +852,11 @@ export class AdminArticleService {
 						},
 						where: { isPhysicallyExist: isExsistFormat.YES },
 					},
+                    {
+                        model: Tag,
+                        as: "tags", // Matches the alias in @BelongsToMany
+                        through: { attributes: [] }, // Exclude the pivot table fields if not needed
+                    },
 				],
 				order: [[sorting.sortBy, sorting.sortDirection.toUpperCase()]], 
 				limit: pagination.perPage, 
@@ -681,7 +921,26 @@ export class AdminArticleService {
 			await article.$set("media", []);
 		}
 
-		const { media, ...updateData } = updateArticleDto;
+		if (updateArticleDto.tags && updateArticleDto.tags.length > 0) {
+			const tagItems = await Promise.all(
+				updateArticleDto.tags.map(async (tagId) => {
+					const tagItem = await this.adminTagService.findOne(
+						tagId,
+					);
+					if (!tagItem) {
+						throw new NotFoundException(
+							`Tag with ID ${tagId} not found`,
+						);
+					}
+					return tagItem;
+				}),
+			);
+			await article.$set("tags", tagItems);
+		} else if (updateArticleDto.tags === null) {
+			await article.$set("tags", []);
+		}
+
+		const { media, tags, ...updateData } = updateArticleDto;
 
 		await article.update(updateData);
 		await article.reload();

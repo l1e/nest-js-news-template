@@ -53,6 +53,8 @@ export class CreateArticleDto {
 	// @IsOptional()
 	media: number[] | null;
 
+    tags: number[] | null;
+
 	// @ApiProperty({
 	//   example: 1,
 	//   description: 'The ID of the category the article belongs to',

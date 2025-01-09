@@ -8,6 +8,8 @@ import { Article } from "./../admin/admin-article/model/article.model";
 import { Category } from "./../admin/admin-category/model/category.model";
 import { Media } from "./../admin/admin-media/model/media.model";
 import { User } from "./../admin/admin-user/model/user.model";
+import { TagArticle } from "./../admin/admin-tag/model/tag,article.model";
+import { Tag } from "./../admin/admin-tag/model/tag.model";
 
 
 dotenv.config();
@@ -33,10 +35,10 @@ console.log(
 			  username: configService.get<string>('MYSQL_USERNAME', 'root'),
 			  password: configService.get<string>('MYSQL_PASSWORD', 'root'),
 			  database: configService.get<string>('MYSQL_DATABASE', 'nest-auth-sequlize-seeds'),
-			  models: [Category, Article, User, Media],
+			  models: [Category, Article, Tag, TagArticle, User, Media],
 			}),
 		  }),
-		SequelizeModule.forFeature([Category, Article, User, Media]), 
+		SequelizeModule.forFeature([Category, Article, Tag, TagArticle, User, Media]), 
 	],
 	exports: [SequelizeModule],
 })

@@ -16,6 +16,9 @@ import { PublisherAuthModule } from "./publisher/publisher-auth/publisher-auth.m
 import { PublisherMeModule } from "./publisher/publisher-me/publisher-me.module";
 import { AdminMediaModule } from "./admin/admin-media/admin-media.module";
 import { PublisherMediaModule } from "./publisher/publisher-media/publisher-media.module";
+import { AdminTagModule } from "./admin/admin-tag/admin-tag.module";
+import { CmsTagModule } from "./cms/cms-tag/cms-tag.module";
+import { PublisherTagModule } from "./publisher/publisher-tag/publisher-tag.module";
 
 async function bootstrap() {
 	const PORT = process.env.NEST_APP_PORT || 3006;
@@ -31,7 +34,7 @@ async function bootstrap() {
 	const adminConfig = new DocumentBuilder()
 		.setTitle("Admin API")
 		.setDescription("Admin Section API Documentation")
-		.setVersion("1.0")
+		.setVersion("1.0.1")
 		.addBearerAuth()
 		// .addTag('Admin panel')
 		.build();
@@ -43,6 +46,7 @@ async function bootstrap() {
 			UserModule,
 			AdminAuthModule,
 			AdminMediaModule,
+            AdminTagModule,
 		],
 	});
 	SwaggerModule.setup("api/admin", app, adminDocument);
@@ -51,7 +55,7 @@ async function bootstrap() {
 	const publisherConfig = new DocumentBuilder()
 		.setTitle("Publisher API")
 		.setDescription("Publisher Section API Documentation")
-		.setVersion("1.0")
+		.setVersion("1.0.1")
 		.addBearerAuth()
 		// .addTag('publisher')
 		.build();
@@ -65,6 +69,7 @@ async function bootstrap() {
 				PublisherAuthModule,
 				PublisherMeModule,
 				PublisherMediaModule,
+                PublisherTagModule
 			],
 		},
 	);
@@ -74,10 +79,10 @@ async function bootstrap() {
 	const cmsConfig = new DocumentBuilder()
 		.setTitle("CMS API")
 		.setDescription("CMS Section API Documentation")
-		.setVersion("1.0")
+		.setVersion("1.0.1")
 		.build();
 	const cmsDocument = SwaggerModule.createDocument(app, cmsConfig, {
-		include: [CmsArticleModule, CmsPublisherModule, CmsCategoryModule],
+		include: [CmsArticleModule, CmsPublisherModule, CmsCategoryModule, CmsTagModule],
 	});
 	SwaggerModule.setup("api/cms", app, cmsDocument);
 

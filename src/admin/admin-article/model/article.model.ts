@@ -1,5 +1,6 @@
 import {
 	BelongsTo,
+	BelongsToMany,
 	Column,
 	DataType,
 	ForeignKey,
@@ -10,6 +11,8 @@ import {
 import { Category } from "./../../admin-category/model/category.model";
 import { Media } from "./../../admin-media/model/media.model";
 import { User } from "./../../admin-user/model/user.model";
+import { Tag } from "./../../admin-tag/model/tag.model";
+import { TagArticle } from "../../admin-tag/model/tag,article.model";
 
 export enum PublishStatus {
 	PUBLISHED = "published",
@@ -117,4 +120,8 @@ export class Article extends Model<Article> {
 
 	@HasMany(() => Media)
 	media: Media[];
+
+
+	@BelongsToMany(() => Tag, () => TagArticle)
+	tags: Tag[];
 }

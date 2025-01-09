@@ -7,6 +7,7 @@ import { AdminUserService } from "./../../../src/admin/admin-user/admin-user.ser
 import { AdminMediaService } from "./../../../src/admin/admin-media/admin-media.service";
 import { DatabaseModule } from "./../../../src/database/database.module";
 import { AdminOpensearchService } from "./../../../src/admin/admin-opensearch/admin-opensearch.service";
+import { AdminTagService } from "./../../../src/admin/admin-tag/admin-tag.service";
 
 describe("PublisherCategoryService", () => {
 	let service: PublisherCategoryService;
@@ -16,6 +17,7 @@ describe("PublisherCategoryService", () => {
 			providers: [
 				PublisherCategoryService,
 				AdminCategoryService,
+                AdminTagService,
 				AdminArticleService,
 				AdminOpensearchService,
 				AdminUserService,

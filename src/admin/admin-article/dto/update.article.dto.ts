@@ -103,6 +103,15 @@ export class UpdateArticleDto {
 	// @IsInt()
 	media?: number[] | null;
 
+
+	@ApiPropertyOptional({
+		example: [1],
+		description: "The ID of the category the article belongs to",
+	})
+	@IsOptional()
+	// @IsInt()
+	tags?: number[] | null;
+
 	//   @ApiProperty({
 	//     example: 1,
 	//     description: 'The ID of the user the article belongs to.',

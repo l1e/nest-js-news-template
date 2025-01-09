@@ -122,13 +122,32 @@ export class CmsArticleService {
 		sortBy: "views" | "createdAt" = "createdAt",
 		sortDirection: "asc" | "desc" = "desc",
 		requestor: Requestor,
-	): Promise<Article[]> {
+        pagination: Pagination
+	): Promise<{ pagination: any; articles: Article[] }> {
 		return this.adminArticleService.getArticlesByCategoryId(
 			categoryId,
 			sortBy,
 			sortDirection,
 			requestor,
+            pagination
 		);
+	}
+
+    async getArticlesByTagId(
+		tagyId: number,
+		sortBy: "views" | "createdAt" = "createdAt",
+		sortDirection: "asc" | "desc" = "desc",
+		requestor: Requestor,
+        pagination: Pagination
+	): Promise<{ pagination: any; articles: Article[] }> {
+		let articles = await this.adminArticleService.getArticlesByTagId(
+			tagyId,
+			sortBy,
+			sortDirection,
+			requestor,
+            pagination
+		);
+        return articles;
 	}
 
 	async getArticleOfTheDay(requestor: Requestor): Promise<Article> {

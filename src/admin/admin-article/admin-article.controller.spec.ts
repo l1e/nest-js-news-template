@@ -22,11 +22,13 @@ import {
 } from "./model/article.model";
 import { SortByArticles, SortDirection } from "./../../utils/types/types";
 import { AdminOpensearchService } from "../admin-opensearch/admin-opensearch.service";
+import { AdminTagService } from "../admin-tag/admin-tag.service";
 
 describe("AdminArticleController", () => {
 	let controller: AdminArticleController;
 	let service: AdminArticleService;
 	let adminCategoryService: AdminCategoryService;
+    let adminTagService: AdminTagService;
 	let adminUserService: AdminUserService;
 	let adminMediaService: AdminMediaService;
 
@@ -52,6 +54,10 @@ describe("AdminArticleController", () => {
 		getCategoryById: jest.fn(),
 	};
 
+    const mockAdminTagService = {
+		getTagById: jest.fn(),
+	};
+
 	const mockAdminUserService = {
 		findByEmail: jest.fn(),
 	};
@@ -70,6 +76,10 @@ describe("AdminArticleController", () => {
 					provide: AdminCategoryService,
 					useValue: mockAdminCategoryService,
 				},
+				{
+					provide: AdminTagService,
+					useValue: mockAdminTagService,
+				},
 				{ provide: AdminUserService, useValue: mockAdminUserService },
 				{ provide: AdminMediaService, useValue: mockAdminMediaService },
 			],
@@ -79,6 +89,8 @@ describe("AdminArticleController", () => {
 		service = module.get<AdminArticleService>(AdminArticleService);
 		adminCategoryService =
 			module.get<AdminCategoryService>(AdminCategoryService);
+		adminTagService =
+			module.get<AdminTagService>(AdminTagService);
 		adminUserService = module.get<AdminUserService>(AdminUserService);
 		adminMediaService = module.get<AdminMediaService>(AdminMediaService);
 	});
@@ -91,14 +103,15 @@ describe("AdminArticleController", () => {
 
 		it("should create an article", async () => {
 			const createArticleDto: CreateArticleDto = {
-				title: "New Article",
-				description: "Description of the article",
-				categoryId: 1,
-				creatorEmail: "creator@example.com",
-				media: [],
-				articleOfTheDay: ArticleOfTheDay.YES,
-				creatorId: mockUser.id,
-			};
+                title: "New Article",
+                description: "Description of the article",
+                categoryId: 1,
+                creatorEmail: "creator@example.com",
+                media: [],
+                articleOfTheDay: ArticleOfTheDay.YES,
+                creatorId: mockUser.id,
+                tags: []
+            };
 			const createdArticle = { id: 1, ...createArticleDto };
 			mockArticleService.createArticle.mockResolvedValue(createdArticle);
 

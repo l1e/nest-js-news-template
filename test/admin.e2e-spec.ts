@@ -13,8 +13,8 @@ import {
 	updateCategoryAsAdminDto
 } from "./test.mock.e2e.data";
 import { CreateCategoryDto } from "./../src/admin/admin-category/dto/category.create.dto";
-import { CreateArticleDto } from "src/admin/admin-article/dto/article.create.dto";
-import { UpdateArticleDto } from "src/admin/admin-article/dto/update.article.dto";
+import { CreateArticleDto } from "./../src/admin/admin-article/dto/article.create.dto";
+import { UpdateArticleDto } from "./../src/admin/admin-article/dto/update.article.dto";
 
 
 describe("Admin (e2e)", () => {

@@ -1,6 +1,6 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { PublisherCategoryController } from "./publisher-category.controller";
 import { S3Module } from "nestjs-s3";
+import { PublisherCategoryController } from "./publisher-category.controller";
 import { PublisherCategoryService } from "./publisher-category.service";
 import { DatabaseModule } from "./../../../src/database/database.module";
 import { PublisherCategoryModule } from "./publisher-category.module";
@@ -9,6 +9,7 @@ import { AdminArticleService } from "./../../../src/admin/admin-article/admin-ar
 import { AdminUserService } from "./../../../src/admin/admin-user/admin-user.service";
 import { AdminMediaService } from "./../../../src/admin/admin-media/admin-media.service";
 import { AdminOpensearchService } from "./../../admin/admin-opensearch/admin-opensearch.service";
+import { AdminTagModule } from "./../../admin/admin-tag/admin-tag.module";
 
 describe("PublisherCategoryController", () => {
 	let controller: PublisherCategoryController;
@@ -20,6 +21,7 @@ describe("PublisherCategoryController", () => {
 				DatabaseModule,
 				PublisherCategoryModule,
 				AdminCategoryModule,
+                AdminTagModule,
 				S3Module.forRoot({
 					config: {
 						credentials: {

@@ -52,23 +52,24 @@ export const adminRegister = {
 };
 
 export const mockCreateArticleAsPublisher: CreateArticleDto = {
-	title: "Kamara shines as Saints stun Cowboys"+randomArticleTitlePrefix,
-	description: `
+    title: "Kamara shines as Saints stun Cowboys" + randomArticleTitlePrefix,
+    description: `
 		Putting 40-plus points against the lowly Carolina Panthers last week was one thing, but beating the Cowboys 44-19 in their home opener is a different story as the Saints sent out a warning to the rest of the league.
 		The unstoppable Alvin Kamara scored four touchdowns for this prolific Saints attack, which has now scored 91 points in their opening two games - the second most in the Super Bowl era.
 		Matching the 1971 Cowboys, only the Saints themselves, in 2009, scored more with 95 - and both of those teams went on to win the Super Bowl.
 	`,
-	validationStatus: ValidationStatus.APPROVED,
-	articleOfTheDay: ArticleOfTheDay.NO,
-	categoryId: 1,
-	media: [1, 2],
-	creatorId: 1,
-	creatorEmail: "",
+    validationStatus: ValidationStatus.APPROVED,
+    articleOfTheDay: ArticleOfTheDay.NO,
+    categoryId: 1,
+    media: [1, 2],
+    creatorId: 1,
+    creatorEmail: "",
+    tags: [1, 2],
 };
 
 export const mockCreateArticleAsAdmin: CreateArticleDto = {
-	title: "Astronauts reveal what life is like on",
-	description: `
+    title: "Astronauts reveal what life is like on",
+    description: `
 		In June two American astronauts left Earth expecting to spend eight days on the International Space Station (ISS).
 		But after fears that their Boeing Starliner spacecraft was unsafe to fly back on, Nasa delayed Suni Williams and Butch Wilmore’s return until 2025.
 		They are now sharing a space about the size of a six-bedroom house with nine other people.
@@ -76,12 +77,13 @@ export const mockCreateArticleAsAdmin: CreateArticleDto = {
 		But how does it really feel to be 400km above Earth? How do you deal with tricky crewmates? How do you exercise and wash your clothes? What do you eat - and, importantly, what is the “space smell”?
 		Talking to BBC News, three former astronauts divulge the secrets to surviving in orbit.
 	`,
-	validationStatus: ValidationStatus.APPROVED,
-	articleOfTheDay: ArticleOfTheDay.NO,
-	categoryId: 1,
-	media: [1, 2],
-	creatorId: 1,
-	creatorEmail: "",
+    validationStatus: ValidationStatus.APPROVED,
+    articleOfTheDay: ArticleOfTheDay.NO,
+    categoryId: 1,
+    media: [1, 2],
+    creatorId: 1,
+    creatorEmail: "",
+    tags: [1, 2],
 };
 
 export const createCategoryAsAdminDto: CreateCategoryDto = {

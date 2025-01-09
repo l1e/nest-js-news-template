@@ -7,6 +7,7 @@ import { CmsArticleService } from "./cms-article.service";
 import { CmsArticleController } from "./cms-article.controller";
 import { AdminArticleModule } from "./../../admin/admin-article/admin-article.module";
 import { AdminOpensearchModule } from "./../../admin/admin-opensearch/admin-opensearch.module";
+import { AdminTagModule } from "./../../admin/admin-tag/admin-tag.module";
 
 @Module({
 	imports: [
@@ -21,6 +22,7 @@ import { AdminOpensearchModule } from "./../../admin/admin-opensearch/admin-open
             inject: [ConfigService],
         }),
 		AdminOpensearchModule,
+        AdminTagModule
 
 	],
 	providers: [CmsArticleService],

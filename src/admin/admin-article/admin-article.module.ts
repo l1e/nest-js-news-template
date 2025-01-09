@@ -9,13 +9,17 @@ import { UserModule } from "../admin-user/admin-user.module";
 import { Media } from "../admin-media/model/media.model";
 import { AdminMediaModule } from "../admin-media/admin-media.module";
 import { Category } from "../admin-category/model/category.model";
+import { Tag } from '../admin-tag/model/tag.model';
+import { TagArticle } from '../admin-tag/model/tag,article.model';
+import { AdminTagModule } from '../admin-tag/admin-tag.module';
 
 @Module({
 	imports: [
 		AdminCategoryModule,
 		AdminMediaModule,
+        AdminTagModule,
 		UserModule,
-		SequelizeModule.forFeature([Article, Media, Category]),
+		SequelizeModule.forFeature([Article, Media, Category, Tag, TagArticle]),
 		AdminOpensearchModule,
 	],
 	providers: [AdminArticleService],
