@@ -47,6 +47,22 @@ services:
         networks:
             - news-net
 
+    opensearch-push:
+        container_name: opensearch_push_service
+        image: curlimages/curl:latest
+        env_file:
+            - ./.env
+        command: >
+            /bin/sh -c "sleep 90 && 
+            curl -X 'GET' 'http://app:${NEST_APP_PORT}/admin-article/automatic-push-with-secret-key?secretKey=${OPEN_SEARCH_SECRET_KEY_TO_PUSH_ARTICLES}' 
+            -H 'accept: */*'"
+        depends_on:
+            - app
+            - opensearch-node1
+            - opensearch-node2
+        networks:
+            - news-net
+
     mariadb:
         container_name: nest_js_news_template_mariadb
         build:

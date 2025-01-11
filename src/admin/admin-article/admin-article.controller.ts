@@ -13,9 +13,11 @@ import {
 	BadRequestException,
 	NotFoundException,
 	InternalServerErrorException,
+    UnauthorizedException,
 } from "@nestjs/common";
 import {
 	ApiBearerAuth,
+	ApiExcludeEndpoint,
 	ApiOperation,
 	ApiQuery,
 	ApiResponse,
@@ -30,17 +32,33 @@ import { AuthAdminhGuard } from "./../../utils/auth.admin.guard";
 import { EmailToken } from "./../../utils/email.from.token.decorator";
 import { UpdateArticleDto } from "./dto/update.article.dto";
 import { Pagination, SoringArticles, SortByArticles, SortDirection } from "./../../utils/types/types";
+import { ConfigService } from "@nestjs/config";
 
 @ApiBearerAuth()
 @ApiTags("articles")
 @Controller("admin-article")
 export class AdminArticleController {
-	constructor(private readonly adminArticleService: AdminArticleService) {}
+	constructor(
+        private readonly adminArticleService: AdminArticleService,
+        private readonly configService: ConfigService
+    ) {}
 
 	@Get("push-to-opensearch")
     @ApiOperation({ summary: "Push articles to the OpenSearch" })
     @UseGuards(AuthGuard("jwt"), AuthAdminhGuard)
-    async pushModelsToOpenSearch() {
+    async pushArticlesToOpenSearch() {
+        return await this.adminArticleService.pushArticleToOpenSearch();
+    }
+
+    @Get("automatic-push-with-secret-key")
+    @ApiOperation({ summary: "Automatic push with a secret key" })
+    @ApiExcludeEndpoint()
+    async pushArticlesAutomaticlyToOpenSearch(@Query("secretKey") secretKey: string) {
+
+        if (secretKey !== this.configService.get<string>('OPEN_SEARCH_SECRET_KEY_TO_PUSH_ARTICLES')) {
+            throw new UnauthorizedException("Invalid secret key");
+        }
+
         return await this.adminArticleService.pushArticleToOpenSearch();
     }
 

@@ -12,6 +12,7 @@ import { Category } from "../admin-category/model/category.model";
 import { Tag } from '../admin-tag/model/tag.model';
 import { TagArticle } from '../admin-tag/model/tag,article.model';
 import { AdminTagModule } from '../admin-tag/admin-tag.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
 	imports: [
@@ -21,6 +22,7 @@ import { AdminTagModule } from '../admin-tag/admin-tag.module';
 		UserModule,
 		SequelizeModule.forFeature([Article, Media, Category, Tag, TagArticle]),
 		AdminOpensearchModule,
+        ConfigModule.forRoot()
 	],
 	providers: [AdminArticleService],
 	controllers: [AdminArticleController],
