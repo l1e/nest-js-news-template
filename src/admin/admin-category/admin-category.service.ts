@@ -35,11 +35,15 @@ export class AdminCategoryService {
 	async getCategoryById(
 		id: number,
 		requestor: Requestor = Requestor.PUBLISHER,
+        articleAdd: boolean = true
 	): Promise<Category> {
 		try {
-			const category = await this.categoryModel.findByPk(id, {
+			const category = await this.categoryModel.findByPk(id, 
+                articleAdd ?{
 				include: [Article],
-			});
+                } : {}
+            
+            );
 			// console.log("getCategoryById category:", category);
 			if (!category) {
 				throw new HttpException(

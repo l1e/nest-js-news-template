@@ -22,4 +22,4 @@
    - Total views
    - Article size
    - Text in the title/description
-- 19) During the initial launch, push articles into OpenSearch.
++ 19) During the initial launch, push articles into OpenSearch.

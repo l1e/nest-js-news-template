@@ -1,4 +1,4 @@
-import { BadRequestException, Controller, Get, HttpStatus, Inject, InternalServerErrorException, Query } from "@nestjs/common";
+import { BadRequestException, Controller, Get, HttpStatus, Inject, InternalServerErrorException, Param, ParseIntPipe, Query } from "@nestjs/common";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { CmsCategoryService } from "./cms-category.service";
 import { Category } from "./../../admin/admin-category/model/category.model";
@@ -17,6 +17,30 @@ export class CmsCategoryController {
 		@Inject(CACHE_MANAGER)
         private cacheManager: Cache,
 	) {}
+
+    @Get(":id")
+    @ApiOperation({ summary: "Get a category by ID" })
+    @ApiResponse({
+        status: 200,
+        description: "Return a single category.",
+    })
+    @ApiResponse({
+        status: 403,
+        description: "Invalid credentials",
+    })
+    @ApiResponse({
+        status: 404,
+        description: "Category not found",
+    })
+    @ApiResponse({
+        status: 500,
+        description: "Failed to fetch category",
+    })
+    async getCategoryById(
+        @Param("id", ParseIntPipe) id: number,
+    ): Promise<Category> {
+        return this.publisherCategoryService.getCategoryById(id);
+    }
 
 	@Get()
 	@ApiOperation({ summary: "Get all categories" })

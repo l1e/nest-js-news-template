@@ -11,4 +11,8 @@ export class CmsCategoryService {
 	async getAllCategories(requestor: Requestor, sorting:SoringCategories, pagination:Pagination): Promise<{ pagination: any, categories: Category[] }> {
 		return this.adminCategoryService.getAllCategories(requestor, sorting, pagination);
 	}
+    async getCategoryById(id: number): Promise<Category> {
+        return  await this.adminCategoryService.getCategoryById(id, Requestor.CMS, false);
+    }
+
 }
