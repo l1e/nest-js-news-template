@@ -7,7 +7,7 @@ export class ContactForm extends Model<ContactForm> {
         allowNull: false,
         // unique: true,
     })
-    fistName: string;
+    firstName: string;
 
     @Column({
         type: DataType.STRING(191),

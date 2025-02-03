@@ -8,7 +8,7 @@ export class CreateContactFormDto {
         description: "The name of the sender",
     })
     @IsString()
-    fistName: string;
+    firstName: string;
 
     @ApiProperty({
         example: "Andoidov",
