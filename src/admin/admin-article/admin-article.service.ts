@@ -176,7 +176,7 @@ export class AdminArticleService {
 
 			const attributesToExcludeFromArticle =
 				requestor === Requestor.CMS
-					? ["requestor", "validationStatus", "categoryId"]
+					? ["requestor", "validationStatus", "categoryId", "creatorId"]
 					: [];
 
 			const article = await this.articleModel.findOne({
@@ -458,6 +458,11 @@ export class AdminArticleService {
                         as: "tags", // Matches the alias in @BelongsToMany
                         through: { attributes: [] }, // Exclude the pivot table fields if not needed
                     },
+                    {
+						model: User,
+						as: "creator",
+						attributes: ["id", "firstName", "lastName"],
+					},
 				]
 				// include: [
 				// 	{
@@ -503,6 +508,11 @@ export class AdminArticleService {
                         as: "tags", // Matches the alias in @BelongsToMany
                         through: { attributes: [] }, // Exclude the pivot table fields if not needed
                     },
+                    {
+						model: User,
+						as: "creator",
+						attributes: ["id", "firstName", "lastName"],
+					},
 				],
 				order: [[sorting.sortBy, sorting.sortDirection]],
 				limit: pagination.perPage,
@@ -1011,7 +1021,9 @@ export class AdminArticleService {
 			if (!is_alredy_saved_article) {
 				// If the product does not exist, create it in the OpenSearch index
 				this.adminOpensearchService.createArticle(article);
-			}
+			}else{
+                await this.adminOpensearchService.updateArticle(article);
+            }
 		}
         return "Data successfully pushed into the opensearch";
     }

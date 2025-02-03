@@ -19,6 +19,8 @@ import { PublisherMediaModule } from "./publisher/publisher-media/publisher-medi
 import { AdminTagModule } from "./admin/admin-tag/admin-tag.module";
 import { CmsTagModule } from "./cms/cms-tag/cms-tag.module";
 import { PublisherTagModule } from "./publisher/publisher-tag/publisher-tag.module";
+import { AdminContactFormModule } from "./admin/admin-contact-form/admin-contact-form.module";
+import { CmsContactFormModule } from "./cms/cms-contact-form/cms-contact-form.module";
 
 async function bootstrap() {
 	const PORT = process.env.NEST_APP_PORT || 3006;
@@ -47,6 +49,7 @@ async function bootstrap() {
 			AdminAuthModule,
 			AdminMediaModule,
             AdminTagModule,
+            AdminContactFormModule
 		],
 	});
 	SwaggerModule.setup("api/admin", app, adminDocument);
@@ -82,7 +85,13 @@ async function bootstrap() {
 		.setVersion("1.0.1")
 		.build();
 	const cmsDocument = SwaggerModule.createDocument(app, cmsConfig, {
-		include: [CmsArticleModule, CmsPublisherModule, CmsCategoryModule, CmsTagModule],
+		include: [
+            CmsArticleModule, 
+            CmsPublisherModule, 
+            CmsCategoryModule, 
+            CmsTagModule, 
+            CmsContactFormModule
+        ],
 	});
 	SwaggerModule.setup("api/cms", app, cmsDocument);
 

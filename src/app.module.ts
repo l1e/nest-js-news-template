@@ -31,6 +31,9 @@ import { Tag } from "./admin/admin-tag/model/tag.model";
 import { TagArticle } from "./admin/admin-tag/model/tag,article.model";
 import { CmsTagModule } from './cms/cms-tag/cms-tag.module';
 import { PublisherTagModule } from './publisher/publisher-tag/publisher-tag.module';
+import { AdminContactFormModule } from './admin/admin-contact-form/admin-contact-form.module';
+import { ContactForm } from "./admin/admin-contact-form/model/contact-form.model";
+import { CmsContactFormModule } from './cms/cms-contact-form/cms-contact-form.module';
 
 
 @Module({
@@ -44,7 +47,7 @@ import { PublisherTagModule } from './publisher/publisher-tag/publisher-tag.modu
                 username: configService.get<string>("MYSQL_USERNAME"),
                 password: configService.get<string>("MYSQL_PASSWORD"),
                 database: configService.get<string>("MYSQL_DATABASE"),
-                models: [User, Article, Category, Tag, TagArticle, Media],
+                models: [User, Article, Category, Tag, TagArticle, Media, ContactForm],
                 autoLoadModels: true,
                 synchronize: true,
                 logging: (sql) => {
@@ -70,7 +73,7 @@ import { PublisherTagModule } from './publisher/publisher-tag/publisher-tag.modu
 			isGlobal: true,
 			envFilePath: process.env.NODE_ENV === 'development' ? '.env' : `.env.${process.env.NODE_ENV}`,
 		}),
-		SequelizeModule.forFeature([User, Article, Tag, TagArticle, Category, Media]),
+		SequelizeModule.forFeature([User, Article, Tag, TagArticle, Category, Media, ContactForm]),
 		AdminCategoryModule,
 		CmsCategoryModule,
 		PublisherArticleModule,
@@ -87,6 +90,8 @@ import { PublisherTagModule } from './publisher/publisher-tag/publisher-tag.modu
 		AdminTagModule,
 		CmsTagModule,
 		PublisherTagModule,
+		AdminContactFormModule,
+		CmsContactFormModule
 	],
 	controllers: [AppController],
 	providers: [
