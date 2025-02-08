@@ -144,7 +144,7 @@ export class AdminUserController {
 	})
 	@Delete(":id")
 	@UseGuards(AuthGuard("jwt"), AuthAdminhGuard)
-	remove(@Param("id") id: string): Promise<number> {
-		return this.adminUserService.deleteUser(id);
+	async remove(@Param("id") id: string): Promise<number> {
+		return await this.adminUserService.deleteUser(id);
 	}
 }

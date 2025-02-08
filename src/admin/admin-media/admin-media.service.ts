@@ -183,9 +183,8 @@ export class AdminMediaService {
 					message: `File ${mediaDeleteDto.name} already removed.`,
 				};
 			}
-			throw new HttpException(
-				"Error deleting file",
-				HttpStatus.INTERNAL_SERVER_ERROR,
+            throw new InternalServerErrorException(
+				`Error deleting file. ${error}`,
 			);
 		}
 	}

@@ -1,5 +1,5 @@
 import { PaginationAndSortUsers } from './../../utils/types/types';
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import * as bcrypt from "bcrypt";
 import { Sequelize } from "sequelize-typescript";
@@ -253,10 +253,15 @@ export class AdminUserService {
 
 			return user;
 		} catch (error) {
-			throw new HttpException(
-				`Failed to fetch user`,
-				HttpStatus.INTERNAL_SERVER_ERROR,
-			);
+            if (
+                error.status === HttpStatus.NOT_FOUND ||
+                error.status === HttpStatus.FORBIDDEN
+            ) {
+                throw error;
+            }
+            throw new InternalServerErrorException(
+                `Failed to fetch user. ${error}`, 
+            );
 		}
 	}
 
@@ -279,8 +284,26 @@ export class AdminUserService {
 		return updatedUser;
 	}
 
-	deleteUser(id: string): Promise<number> {
-		return this.userModel.destroy({ where: { id } });
+	async deleteUser(id: string): Promise<number> {
+        try {
+
+            const user = await this.userModel.findByPk(id);
+            if(!user) {
+                throw new NotFoundException(`User with ID ${id} not found`);
+            }
+            return await this.userModel.destroy({ where: { id } });
+        } catch (error) {
+            if (
+                error.status === HttpStatus.NOT_FOUND ||
+                error.status === HttpStatus.FORBIDDEN
+            ) {
+                throw error;
+            }
+            throw new InternalServerErrorException(
+                `An error occurred while deleting user. ${error}`, 
+            );
+        }
+
 	}
 
 	async findByPayload(payload: Payload): Promise<User | null> {

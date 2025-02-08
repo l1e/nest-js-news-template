@@ -1,6 +1,6 @@
-import { updatedArticle } from './../../../test/test.mock.data';
 import { AdminOpensearchService } from './../admin-opensearch/admin-opensearch.service';
 import {
+    ForbiddenException,
 	HttpException,
 	HttpStatus,
 	Injectable,
@@ -202,7 +202,6 @@ export class AdminArticleService {
 				],
 			});
 
-			console.log('getArticleById article:',article)
 
 			if (!article) {
 				throw new NotFoundException(`Article with ID ${id} not found`);
@@ -234,7 +233,6 @@ export class AdminArticleService {
 				? article.toJSON()
 				: article;
 
-				console.log('getArticleById additionalFilter', additionalFilter)
 
 			delete additionalFilter?.creatorId;
 			if (requestor === Requestor.CMS) {
@@ -242,140 +240,156 @@ export class AdminArticleService {
 				delete additionalFilter?.category?.publishStatus;
 			}
 
-			console.log('getArticleById additionalFilter delete', additionalFilter)
-
 			return additionalFilter;
 		} catch (error) {
-			if (error instanceof NotFoundException) {
-				console.log("0: Error fetching article", error);
-				throw error;
+            if (
+                error.status === HttpStatus.NOT_FOUND
+            ) {
+                throw error;
             }
 
-			// console.log("1: Error fetching article", error);
 
 			throw new InternalServerErrorException("Failed to fetch articles");
 		}
 	}
 
 	async getArticleOfTheDay(requestor: Requestor): Promise<Article> {
-		const attributesToExcludeFromMedia =
+        
+        try {
+
+            const attributesToExcludeFromMedia =
 			requestor === Requestor.CMS
 				? ["isPhysicallyExist", "publishStatus", "articleId"]
 				: [];
 
-		// const whereConditionsForMedia =
-		// 	requestor === Requestor.CMS
-		// 		? { isPhysicallyExist: isExsistFormat.YES }
-		// 		: {};
+            // const whereConditionsForMedia =
+            // 	requestor === Requestor.CMS
+            // 		? { isPhysicallyExist: isExsistFormat.YES }
+            // 		: {};
 
-		const article = await this.articleModel.findOne({
-			where: { articleOfTheDay: ArticleOfTheDay.YES },
-			attributes: {
-				exclude: [
-					"requestor",
-					"validationStatus",
-					"categoryId",
-					"publishStatus",
-					"creatorId",
-				],
-			},
-			include: [
-				{
-					model: Category,
-					as: "category",
-					attributes: {
-						exclude: [
-							"publishStatus",
-							"phone",
-							"updatedAt",
-							"createdAt",
-						],
-					},
-				},
-				{
-					model: User,
-					as: "creator",
-					attributes: {
-						exclude: ["password", "role", "status", "email"],
-					},
-				},
-				{
-					model: Media,
-					as: "media",
-					attributes: {
-						exclude: attributesToExcludeFromMedia,
-					},
-					// where: whereConditionsForMedia,
-				},
-			],
-		});
+            const article = await this.articleModel.findOne({
+                where: { articleOfTheDay: ArticleOfTheDay.YES },
+                attributes: {
+                    exclude: [
+                        "requestor",
+                        "validationStatus",
+                        "categoryId",
+                        "publishStatus",
+                        "creatorId",
+                    ],
+                },
+                include: [
+                    {
+                        model: Category,
+                        as: "category",
+                        attributes: {
+                            exclude: [
+                                "publishStatus",
+                                "phone",
+                                "updatedAt",
+                                "createdAt",
+                            ],
+                        },
+                    },
+                    {
+                        model: User,
+                        as: "creator",
+                        attributes: {
+                            exclude: ["password", "role", "status", "email"],
+                        },
+                    },
+                    {
+                        model: Media,
+                        as: "media",
+                        attributes: {
+                            exclude: attributesToExcludeFromMedia,
+                        },
+                        // where: whereConditionsForMedia,
+                    },
+                ],
+            });
 
-		return article;
+            return article;
+        } catch (error) {
+            throw new InternalServerErrorException(
+                `An error occurred while get special article. ${error}`, 
+            );
+        }
+
 	}
 
 	async getArticleSpecial(requestor: Requestor): Promise<Article[]> {
-		const attributesToExcludeFromMedia =
+        try {
+
+            const attributesToExcludeFromMedia =
 			requestor === Requestor.CMS
 				? ["isPhysicallyExist", "publishStatus", "articleId"]
 				: [];
 
-		const whereConditionsForMedia =
-			requestor === Requestor.CMS
-				? { isPhysicallyExist: isExsistFormat.YES }
-				: {};
+            const whereConditionsForMedia =
+                requestor === Requestor.CMS
+                    ? { isPhysicallyExist: isExsistFormat.YES }
+                    : {};
 
-		const article = await this.articleModel.findAll({
-			where: { articleSpecial: ArticleSpecial.YES },
-			attributes: {
-				exclude: [
-					"requestor",
-					"validationStatus",
-					"categoryId",
-					"publishStatus",
-					"creatorId",
-				],
-			},
-			include: [
-				{
-					model: Category,
-					as: "category",
-					attributes: {
-						exclude: ["publishStatus"],
-					},
-				},
-				{
-					model: User,
-					as: "creator",
-					attributes: {
-						exclude: [
-							"password",
-							"role",
-							"status",
-							"email",
-							"publishStatus",
-							"phone",
-							"updatedAt",
-							"createdAt",
-						],
-					},
-				},
-				{
-					model: Media,
-					as: "media",
-					attributes: {
-						exclude: attributesToExcludeFromMedia,
-					},
-					where: whereConditionsForMedia,
-				},
-                {
-                    model: Tag,
-                    as: "tags", // Matches the alias in @BelongsToMany
-                    through: { attributes: [] }, // Exclude the pivot table fields if not needed
+            const article = await this.articleModel.findAll({
+                where: { articleSpecial: ArticleSpecial.YES },
+                attributes: {
+                    exclude: [
+                        "requestor",
+                        "validationStatus",
+                        "categoryId",
+                        "publishStatus",
+                        "creatorId",
+                    ],
                 },
-			],
-		});
+                include: [
+                    {
+                        model: Category,
+                        as: "category",
+                        attributes: {
+                            exclude: ["publishStatus"],
+                        },
+                    },
+                    {
+                        model: User,
+                        as: "creator",
+                        attributes: {
+                            exclude: [
+                                "password",
+                                "role",
+                                "status",
+                                "email",
+                                "publishStatus",
+                                "phone",
+                                "updatedAt",
+                                "createdAt",
+                            ],
+                        },
+                    },
+                    {
+                        model: Media,
+                        as: "media",
+                        attributes: {
+                            exclude: attributesToExcludeFromMedia,
+                        },
+                        where: whereConditionsForMedia,
+                    },
+                    {
+                        model: Tag,
+                        as: "tags", // Matches the alias in @BelongsToMany
+                        through: { attributes: [] }, // Exclude the pivot table fields if not needed
+                    },
+                ],
+            });
 
-		return article;
+            return article;
+            
+        } catch (error) {
+            throw new InternalServerErrorException(
+                `An error occurred while get special article. ${error}`, 
+            );
+        }
+
 	}
 
 	async getAllArticles(
@@ -541,10 +555,12 @@ export class AdminArticleService {
 	
 			return { pagination: paginationResult, articles: articles };
 		} catch (error) {
-			// console.log('getAllArticles error:',error)
-			if (error instanceof NotFoundException) {
-				throw error;
-			}
+            if (
+                error.status === HttpStatus.NOT_FOUND ||
+                error.status === HttpStatus.FORBIDDEN
+            ) {
+                throw error;
+            }
 
 			throw new InternalServerErrorException(
 				"Internal server error. An unexpected error occurred while fetching the articles.",
@@ -887,9 +903,11 @@ export class AdminArticleService {
 			};
 			
 		} catch (error) {
-			if (error instanceof NotFoundException) {
-				throw error;
-			}
+            if (
+                error.status === HttpStatus.NOT_FOUND
+            ) {
+                throw error;
+            }
 			throw new InternalServerErrorException("Failed to fetch articles");
 		}
 	}
@@ -898,72 +916,85 @@ export class AdminArticleService {
 		id: number,
 		updateArticleDto: UpdateArticleDto,
 	): Promise<Article> {
-		const articleOwnershipValidation = await this.getArticleById(
-			id,
-			updateArticleDto.requestor,
-			updateArticleDto.creatorEmail,
-		);
-
-		const article = await this.articleModel.findByPk(id, {
-			include: [Media],
-		});
-
-		if (!article) {
-			throw new NotFoundException(`Article with ID ${id} not found.`);
-		}
-
-		if (updateArticleDto.media && updateArticleDto.media.length > 0) {
-			const mediaItems = await Promise.all(
-				updateArticleDto.media.map(async (mediaId) => {
-					const mediaItem = await this.adminMediaService.findOne(
-						mediaId,
-					);
-					if (!mediaItem) {
-						throw new NotFoundException(
-							`Media with ID ${mediaId} not found`,
-						);
-					}
-					return mediaItem;
-				}),
-			);
-			await article.$set("media", mediaItems);
-		} else if (updateArticleDto.media === null) {
-			await article.$set("media", []);
-		}
-
-		if (updateArticleDto.tags && updateArticleDto.tags.length > 0) {
-			const tagItems = await Promise.all(
-				updateArticleDto.tags.map(async (tagId) => {
-					const tagItem = await this.adminTagService.findOne(
-						tagId,
-					);
-					if (!tagItem) {
-						throw new NotFoundException(
-							`Tag with ID ${tagId} not found`,
-						);
-					}
-					return tagItem;
-				}),
-			);
-			await article.$set("tags", tagItems);
-		} else if (updateArticleDto.tags === null) {
-			await article.$set("tags", []);
-		}
-
-		const { media, tags, ...updateData } = updateArticleDto;
-
-		await article.update(updateData);
-		await article.reload();
-
-		const articleSanitized = await this.articleModel.findByPk(article.id, {
-			attributes: {
-				exclude: ["requestor", "validationStatus", "creatorId"],
-			},
-		});
-		if(process.env.NODE_ENV !=='test'){
-			await this.trigetToUpdateTalentByIdOpenSearch(article.id);
-		}
-		return articleSanitized;
+        try {
+            const articleOwnershipValidation = await this.getArticleById(
+                id,
+                updateArticleDto.requestor,
+                updateArticleDto.creatorEmail,
+            );
+    
+            const article = await this.articleModel.findByPk(id, {
+                include: [Media],
+            });
+    
+            if (!article) {
+                throw new NotFoundException(`Article with ID ${id} not found.`);
+            }
+    
+            if (updateArticleDto.media && updateArticleDto.media.length > 0) {
+                const mediaItems = await Promise.all(
+                    updateArticleDto.media.map(async (mediaId) => {
+                        const mediaItem = await this.adminMediaService.findOne(
+                            mediaId,
+                        );
+                        if (!mediaItem) {
+                            throw new NotFoundException(
+                                `Media with ID ${mediaId} not found`,
+                            );
+                        }
+                        return mediaItem;
+                    }),
+                );
+                await article.$set("media", mediaItems);
+            } else if (updateArticleDto.media === null) {
+                await article.$set("media", []);
+            }
+    
+            if (updateArticleDto.tags && updateArticleDto.tags.length > 0) {
+                const tagItems = await Promise.all(
+                    updateArticleDto.tags.map(async (tagId) => {
+                        const tagItem = await this.adminTagService.findOne(
+                            tagId,
+                        );
+                        if (!tagItem) {
+                            throw new NotFoundException(
+                                `Tag with ID ${tagId} not found`,
+                            );
+                        }
+                        return tagItem;
+                    }),
+                );
+                await article.$set("tags", tagItems);
+            } else if (updateArticleDto.tags === null) {
+                await article.$set("tags", []);
+            }
+    
+            const { media, tags, ...updateData } = updateArticleDto;
+    
+            await article.update(updateData);
+            await article.reload();
+    
+            const articleSanitized = await this.articleModel.findByPk(article.id, {
+                attributes: {
+                    exclude: ["requestor", "validationStatus", "creatorId"],
+                },
+            });
+            if(process.env.NODE_ENV !=='test'){
+                await this.trigetToUpdateTalentByIdOpenSearch(article.id);
+            }
+            return articleSanitized;
+        } catch (error) {
+            if (
+                error.status === HttpStatus.NOT_FOUND ||
+                error.status === HttpStatus.FORBIDDEN
+            ) {
+                throw error;
+            }
+            throw new InternalServerErrorException(
+                `An error occurred while updating article. ${error}`, 
+            );
+        }
+		
 	}
 
 	async deleteArticle(
@@ -971,20 +1002,36 @@ export class AdminArticleService {
 		requestor: Requestor,
 		creatorEmail: string,
 	): Promise<void> {
-		if (!Requestor.ADMIN) {
-			const articleOwnershipValidation = await this.getArticleById(
-				id,
-				requestor,
-				creatorEmail,
-			);
-		}
+        try {
+            if (!Requestor.ADMIN) {
+                const articleOwnershipValidation = await this.getArticleById(
+                    id,
+                    requestor,
+                    creatorEmail,
+                );
+            }
+    
+            const article = await this.articleModel.findByPk(id);
+            if(!article) {
+                throw new NotFoundException(`Article with ID ${id} not found`);
+            }
+    
+            await article.destroy();
+            if(process.env.NODE_ENV !=='test'){
+                await this.adminOpensearchService.removeArticle(id);
+            }
+        } catch (error) {
+            if (
+                error.status === HttpStatus.NOT_FOUND ||
+                error.status === HttpStatus.FORBIDDEN
+            ) {
+                throw error;
+            }
+            throw new InternalServerErrorException(
+                `An error occurred while deleting article. ${error}`, 
+            );
+        }
 
-		const article = await this.articleModel.findByPk(id);
-
-		await article.destroy();
-		if(process.env.NODE_ENV !=='test'){
-			await this.adminOpensearchService.removeArticle(id);
-		}
 	}
 	async articleOwnerValidation(
 		article: Article,
@@ -996,7 +1043,7 @@ export class AdminArticleService {
 		});
 
 		if (requesor === Requestor.PUBLISHER && article.creatorId !== user.id) {
-			throw new NotFoundException(
+			throw new ForbiddenException(
 				`You do not have rights to do manipulations with article ${article.id}`,
 			);
 		}

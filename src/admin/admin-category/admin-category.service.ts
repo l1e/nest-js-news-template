@@ -1,5 +1,6 @@
 import { Requestor } from "./../admin-article/model/article.model";
 import {
+    ForbiddenException,
 	HttpException,
 	HttpStatus,
 	Injectable,
@@ -23,7 +24,7 @@ export class AdminCategoryService {
 		createCategoryDto: CreateCategoryDto,
 	): Promise<Category> {
 		try {
-			return this.categoryModel.create(createCategoryDto);
+			return await this.categoryModel.create(createCategoryDto);
 		} catch (error) {
 			throw new InternalServerErrorException(
 				"An error occurred while creating category",
@@ -46,18 +47,17 @@ export class AdminCategoryService {
             );
 			// console.log("getCategoryById category:", category);
 			if (!category) {
-				throw new HttpException(
-					`Category with ID ${id} not found`,
-					HttpStatus.NOT_FOUND,
+				throw new NotFoundException(
+					`Category with ID ${id} not found`
 				);
 			}
 			if (
 				requestor === Requestor.PUBLISHER &&
 				category.publishStatus !== PublishStatus.PUBLISHED
 			) {
-				throw new HttpException(
-					"Invalid credentials",
-					HttpStatus.FORBIDDEN,
+                
+				throw new ForbiddenException(
+					"Invalid credentials"
 				);
 			}
 			return category;
@@ -66,7 +66,6 @@ export class AdminCategoryService {
 				error.status === HttpStatus.FORBIDDEN ||
 				error.status === HttpStatus.NOT_FOUND
 			) {
-				// Rethrowing known exceptions to preserve their messages
 				throw error;
 			}
 
@@ -136,6 +135,12 @@ export class AdminCategoryService {
 			return category.update(updateCategoryDto);
 
 		} catch (error) {
+            if (
+                error.status === HttpStatus.NOT_FOUND
+            ) {
+                throw error;
+            }
+
 			throw new InternalServerErrorException(
 				`An error occurred while updating category. ${error}`,
 			);
@@ -154,6 +159,11 @@ export class AdminCategoryService {
 			await category.destroy();
 
 		} catch (error) {
+            if (
+                error.status === HttpStatus.NOT_FOUND
+            ) {
+                throw error;
+            }
 			throw new InternalServerErrorException(
 				`An error occurred while deleting category. ${error}`, 
 			);

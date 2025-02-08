@@ -20,9 +20,8 @@ export class AdminContactFormService {
         try {
             const contactForm = await this.contactFormModel.findByPk(id);
             if (!contactForm) {
-                throw new HttpException(
-                    `Conctact form with ID ${id} not found`,
-                    HttpStatus.NOT_FOUND,
+                throw new NotFoundException(
+                    `Conctact form with ID ${id} not found`
                 );
             }
             if (
@@ -88,6 +87,11 @@ export class AdminContactFormService {
             return contactForm.update(updateContactFormDto);
 
         } catch (error) {
+            if (
+                error.status === HttpStatus.NOT_FOUND
+            ) {
+                throw error;
+            }
             throw new InternalServerErrorException(
                 `An error occurred while updating contact form. ${error}`,
             );
@@ -106,6 +110,11 @@ export class AdminContactFormService {
             await contactForm.destroy();
 
         } catch (error) {
+            if (
+                error.status === HttpStatus.NOT_FOUND
+            ) {
+                throw error;
+            }
             throw new InternalServerErrorException(
                 `An error occurred while deleting conctact form. ${error}`, 
             );
