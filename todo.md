@@ -23,3 +23,4 @@
    - Article size
    - Text in the title/description
 + 19) During the initial launch, push articles into OpenSearch.
+20) Add redis to cms (get article by id, special article and so on)

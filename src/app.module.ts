@@ -50,10 +50,14 @@ import { CmsContactFormModule } from './cms/cms-contact-form/cms-contact-form.mo
                 models: [User, Article, Category, Tag, TagArticle, Media, ContactForm],
                 autoLoadModels: true,
                 synchronize: true,
-                logging: (sql) => {
-                    const logger = new Logger('Sequelize');
-                    logger.log(sql); // Logs the raw SQL queries to the console
-                },
+				logging: (sql, timing) => {
+					const logger = new Logger('Sequelize');
+					if (timing !== undefined) {
+						logger.log(`[Execution Time: ${timing}ms] ${sql}`);
+					} else {
+						logger.log(sql);
+					}
+				},
             }),
 
             inject: [ConfigService],
