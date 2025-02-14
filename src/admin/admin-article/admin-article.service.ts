@@ -242,9 +242,14 @@ export class AdminArticleService {
 
 			return additionalFilter;
 		} catch (error) {
+
             if (
                 error.status === HttpStatus.NOT_FOUND
             ) {
+                throw error;
+            }else if(
+                error.status === HttpStatus.FORBIDDEN
+            ){
                 throw error;
             }
 
@@ -1003,7 +1008,7 @@ export class AdminArticleService {
 		creatorEmail: string,
 	): Promise<void> {
         try {
-            if (!Requestor.ADMIN) {
+            if (requestor !== Requestor.ADMIN) {
                 const articleOwnershipValidation = await this.getArticleById(
                     id,
                     requestor,

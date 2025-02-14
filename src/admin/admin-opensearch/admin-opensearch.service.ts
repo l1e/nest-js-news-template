@@ -73,6 +73,12 @@ export class AdminOpensearchService {
 
 	async removeArticle(id: number) {
         try {
+            
+            let article = await this.findOneArticle(id);
+            if (article===null) {
+                return null;
+            }
+
             await this.client.delete({
                 index: process.env.OPENSEARCH_ARTICLE_INDEX_NAME,
                 id: String(id),
